@@ -128,6 +128,9 @@ h2{font-size:29px}
 .smp:hover{background:rgba(138,28,38,.07)}
 .cmp{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
 .cmp input{accent-color:var(--amber)}
+.pcard.compact .pbody{gap:11px}
+.cardlink{font-size:12px;color:var(--muted);text-decoration:none}
+.cardlink:hover{color:var(--amber)}
 .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
 /* discover sliders */
 .disc{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:start}
@@ -615,9 +618,11 @@ function esc(s){return s.replace(/'/g,"\\'");}
 function matchPct(p,prof){var d=0;for(var i=0;i<6;i++)d+=Math.pow(p.t[i]-prof[i],2);return Math.max(0,Math.round(100-Math.sqrt(d)*7));}
 function similar(p,n){return P.filter(x=>x.id!==p.id&&!x.rare).map(x=>({x,d:x.t.reduce((s,v,i)=>s+Math.abs(v-p.t[i]),0)})).sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
 function bars(t){return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*10)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
-function card(p,prof){
+function card(p,prof,opt){
  var m=prof?matchPct(p,prof):null;
- return '<div class="pcard">'
+ /* compact: rustige kaart voor de homepage — smaaktags en smaakbalkjes staan op de productpagina */
+ var compact=!!(opt&&opt.compact);
+ return '<div class="pcard'+(compact?" compact":"")+'">'
  +'<div class="pimg" onclick="go(\'#/product/'+p.id+'\')"><img loading="lazy" src="'+p.img+'" alt="">'
  +'<div class="badges">'+(p.fest?'<span class="badge" style="background:var(--gold);color:#241a0c">FESTIVAL</span>':"")+(p.was?'<span class="badge sale">SALE</span>':"")+(p.rare?'<span class="badge rare">RARE & OLD</span>':"")+(p.isNew?'<span class="badge new">NIEUW</span>':"")+'<span class="badge">'+p.region+'</span></div>'
  +(m!==null?'<div class="match-ring">'+m+'%<small>match</small></div>':"")
@@ -625,12 +630,11 @@ function card(p,prof){
  +'<div class="pbody"><div class="pname" onclick="go(\'#/product/'+p.id+'\')">'+p.name+'</div>'
  +'<div class="pmeta">'+p.region+' · '+p.age+' · '+p.abv+'</div>'
  +(p.rev?'<div class="rev">★ '+p.rev.v+' · '+p.rev.s+'</div>':"")
- +'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
- +bars(p.t)
+ +(compact?"":'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'+bars(p.t))
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div class="prow"><button class="add" '+(p.rare?"disabled":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +(p.sample?'<button class="smp" onclick="add(\'Sample: '+esc(p.name)+'\')">Sample '+eur(p.sample)+'</button>':"")+'</div>'
- +'<label class="cmp"><input type="checkbox" '+(compareSet.has(p.id)?"checked":"")+' onchange="cmp(\''+p.id+'\',this)"> Vergelijk</label></div></div>';
+ +(compact?'<a class="cardlink" href="#/product/'+p.id+'">Smaakprofiel bekijken →</a>':'<label class="cmp"><input type="checkbox" '+(compareSet.has(p.id)?"checked":"")+' onchange="cmp(\''+p.id+'\',this)"> Vergelijk</label>')+'</div></div>';
 }
 /* ================= ROUTER ================= */
 function go(h){location.hash=h;window.scrollTo(0,0);var mm=el("mmenu");if(mm)mm.classList.remove("open");}
@@ -673,9 +677,9 @@ function vHome(){
  +'<a href="#/collectie" onclick="F={flavors:new Set(),region:\'\',max:99999,q:\'rare\',sort:\'priceDesc\'}"><i>'+I("crown",24)+'</i><b>Rare &amp; Old</b><span>Voor de kenner</span></a>'
  +'</div></div></section>'
  +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>Zomerse aanbiedingen</h2><a class="link-a" href="#/collectie">Bekijk alles →</a></div>'
- +'<div class="grid">'+featured.map(p=>card(p)).join("")+'</div></div></section>'
+ +'<div class="grid">'+featured.map(p=>card(p,null,{compact:true})).join("")+'</div></div></section>'
  +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>Nieuw binnen</h2><span class="sec-sub" style="margin:0">Elke dag nieuwe flessen — dit kwam deze week binnen.</span></div>'
- +'<div class="grid">'+nieuw.map(p=>card(p)).join("")+'</div></div></section>'
+ +'<div class="grid">'+nieuw.map(p=>card(p,null,{compact:true})).join("")+'</div></div></section>'
  +'<section style="padding-top:0"><div class="wrap"><div style="background:var(--card);border:1px solid var(--amber2);border-radius:18px;padding:34px;display:flex;align-items:center;gap:26px;flex-wrap:wrap">'
  +'<div style="color:var(--amber)">'+I("flask",44,1.4)+'</div><div style="flex:1;min-width:260px"><h3 style="font-size:22px">Twijfel je? Proef eerst een sample.</h3>'
  +'<p style="color:var(--muted);font-size:14px;margin-top:6px">Met 1.400+ samples vanaf €5,95 proef je elke fles voordat je hem koopt. Ideaal voor een proeverij met vrienden — of om je smaakprofiel te ontdekken.</p></div>'
