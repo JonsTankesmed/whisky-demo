@@ -353,6 +353,34 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 </head>
 <body>
 
+<div class="gate" id="pass" style="background:var(--bg2);z-index:200">
+  <div class="gbox" style="border:none">
+    <h3>Besloten demo</h3>
+    <p>Deze pagina is een concept in ontwikkeling en nog niet openbaar. Heb je een toegangscode gekregen, vul die dan hieronder in.</p>
+    <input id="passIn" type="password" autocomplete="off" placeholder="Toegangscode" style="width:100%;font:inherit;font-size:14px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);text-align:center;margin-bottom:12px">
+    <button class="btn btn-a" style="width:100%;justify-content:center" onclick="passTry()">Naar de demo</button>
+    <p id="passErr" style="color:var(--red);font-size:13px;margin:12px 0 0;display:none">Die code klopt niet.</p>
+    <p style="font-size:12px;color:var(--muted);margin:18px 0 0">Demo-concept van Jons Tankesmed voor Whiskysite.nl</p>
+  </div>
+</div>
+<script>
+(function(){
+ function ph(s){var x=5381;for(var i=0;i<s.length;i++){x=((x<<5)+x+s.charCodeAt(i))>>>0;}return x;}
+ window.passOpen=function(){var p=document.getElementById("pass");if(p)p.style.display="none";};
+ window.passTry=function(){
+  var v=(document.getElementById("passIn").value||"").trim().toLowerCase();
+  if(ph(v)===3170903915){try{localStorage.setItem("wsdemo","1");}catch(e){}passOpen();}
+  else{var e=document.getElementById("passErr");e.style.display="block";document.getElementById("passIn").select();}
+ };
+ try{if(localStorage.getItem("wsdemo")==="1")passOpen();}catch(e){}
+ document.addEventListener("keydown",function(ev){
+  var p=document.getElementById("pass");
+  if(p&&p.style.display!=="none"&&ev.key==="Enter"){ev.preventDefault();passTry();}
+ });
+ document.addEventListener("DOMContentLoaded",function(){var i=document.getElementById("passIn");if(i&&document.getElementById("pass").style.display!=="none")i.focus();});
+})();
+</script>
+
 <div class="gate" id="gate">
   <div class="gbox">
     <h3>Ben je 18 jaar of ouder?</h3>
