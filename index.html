@@ -216,6 +216,15 @@ h2{font-size:29px}
 .sync-box{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:18px}
 .sync-box b{font-family:var(--serif);font-size:17px}
 .sync-box p{font-size:12.5px;color:var(--muted);margin-top:4px}
+.vgf label{display:block;font-size:13px;font-weight:600;margin:18px 0 3px}
+.vgf .h{font-size:12px;color:var(--muted);margin-bottom:7px}
+.vgf input,.vgf textarea,.vgf select{width:100%;font:inherit;font-size:13px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
+.vgf textarea{min-height:70px;resize:vertical}
+.vgf input:focus,.vgf textarea:focus,.vgf select:focus{outline:2px solid var(--amber);outline-offset:1px}
+.vgf .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.vgf button{font:inherit;font-size:13px;font-weight:600;padding:10px 17px;border-radius:9px;cursor:pointer;border:1px solid var(--amber);background:var(--amber);color:#fff}
+.vgf button.gh{background:transparent;color:var(--amber)}
+.vgf #vgOut{display:none;margin-top:14px;min-height:150px}
 /* sommelier */
 .fab{position:fixed;right:22px;bottom:22px;z-index:70;background:var(--amber);color:#fff;border:none;border-radius:28px;padding:14px 22px;font-weight:700;font-size:14px;box-shadow:0 10px 26px rgba(80,50,30,.2)}
 .fab:hover{background:#a12631}
@@ -821,9 +830,38 @@ var SYNCLOG=[
  {t:"07:58",e:"AI-verrijking batch 12",d:"250 smaakprofielen voorgesteld · wacht op review",st:"warn"},
  {t:"03:20",e:"Prijssync",d:"1.204 prijzen bijgewerkt",st:"ok"}
 ];
+var VOORTGANG=[
+ {s:"Voorstel besproken en akkoord",d:"Gesprek met Jack, Tino en zoon verwerkt; offerte verstuurd conform voorstel.",st:"ok",lbl:"Afgerond"},
+ {s:"Demo-concept opgeleverd",d:"Deze demo, met echte productdata en prijzen (juli 2026) in de huisstijl van de site.",st:"ok",lbl:"Afgerond"},
+ {s:"Read-only API-toegang ontvangen",d:"Inhoud en producten op lezen — genoeg om de bron te inventariseren zonder risico op wijzigingen.",st:"ok",lbl:"Afgerond"},
+ {s:"Inventarisatie van de catalogus",d:"Welke velden zijn gevuld, waar ontbreken smaakkenmerken, welke foto's voldoen niet aan even groot / scherp / witte achtergrond.",st:"warn",lbl:"Loopt"},
+ {s:"Streekpagina Campbeltown",d:"Voorstel van Jack overgenomen: kleinste Schotse regio eerst volledig af als sjabloon, daarna Islay, Speyside en de rest.",st:"warn",lbl:"Loopt"},
+ {s:"Lijst met signaleringen uit de data",d:"Overzicht van producten waar iets aan mankeert — foto, omschrijving of ontbrekende kenmerken. Gaat naar Jack zodra de inventarisatie rond is.",st:"warn",lbl:"Gepland"},
+ {s:"Afstemming met technische partners",d:"Kort overleg met Dennis (it2help) en Dennis (2ndchapter) over hosting, domein en de bestaande site.",st:"warn",lbl:"Gepland"},
+ {s:"Testversie met eigen catalogus",d:"Stap 1 uit het voorstel: eerst draaiend zien met jullie eigen producten.",st:"warn",lbl:"Gepland"},
+ {s:"Besluit livegang",d:"Stap 2. Pas aan de orde als de testversie doet wat we ervan verwachten.",st:"warn",lbl:"Gepland"}
+];
+function vgTekst(){
+ var r=["Antwoorden vragenlijst — Ontdeksite Whiskysite.nl",""],n=0;
+ for(var i=1;i<=8;i++){var e=el("vg"+i);if(!e)continue;var w=(e.value||"").trim();if(!w)continue;n++;r.push(e.getAttribute("data-l")+":");r.push(w);r.push("");}
+ return n?r.join("\n"):null;
+}
+function vgMail(){
+ var t=vgTekst();if(!t){toast("Er is nog niets ingevuld");return;}
+ var u="mailto:info@tankesmed.com?subject="+encodeURIComponent("Antwoorden vragenlijst — Ontdeksite Whiskysite.nl")+"&body="+encodeURIComponent(t);
+ if(u.length>1900){vgToon(t);toast("Te lang voor de mailknop — kopieer de tekst hieronder");return;}
+ window.location.href=u;toast("Je mailprogramma opent met de antwoorden erin");
+}
+function vgCopy(){
+ var t=vgTekst();if(!t){toast("Er is nog niets ingevuld");return;}
+ vgToon(t);
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("Gekopieerd — plak het in een mail aan info@tankesmed.com");},function(){toast("Selecteer de tekst hieronder en kopieer met Ctrl+C");});}
+ else{try{document.execCommand("copy");toast("Gekopieerd — plak het in een mail aan info@tankesmed.com");}catch(e){toast("Selecteer de tekst hieronder en kopieer met Ctrl+C");}}
+}
+function vgToon(t){var o=el("vgOut");if(!o)return;o.value=t;o.style.display="block";o.select();}
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"]];
+ var side=[["dashboard","Dashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"],["voortgang","Voortgang project"]];
  var body;
  if(sub==="producten"){
   body='<h3 style="font-size:20px;margin-bottom:16px">Producten <span style="font-size:12px;color:var(--muted);font-weight:400">(demo: '+P.length+' · live: 10.482)</span></h3>'
@@ -845,6 +883,38 @@ function vAdmin(rt){
   +'<div class="sync-box"><b>● Verbonden met Lightspeed eCom</b><p>Laatste volledige sync: vannacht 03:20 · Webhooks actief: producten, voorraad, orders · API-key veilig server-side opgeslagen (nooit in frontend)</p></div>'
   +'<table class="atable"><tr><th>Tijd</th><th>Gebeurtenis</th><th>Details</th><th>Status</th></tr>'
   +SYNCLOG.map(l=>'<tr><td>'+l.t+'</td><td>'+l.e+'</td><td>'+l.d+'</td><td><span class="st '+l.st+'">'+(l.st==="ok"?"OK":"Actie")+'</span></td></tr>').join("")+'</table>';
+ }else if(sub==="voortgang"){
+  body='<h3 style="font-size:20px;margin-bottom:6px">Voortgang project</h3>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:18px">Deze pagina houdt bij waar we staan en wat er nog nodig is. Geen echte klantdata — alleen de stand van het project.</p>'
+  +'<div class="sync-box"><b>● Stap 1 — testversie in voorbereiding</b><p>Laatst bijgewerkt: 24 augustus 2026 · Eerst een werkende testversie met de eigen catalogus, daarna pas het besluit over livegang.</p></div>'
+  +'<div class="kpis"><div class="kpi"><span>Fase</span><b>1 van 2</b><small>testversie</small></div>'
+  +'<div class="kpi"><span>Stappen afgerond</span><b>3 van 9</b><small>2 lopen nu</small></div>'
+  +'<div class="kpi"><span>Eerste streekpagina</span><b>Campbeltown</b><small>voorstel Jack</small></div>'
+  +'<div class="kpi"><span>Openstaande vragen</span><b>6</b><small>zie onderaan</small></div></div>'
+  +'<h3 style="font-size:16px;margin:22px 0 10px">Waar we staan</h3>'
+  +'<table class="atable"><tr><th>Stap</th><th>Toelichting</th><th>Status</th></tr>'
+  +VOORTGANG.map(v=>'<tr><td><b>'+v.s+'</b></td><td style="color:var(--muted)">'+v.d+'</td><td><span class="st '+v.st+'">'+v.lbl+'</span></td></tr>').join("")+'</table>'
+  +'<h3 style="font-size:16px;margin:24px 0 10px">Wie doet wat</h3>'
+  +'<table class="atable"><tr><th>Wie</th><th>Rol</th></tr>'
+  +'<tr><td><b>Jack</b></td><td>Opdrachtgever — besluit over test en livegang</td></tr>'
+  +'<tr><td><b>Tino</b></td><td>Meelezen en inhoud</td></tr>'
+  +'<tr><td><b>Dennis (it2help)</b></td><td>IT en techniek</td></tr>'
+  +'<tr><td><b>Dennis (2ndchapter)</b></td><td>Bestaande website</td></tr>'
+  +'<tr><td><b>John Klinkenberg</b></td><td>Ontwerp en bouw ontdeksite — Jons Tankesmed</td></tr></table>'
+  +'<h3 style="font-size:16px;margin:26px 0 6px">Wat ik nog van jullie nodig heb</h3>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:4px">Vul in wat je zo kunt beantwoorden — de rest mag leeg blijven. Onderaan verstuur je het in één keer, of je kopieert de tekst naar een gewone mail.</p>'
+  +'<div class="vgf">'
+  +'<label>1. Welk Lightspeed-pakket hebben jullie?</label><div class="h">Nodig om te bepalen wat er via de koppeling wél en niet kan.</div><input id="vg1" data-l="Lightspeed-pakket" placeholder="bijv. eCom Advanced">'
+  +'<label>2. Hoe zijn de circa 12.000 producten verdeeld?</label><div class="h">Ruwe verhouding is genoeg: whisky / wijn &amp; champagne / overig gedistilleerd.</div><input id="vg2" data-l="Verdeling catalogus" placeholder="bijv. 10.000 whisky, 1.500 wijn, 500 overig">'
+  +'<label>3. Productfoto\'s — hoe ver mag ik gaan?</label><div class="h">Je noemde: even groot, scherp, witte achtergrond. Mag ik bestaande foto\'s bijsnijden en de achtergrond wit maken, of moet dat eerst langs jullie?</div>'
+  +'<select id="vg3" data-l="Fotobeleid"><option value="">— kies —</option><option>Ga je gang, ik zie het resultaat wel terug</option><option>Eerst een proef van 20 stuks, daarna beslissen we</option><option>Alleen na goedkeuring per product</option><option>Anders — zie toelichting bij vraag 7</option></select>'
+  +'<label>4. Campbeltown: welke merken zijn commercieel het belangrijkst?</label><div class="h">Die zetten we vooraan op de streekpagina.</div><textarea id="vg4" data-l="Campbeltown-merken" placeholder="bijv. Springbank, Kilkerran, Glen Scotia..."></textarea>'
+  +'<label>5. Wanneer beginnen de drukke maanden precies?</label><div class="h">Bepaalt of we vóór of ná de piek willen live gaan.</div><input id="vg5" data-l="Drukke periode" placeholder="bijv. vanaf half oktober tot kerst">'
+  +'<label>6. Wie mag straks wat wijzigen in de ontdeksite?</label><textarea id="vg6" data-l="Rechten en rollen" placeholder="bijv. Jack alles, Tino teksten, Dennis technisch"></textarea>'
+  +'<label>7. Iets anders dat ik moet weten?</label><textarea id="vg7" data-l="Overig" placeholder="Opmerkingen, zorgen, wensen..."></textarea>'
+  +'<label>Van wie zijn deze antwoorden?</label><input id="vg8" data-l="Afzender" placeholder="Jack / Tino / ...">'
+  +'<div class="btns"><button onclick="vgMail()">Versturen per e-mail</button><button class="gh" onclick="vgCopy()">Antwoorden kopiëren</button></div>'
+  +'<textarea id="vgOut" readonly></textarea></div>';
  }else{
   body='<h3 style="font-size:20px;margin-bottom:16px">Dashboard</h3>'
   +'<div class="kpis"><div class="kpi"><span>Omzet vandaag</span><b>€2.847</b><small>+18% vs vorige week</small></div>'
