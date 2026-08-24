@@ -654,6 +654,7 @@ function render(){
  var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin}[rt.r];
  el("app").innerHTML=v(rt);
  updateBadges();
+ if(rt.r==="admin"&&rt.sub==="voortgang"&&typeof arRender==="function")arRender();
 }
 /* ================= VIEWS ================= */
 function vHome(){
@@ -871,7 +872,9 @@ var VOORTGANG=[
  {s:"Lijst met signaleringen uit de data",d:"Overzicht van producten waar iets aan mankeert — foto, omschrijving of ontbrekende kenmerken. Gaat naar Jack zodra de inventarisatie rond is.",st:"warn",lbl:"Gepland"},
  {s:"Afstemming met technische partners",d:"Kort overleg met Dennis (it2help) en Dennis (2ndchapter) over hosting, domein en de bestaande site.",st:"warn",lbl:"Gepland"},
  {s:"Testversie met eigen catalogus",d:"Stap 1 uit het voorstel: eerst draaiend zien met jullie eigen producten.",st:"warn",lbl:"Gepland"},
- {s:"Besluit livegang",d:"Stap 2. Pas aan de orde als de testversie doet wat we ervan verwachten.",st:"warn",lbl:"Gepland"}
+ {s:"Besluit livegang",d:"Stap 2. Pas aan de orde als de testversie doet wat we ervan verwachten.",st:"warn",lbl:"Gepland"},
+ {s:"Nieuw en aanbiedingen op de voorpagina",d:"Wens van Jack (25 aug): klanten kijken altijd eerst naar nieuw toegevoegde items en aanbiedingen. Die moeten prominent op de voorpagina staan.",st:"warn",lbl:"Gepland"},
+ {s:"Bouwomgeving voor de complete site",d:"Aparte afgeschermde omgeving waar de site als geheel wordt opgebouwd met de volledige catalogus, na goedkeuring van de onderdelen hier.",st:"warn",lbl:"Gepland"}
 ];
 var VRAAGLOG=[
  {d:"21 aug",o:"Met wie schakelen we naast Jack?",a:"Jack en Tino; contactgegevens per mail doorgegeven.",st:"ok",lbl:"Beantwoord"},
@@ -881,14 +884,41 @@ var VRAAGLOG=[
  {d:"21 aug",o:"Wat gebeurt er met wat de analyse signaleert?",a:"Jack ontvangt een lijst per mail. Toegezegd: per categorie, te beginnen bij Campbeltown.",st:"ok",lbl:"Beantwoord"},
  {d:"21 aug",o:"Welke link is de voortgangspagina?",a:"Deze — sinds 24 augustus in de beheeromgeving van de demo.",st:"ok",lbl:"Beantwoord"},
  {d:"24 aug",o:"Beheert 2ndchapter de bestaande website?",a:"Nee, 2ndchapter doet alleen het Google-deel. Rol hierboven aangepast.",st:"ok",lbl:"Beantwoord"},
- {d:"24 aug",o:"Welk Lightspeed-pakket hebben jullie?",a:"—",st:"warn",lbl:"Open"},
- {d:"24 aug",o:"Verdeling van de circa 12.000 producten",a:"—",st:"warn",lbl:"Open"},
- {d:"24 aug",o:"Hoe ver mag ik gaan met de productfoto's?",a:"—",st:"warn",lbl:"Open"},
- {d:"24 aug",o:"Belangrijkste merken uit Campbeltown",a:"—",st:"warn",lbl:"Open"},
- {d:"24 aug",o:"Wanneer beginnen de drukke maanden?",a:"—",st:"warn",lbl:"Open"},
- {d:"24 aug",o:"Wie mag straks wat wijzigen?",a:"—",st:"warn",lbl:"Open"},
- {d:"24 aug",o:"Bouwt iemand aan het Lightspeed-thema?",a:"—",st:"warn",lbl:"Open"}
+ {d:"25 aug",o:"Welk Lightspeed-pakket hebben jullie?",a:"eCom C-series.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Verdeling van de catalogus",a:"1.400 samples, 5.000 whisky, 1.750 wijnen, 3.500 overige dranken. Er komen nog circa 5.000 artikelen bij, geen whisky.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Hoe ver mag ik gaan met de productfoto's?",a:"Vrij om aan te passen; Jack ziet het resultaat terug. Afspraak: eerst een proef van twintig flessen.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Belangrijkste merken uit Campbeltown",a:"Springbank, Longrow, Kilkerran en Glen Scotia — daarmee is de regio gedekt.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Wanneer begint de drukke periode?",a:"Vanaf 1 oktober.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Wie mag straks wat wijzigen?",a:"Jack en Tino.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Nieuw en aanbiedingen op de voorpagina",a:"Wens van Jack: klanten kijken altijd eerst naar nieuwe items en aanbiedingen. Opgenomen als projectstap.",st:"ok",lbl:"Beantwoord"},
+ {d:"25 aug",o:"Bouwt iemand aan het Lightspeed-thema?",a:"—",st:"warn",lbl:"Open"},
+ {d:"25 aug",o:"Halen we 1 oktober, of gaan we na de piek live?",a:"—",st:"warn",lbl:"Open"},
+ {d:"25 aug",o:"Vallen wijn en overige dranken ook onder de ontdeklaag?",a:"—",st:"warn",lbl:"Open"}
 ];
+function arLijst(){
+ var a=[];
+ VRAAGLOG.forEach(function(q){a.push({t:"Vraag",d:q.d,o:q.o,x:q.a,st:q.st,lbl:q.lbl});});
+ VOORTGANG.forEach(function(v){a.push({t:"Stap",d:"",o:v.s,x:v.d,st:v.st,lbl:v.lbl});});
+ return a;
+}
+var arAlles=false;
+function arToggle(){arAlles=!arAlles;arRender();}
+function arRender(){
+ var res=el("arRes");if(!res)return;
+ var q=((el("arZoek")||{}).value||"").trim().toLowerCase();
+ var alles=arLijst();
+ var hit=q?alles.filter(function(r){return (r.t+" "+r.o+" "+r.x+" "+r.lbl).toLowerCase().indexOf(q)>-1;}):null;
+ var rows=hit?hit:(arAlles?alles:alles.filter(function(r){return r.st!=="ok";}));
+ var kop='<table class="atable"><tr><th style="width:66px">Soort</th><th>Onderwerp</th><th>Stand van zaken</th><th style="width:96px">Status</th></tr>';
+ var body=rows.map(function(r){
+  return '<tr><td style="color:var(--muted);white-space:nowrap">'+r.t+(r.d?' · '+r.d:'')+'</td><td><b>'+r.o+'</b></td><td style="color:var(--muted)">'+r.x+'</td><td><span class="st '+r.st+'">'+r.lbl+'</span></td></tr>';
+ }).join("");
+ var leeg='<p style="font-size:12.5px;color:var(--muted);padding:10px 0">Niets gevonden voor die zoekterm.</p>';
+ var uitleg=q?('<p style="font-size:12px;color:var(--muted);margin:8px 0 0">'+rows.length+' resultaten voor "'+q.replace(/[<>&]/g,"")+'"</p>')
+   :('<p style="font-size:12px;color:var(--muted);margin:8px 0 0">'+(arAlles?"Alles zichtbaar":"Alleen wat nog openstaat")+' · zoek hierboven om iets terug te vinden</p>');
+ res.innerHTML=(rows.length?kop+body+'</table>':leeg)+uitleg;
+ var b=el("arBtn");if(b)b.textContent=arAlles?"Toon alleen open":"Toon alles";
+}
 function vgTekst(){
  var r=["Antwoorden vragenlijst — Ontdeksite Whiskysite.nl",""],n=0;
  for(var i=1;i<=8;i++){var e=el("vg"+i);if(!e)continue;var w=(e.value||"").trim();if(!w)continue;n++;r.push(e.getAttribute("data-l")+":");r.push(w);r.push("");}
@@ -936,12 +966,13 @@ function vAdmin(rt){
   +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:18px">Deze pagina houdt bij waar we staan en wat er nog nodig is. Geen echte klantdata — alleen de stand van het project.</p>'
   +'<div class="sync-box"><b>● Stap 1 — testversie in voorbereiding</b><p>Laatst bijgewerkt: 24 augustus 2026 · Eerst een werkende testversie met de eigen catalogus, daarna pas het besluit over livegang.</p></div>'
   +'<div class="kpis"><div class="kpi"><span>Fase</span><b>1 van 2</b><small>testversie</small></div>'
-  +'<div class="kpi"><span>Stappen afgerond</span><b>3 van 9</b><small>2 lopen nu</small></div>'
+  +'<div class="kpi"><span>Stappen afgerond</span><b>'+VOORTGANG.filter(v=>v.lbl==="Afgerond").length+' van '+VOORTGANG.length+'</b><small>'+VOORTGANG.filter(v=>v.lbl==="Loopt").length+' lopen nu</small></div>'
   +'<div class="kpi"><span>Eerste streekpagina</span><b>Campbeltown</b><small>voorstel Jack</small></div>'
-  +'<div class="kpi"><span>Openstaande vragen</span><b>6</b><small>zie onderaan</small></div></div>'
-  +'<h3 style="font-size:16px;margin:22px 0 10px">Waar we staan</h3>'
+  +'<div class="kpi"><span>Openstaande vragen</span><b>'+VRAAGLOG.filter(q=>q.st!=="ok").length+'</b><small>zie archief</small></div></div>'
+  +'<h3 style="font-size:16px;margin:22px 0 10px">Waar we nu mee bezig zijn</h3>'
   +'<table class="atable"><tr><th>Stap</th><th>Toelichting</th><th>Status</th></tr>'
-  +VOORTGANG.map(v=>'<tr><td><b>'+v.s+'</b></td><td style="color:var(--muted)">'+v.d+'</td><td><span class="st '+v.st+'">'+v.lbl+'</span></td></tr>').join("")+'</table>'
+  +VOORTGANG.filter(v=>v.lbl==="Loopt").map(v=>'<tr><td><b>'+v.s+'</b></td><td style="color:var(--muted)">'+v.d+'</td><td><span class="st '+v.st+'">'+v.lbl+'</span></td></tr>').join("")+'</table>'
+  +'<p style="font-size:12px;color:var(--muted);margin-top:8px">Afgeronde en geplande stappen staan in het archief onderaan.</p>'
   +'<h3 style="font-size:16px;margin:24px 0 10px">Wie doet wat</h3>'
   +'<table class="atable"><tr><th>Wie</th><th>Rol</th></tr>'
   +'<tr><td><b>Jack</b></td><td>Opdrachtgever — besluit over test en livegang</td></tr>'
@@ -949,11 +980,13 @@ function vAdmin(rt){
   +'<tr><td><b>Dennis (it2help)</b></td><td>IT en techniek</td></tr>'
   +'<tr><td><b>Dennis (2ndchapter)</b></td><td>Google — advertenties en vindbaarheid</td></tr>'
   +'<tr><td><b>John Klinkenberg</b></td><td>Ontwerp en bouw ontdeksite — Jons Tankesmed</td></tr></table>'
-  +'<h3 style="font-size:16px;margin:26px 0 6px">Archief — vragen en antwoorden</h3>'
-  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we tot nu toe hebben afgestemd, op één plek. Ik werk dit bij zodra er antwoorden binnenkomen, zodat we later niet hoeven te zoeken wie wat wanneer heeft gezegd.</p>'
-  +'<table class="atable"><tr><th style="width:64px">Datum</th><th>Vraag</th><th>Antwoord</th><th style="width:96px">Status</th></tr>'
-  +VRAAGLOG.map(q=>'<tr><td style="color:var(--muted);white-space:nowrap">'+q.d+'</td><td><b>'+q.o+'</b></td><td style="color:var(--muted)">'+q.a+'</td><td><span class="st '+q.st+'">'+q.lbl+'</span></td></tr>').join("")+'</table>'
-  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open</p>'
+  +'<h3 style="font-size:16px;margin:26px 0 6px">Archief — vragen en voortgang</h3>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we hebben afgestemd en elke projectstap, doorzoekbaar. Standaard zie je alleen wat nog openstaat — typ een woord om iets terug te vinden, bijvoorbeeld <i>foto</i>, <i>Campbeltown</i> of <i>Google</i>.</p>'
+  +'<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
+  +'<input id="arZoek" oninput="arRender()" placeholder="Zoek in vragen en voortgang…" style="flex:1 1 220px;font:inherit;font-size:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)">'
+  +'<button id="arBtn" onclick="arToggle()" style="font:inherit;font-size:12.5px;font-weight:600;padding:9px 14px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--amber)">Toon alles</button>'
+  +'</div><div id="arRes"></div>'
+  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen</p>'
   +'<h3 style="font-size:16px;margin:26px 0 6px">Wat ik nog van jullie nodig heb</h3>'
   +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:4px">Vul in wat je zo kunt beantwoorden — de rest mag leeg blijven. Onderaan verstuur je het in één keer, of je kopieert de tekst naar een gewone mail.</p>'
   +'<div class="vgf">'
