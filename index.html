@@ -873,6 +873,22 @@ var VOORTGANG=[
  {s:"Testversie met eigen catalogus",d:"Stap 1 uit het voorstel: eerst draaiend zien met jullie eigen producten.",st:"warn",lbl:"Gepland"},
  {s:"Besluit livegang",d:"Stap 2. Pas aan de orde als de testversie doet wat we ervan verwachten.",st:"warn",lbl:"Gepland"}
 ];
+var VRAAGLOG=[
+ {d:"21 aug",o:"Met wie schakelen we naast Jack?",a:"Jack en Tino; contactgegevens per mail doorgegeven.",st:"ok",lbl:"Beantwoord"},
+ {d:"21 aug",o:"Akkoord op de voorgestelde aanpak?",a:"Akkoord — offerte conform voorstel.",st:"ok",lbl:"Beantwoord"},
+ {d:"21 aug",o:"Wordt de streekaanpak een aparte pagina?",a:"Ja. Jack stelt voor te beginnen met Campbeltown, de kleinste regio. Overgenomen als sjabloon voor de rest.",st:"ok",lbl:"Beantwoord"},
+ {d:"21 aug",o:"Mogen de technische partners benaderd worden?",a:"Ja — it2help en 2ndchapter. Jack licht beiden zelf in.",st:"ok",lbl:"Beantwoord"},
+ {d:"21 aug",o:"Wat gebeurt er met wat de analyse signaleert?",a:"Jack ontvangt een lijst per mail. Toegezegd: per categorie, te beginnen bij Campbeltown.",st:"ok",lbl:"Beantwoord"},
+ {d:"21 aug",o:"Welke link is de voortgangspagina?",a:"Deze — sinds 24 augustus in de beheeromgeving van de demo.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Beheert 2ndchapter de bestaande website?",a:"Nee, 2ndchapter doet alleen het Google-deel. Rol hierboven aangepast.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Welk Lightspeed-pakket hebben jullie?",a:"—",st:"warn",lbl:"Open"},
+ {d:"24 aug",o:"Verdeling van de circa 12.000 producten",a:"—",st:"warn",lbl:"Open"},
+ {d:"24 aug",o:"Hoe ver mag ik gaan met de productfoto's?",a:"—",st:"warn",lbl:"Open"},
+ {d:"24 aug",o:"Belangrijkste merken uit Campbeltown",a:"—",st:"warn",lbl:"Open"},
+ {d:"24 aug",o:"Wanneer beginnen de drukke maanden?",a:"—",st:"warn",lbl:"Open"},
+ {d:"24 aug",o:"Wie mag straks wat wijzigen?",a:"—",st:"warn",lbl:"Open"},
+ {d:"24 aug",o:"Bouwt iemand aan het Lightspeed-thema?",a:"—",st:"warn",lbl:"Open"}
+];
 function vgTekst(){
  var r=["Antwoorden vragenlijst — Ontdeksite Whiskysite.nl",""],n=0;
  for(var i=1;i<=8;i++){var e=el("vg"+i);if(!e)continue;var w=(e.value||"").trim();if(!w)continue;n++;r.push(e.getAttribute("data-l")+":");r.push(w);r.push("");}
@@ -933,6 +949,11 @@ function vAdmin(rt){
   +'<tr><td><b>Dennis (it2help)</b></td><td>IT en techniek</td></tr>'
   +'<tr><td><b>Dennis (2ndchapter)</b></td><td>Google — advertenties en vindbaarheid</td></tr>'
   +'<tr><td><b>John Klinkenberg</b></td><td>Ontwerp en bouw ontdeksite — Jons Tankesmed</td></tr></table>'
+  +'<h3 style="font-size:16px;margin:26px 0 6px">Archief — vragen en antwoorden</h3>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we tot nu toe hebben afgestemd, op één plek. Ik werk dit bij zodra er antwoorden binnenkomen, zodat we later niet hoeven te zoeken wie wat wanneer heeft gezegd.</p>'
+  +'<table class="atable"><tr><th style="width:64px">Datum</th><th>Vraag</th><th>Antwoord</th><th style="width:96px">Status</th></tr>'
+  +VRAAGLOG.map(q=>'<tr><td style="color:var(--muted);white-space:nowrap">'+q.d+'</td><td><b>'+q.o+'</b></td><td style="color:var(--muted)">'+q.a+'</td><td><span class="st '+q.st+'">'+q.lbl+'</span></td></tr>').join("")+'</table>'
+  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open</p>'
   +'<h3 style="font-size:16px;margin:26px 0 6px">Wat ik nog van jullie nodig heb</h3>'
   +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:4px">Vul in wat je zo kunt beantwoorden — de rest mag leeg blijven. Onderaan verstuur je het in één keer, of je kopieert de tekst naar een gewone mail.</p>'
   +'<div class="vgf">'
