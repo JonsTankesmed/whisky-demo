@@ -532,6 +532,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 
 <div class="toast" id="toast"></div>
 
+<script src="catalogus-lokaal.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
@@ -764,12 +765,19 @@ function normEcht(p){
  if(/virgin|new american|getoast|toasted|re-charred/.test(c))v.push("virgin oak");
  p._vaten=v.length?v:["overig"];
  p._turf=p.t[0]>=7?2:(p.t[0]>=4?1:0);
- p._vol=70;p._sample=false;p._dagen=p.isNew?12:200;p._voorraad=!p.rare;
+ p._vol=70;p._sample=/sample|5cl|3cl/i.test(p.name||"");p._dagen=p.isNew?12:200;p._voorraad=!p.rare;
+ if(!p.img)p.img=BOTTLE;
+ if(!p.t)p.t=[5,5,5,5,5,5];
  p.merk=p.merk||p.dist;
  return p;
 }
 P.forEach(normEcht);
-var CAT=P.concat(genereer(DEMO_AANTAL));
+/* Lokale variant: staat er een catalogus-lokaal.js naast deze pagina (alleen op
+   Johns machine, nooit in de repo), dan draait de preview op de echte export uit
+   fase 0 in plaats van op voorbeelddata. Op de gepubliceerde demo bestaat dat
+   bestand niet en valt de pagina automatisch terug op de voorbeeldcatalogus. */
+var LOKAAL=(typeof CATALOGUS_LOKAAL!=="undefined"&&CATALOGUS_LOKAAL&&CATALOGUS_LOKAAL.length)?CATALOGUS_LOKAAL:null;
+var CAT=P.concat(LOKAAL?LOKAAL.map(normEcht):genereer(DEMO_AANTAL));
 var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
 /* ================= FACETTEN ================= */
 function bktLeeftijd(p){if(p._leeftijd===null)return "Geen leeftijd (NAS)";var a=p._leeftijd;
@@ -969,9 +977,9 @@ function vCollectie(){
  var lijst=sorteer(selectie(null)),n=lijst.length,toon=lijst.slice(0,120);
  return '<section><div class="wrap">'
  +'<div class="sec-head"><h2>'+(F.cat?CATS[F.cat]:"Collectie")+'</h2></div>'
- +'<div class="previewbar"><div><b>Preview zonder koppeling.</b> Deze weergave toont 20 echte flessen naast '
- +DEMO_AANTAL.toLocaleString("nl-NL")+' voorbeeldproducten, zodat het filteren en sorteren op schaal te beoordelen is. '
- +'Er zit geen sleutel in deze pagina en er wordt niets bij Lightspeed opgehaald.</div></div>'
+ +'<div class="previewbar"><div>'+(LOKAAL?'<b>Lokale weergave met de echte catalogus.</b> '+CAT.length.toLocaleString("nl-NL")+' producten uit de export van fase 0. Dit bestand staat alleen op deze computer.'
+  :'<b>Preview zonder koppeling.</b> Deze weergave toont 20 echte flessen naast '+DEMO_AANTAL.toLocaleString("nl-NL")
+  +' voorbeeldproducten, zodat het filteren en sorteren op schaal te beoordelen is. Er zit geen sleutel in deze pagina en er wordt niets bij Lightspeed opgehaald.')+'</div></div>'
  +(F.cat&&CATSUB[F.cat]?'<div class="tnote">'+CATSUB[F.cat]+'</div>':"")
  +((F.cat==="scotch"&&!(F.streek||[]).length)?streekTegels():"")
  +'<div class="taste">'+FLAVORS.map(function(f){return '<button class="chip'+(F.flavors.has(f.k)?" on":"")+'" aria-pressed="'+F.flavors.has(f.k)+'" onclick="fSmaak('+f.k+')"><i>'+I(f.ic,15)+'</i>'+f.n+'</button>';}).join("")+'</div>'
