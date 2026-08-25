@@ -352,6 +352,52 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
   .gbox .btn{display:flex;width:100%;justify-content:center;margin:0 0 10px!important}
   footer{padding:30px 0}
 }
+/* ===== filter- en sorteerlaag (fase 1/2) ===== */
+.colwrap{display:grid;grid-template-columns:262px 1fr;gap:26px;align-items:start}
+.fpanel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 16px 14px;position:sticky;top:86px}
+.fgroup{border-bottom:1px solid var(--line);padding:12px 0}
+.fgroup:last-child{border-bottom:0}
+.fgroup>button.fhead{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:2px 0;font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
+.fgroup>button.fhead span{color:var(--muted);font-weight:500;font-size:11.5px}
+.fopts{margin-top:9px;display:flex;flex-direction:column;gap:6px;max-height:230px;overflow:auto}
+.fopt{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);cursor:pointer;padding:2px 0}
+.fopt input{accent-color:var(--amber);width:15px;height:15px;flex:none}
+.fopt b{font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fopt u{text-decoration:none;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.fopt.leeg{opacity:.4}
+.fopt.leeg input{cursor:not-allowed}
+.fmore{background:none;border:0;color:var(--amber);font-size:11.5px;cursor:pointer;padding:4px 0;text-align:left}
+.factive{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
+.ftag{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:#fff;border:0;border-radius:20px;padding:5px 11px;font-size:12px;cursor:pointer}
+.ftag.wis{background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+.fsort{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.fsort select,.fsort input[type=text]{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 13px;color:var(--text);font-size:13px;outline:none}
+.fsort select:focus-visible,.fsort input:focus-visible,.fopt input:focus-visible,.fhead:focus-visible,.ftag:focus-visible,.chip:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.fcount{font-size:13px;color:var(--muted)}
+.fmobbtn{display:none}
+.previewbar{display:flex;gap:10px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 12px 12px 0;padding:11px 14px;margin-bottom:16px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.demoflag{display:inline-block;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 5px;margin-left:6px;vertical-align:middle}
+/* streekpagina */
+.streekhero{background:linear-gradient(135deg,#2b1d12,#503018);color:#f6efe6;border-radius:18px;padding:34px 32px;margin-bottom:22px}
+.streekhero h1{font-family:var(--serif);font-size:34px;line-height:1.12;margin:6px 0 12px}
+.streekhero p{max-width:62ch;font-size:14.5px;line-height:1.7;color:#e8dccd}
+.statuschip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 11px;font-size:11px;letter-spacing:.03em}
+.streekblok{margin:26px 0}
+.streekblok h2{font-family:var(--serif);font-size:21px;margin-bottom:10px}
+.streekblok p{color:var(--muted);font-size:14px;line-height:1.75;max-width:70ch}
+.distgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
+.distcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.distcard b{display:block;font-size:13.5px;margin-bottom:3px}
+.distcard span{font-size:11.5px;color:var(--muted);line-height:1.5;display:block}
+@media(max-width:900px){
+ .colwrap{grid-template-columns:1fr}
+ .fpanel{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:80;border-radius:18px 18px 0 0;max-height:78vh;overflow:auto;transform:translateY(101%);transition:transform .22s;box-shadow:0 -18px 40px rgba(0,0,0,.18)}
+ .fpanel.open{transform:translateY(0)}
+ .fmobbtn{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:#fff;border:0;border-radius:12px;padding:10px 15px;font-size:13px;font-weight:600;cursor:pointer}
+ .fpanelklaar{display:block;width:100%;margin-top:14px;background:var(--amber);color:#fff;border:0;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer}
+ .streekhero{padding:26px 20px}.streekhero h1{font-size:27px}
+}
+@media(min-width:901px){.fpanelklaar{display:none}}
 </style>
 </head>
 <body>
@@ -572,10 +618,10 @@ function revLink(p){var q=encodeURIComponent(p.name);var u=p.rev?p.rev.u:"";
  return "https://"+u;}
 P.forEach(function(p){p.rev=REV[p.id]||null;});
 /* ================= STATE ================= */
-var F={flavors:new Set(),region:"",max:200,q:"",sort:"rel",cat:""};
+/* F wordt gezet in de data-laag verderop (nieuwF) */
 var CATS={sale:"Aanbiedingen",samples:"Whisky Samples",scotch:"Scotch Whisky",world:"Overige Whisky Landen",ib:"Independent Bottlers",rare:"Rare & Old Single Malt"};
 var CATSUB={sale:"Alle flessen met zomerkorting — dagelijks aangevuld.",samples:"Proef eerst: 6cl-samples vanaf €5,95 (live: 1.400+).",scotch:"Single malts en blends uit alle Schotse regio's.",world:"Japan, Ierland, Taiwan en 25+ andere whiskylanden.",ib:"Onafhankelijke bottelaars: single casks, vatsterkte, ongefilterd (live: 60+ bottelaars).",rare:"Zeldzame en oude bottelingen voor de verzamelaar."};
-function setCat(c){F.cat=F.cat===c?"":c;F.sub="";F.q="";F.flavors=new Set();F.region="";F.max=(F.cat==="rare")?99999:200;F.sort=(F.cat==="samples")?"priceAsc":"rel";PROFILE=null;}
+function setCat(c){var n=(F.cat===c)?"":c;F=nieuwF({cat:n,sort:n==="samples"?"priceAsc":"rel"});PROFILE=null;location.hash="#/collectie"+fNaarUrl();render();}
 function setSub(id){F.sub=F.sub===id?"":id;render();}
 /* sub-selecties per categorie: regio's, landen, bottelaars ("live"-aantallen indicatief) */
 var MONOCOLORS=["linear-gradient(135deg,#8a1c26,#5e1017)","linear-gradient(135deg,#503018,#2b1d12)","linear-gradient(135deg,#2f5240,#1e2a24)","linear-gradient(135deg,#4b3a6e,#241a2e)","linear-gradient(135deg,#7a4a22,#30231a)","linear-gradient(135deg,#5e4a1e,#1c1410)"];
@@ -611,7 +657,7 @@ var SL={0:5,1:5,2:5,3:5,4:5,5:5};
 var compareSet=new Set(),wish=new Set(),cart=0;
 var eur=n=>"€"+n.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
 var el=id=>document.getElementById(id);
-var byId=id=>P.find(p=>p.id===id);
+var byId=id=>CAT.find(p=>p.id===id);
 function toast(m){var t=el("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("show"),1900);}
 function esc(s){return s.replace(/'/g,"\\'");}
 /* ================= HELPERS ================= */
@@ -627,7 +673,7 @@ function card(p,prof,opt){
  +'<div class="badges">'+(p.fest?'<span class="badge" style="background:var(--gold);color:#241a0c">FESTIVAL</span>':"")+(p.was?'<span class="badge sale">SALE</span>':"")+(p.rare?'<span class="badge rare">RARE & OLD</span>':"")+(p.isNew?'<span class="badge new">NIEUW</span>':"")+'<span class="badge">'+p.region+'</span></div>'
  +(m!==null?'<div class="match-ring">'+m+'%<small>match</small></div>':"")
  +'<button class="wish" onclick="event.stopPropagation();wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+'</button></div>'
- +'<div class="pbody"><div class="pname" onclick="go(\'#/product/'+p.id+'\')">'+p.name+'</div>'
+ +'<div class="pbody"><div class="pname" onclick="go(\'#/product/'+p.id+'\')">'+p.name+(p.demo?'<span class="demoflag" title="Gegenereerd voorbeeldproduct, geen echte botteling">voorbeeld</span>':'')+'</div>'
  +'<div class="pmeta">'+p.region+' · '+p.age+' · '+p.abv+'</div>'
  +(p.rev?'<div class="rev">★ '+p.rev.v+' · '+p.rev.s+'</div>':"")
  +(compact?"":'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'+bars(p.t))
@@ -636,12 +682,356 @@ function card(p,prof,opt){
  +(p.sample?'<button class="smp" onclick="add(\'Sample: '+esc(p.name)+'\')">Sample '+eur(p.sample)+'</button>':"")+'</div>'
  +(compact?'<a class="cardlink" href="#/product/'+p.id+'">Smaakprofiel bekijken →</a>':'<label class="cmp"><input type="checkbox" '+(compareSet.has(p.id)?"checked":"")+' onchange="cmp(\''+p.id+'\',this)"> Vergelijk</label>')+'</div></div>';
 }
+/* ================= DATA-LAAG (fase 1) =================
+   Deze pagina bevat GEEN API-sleutel en doet geen enkele aanroep naar Lightspeed.
+   De preview draait op twee bronnen:
+     1. de 20 echte demo-flessen hierboven (met echte foto's en prijzen);
+     2. een deterministisch gegenereerde VOORBEELDCATALOGUS, zodat het filteren
+        en sorteren op schaal te zien is zonder catalogusdata te publiceren.
+   In de bouwomgeving vervangt de nachtelijke export uit Lightspeed bron 2.
+   De veldnamen hieronder zijn het datamodel dat straks uit die export komt. */
+var DEMO_AANTAL=2000;
+var VOC={
+ regios:[
+  {r:"Speyside",c:"Schotland",w:26,d:["Macallan","Glenfiddich","Glenlivet","Aberlour","Balvenie","Craigellachie","Mortlach","Glenfarclas","Tamdhu","BenRiach","Longmorn","Linkwood","Strathmill","Dailuaine"],turf:0},
+  {r:"Highland",c:"Schotland",w:20,d:["Glenmorangie","Oban","Dalmore","GlenDronach","Clynelish","Deanston","Glenglassaugh","Tomatin","Edradour","Teaninich","Ben Nevis"],turf:0},
+  {r:"Islay",c:"Schotland",w:16,d:["Lagavulin","Laphroaig","Ardbeg","Bowmore","Bruichladdich","Caol Ila","Bunnahabhain","Kilchoman"],turf:2},
+  {r:"Island",c:"Schotland",w:8,d:["Talisker","Highland Park","Jura","Tobermory","Arran","Scapa"],turf:1},
+  {r:"Campbeltown",c:"Schotland",w:5,d:["Springbank","Glengyle","Glen Scotia"],turf:1},
+  {r:"Lowland",c:"Schotland",w:4,d:["Auchentoshan","Glenkinchie","Bladnoch","Ailsa Bay"],turf:0},
+  {r:"Ierland",c:"Ierland",w:7,d:["Midleton","Teeling","Bushmills","Dingle"],turf:0},
+  {r:"Japan",c:"Japan",w:5,d:["Nikka","Chichibu","Mars Shinshu"],turf:0},
+  {r:"Amerika",c:"USA",w:5,d:["Buffalo Trace","Michter's","Heaven Hill"],turf:0},
+  {r:"Taiwan",c:"Taiwan",w:2,d:["Kavalan"],turf:0},
+  {r:"India",c:"India",w:2,d:["Amrut","Paul John"],turf:0}
+ ],
+ /* merk => distilleerderij: waar het etiket anders heet dan de stokerij (B5) */
+ merken:{"Longrow":"Springbank","Hazelburn":"Springbank","Kilkerran":"Glengyle","Ledaig":"Tobermory","Redbreast":"Midleton"},
+ vaten:[["Ex-Bourbon",["bourbon"],34],["Sherry",["sherry"],22],["Bourbon & Sherry",["bourbon","sherry"],14],["Port finish",["port"],7],["Wijnvat finish",["wijn"],7],["Rumvat finish",["rum"],5],["Virgin oak",["virgin oak"],4],["Refill hogshead",["bourbon"],7]],
+ bottelaars:[["",""],["Gordon & MacPhail","gm"],["Signatory Vintage","sig"],["Douglas Laing","dl"],["Cadenhead","cad"],["Compass Box","cb"]]
+};
+function mul(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function genereer(n){
+ var rnd=mul(20260825),uit=[],tot=VOC.regios.reduce(function(s,x){return s+x.w;},0);
+ var kies=function(arr){return arr[Math.floor(rnd()*arr.length)];};
+ for(var i=0;i<n;i++){
+  var r=rnd()*tot,reg=VOC.regios[0];
+  for(var j=0;j<VOC.regios.length;j++){r-=VOC.regios[j].w;if(r<=0){reg=VOC.regios[j];break;}}
+  var dist=kies(reg.d),merk=dist;
+  for(var m in VOC.merken)if(VOC.merken[m]===dist&&rnd()<.35)merk=m;
+  var vr=rnd()*100,vat=VOC.vaten[0];
+  for(var k=0;k<VOC.vaten.length;k++){vr-=VOC.vaten[k][2];if(vr<=0){vat=VOC.vaten[k];break;}}
+  var bot=(reg.c==="Schotland"&&rnd()<.28)?kies(VOC.bottelaars.slice(1)):VOC.bottelaars[0];
+  var nas=rnd()<.22,leeftijd=nas?null:[8,10,12,12,14,15,15,16,18,18,21,25,30][Math.floor(rnd()*13)];
+  var vatst=rnd()<.3,abv=vatst?Math.round((54+rnd()*7)*10)/10:[40,43,46,46,48][Math.floor(rnd()*5)];
+  var sample=rnd()<.2;
+  var basis=(leeftijd||10)*3.2+(vatst?18:0)+(bot[1]?14:0)+(vat[1].indexOf("sherry")>=0?9:0);
+  var prijs=Math.round((basis+18+rnd()*22)*100)/100;
+  if(leeftijd>=25)prijs=Math.round(prijs*2.4*100)/100;
+  if(sample)prijs=Math.round((prijs*0.14+2.4)*100)/100;
+  var korting=rnd()<.16?Math.round(prijs*(1.15+rnd()*.25)*100)/100:null;
+  var turf=reg.turf===2?(rnd()<.85?2:1):(reg.turf===1?(rnd()<.4?1:0):(rnd()<.06?1:0));
+  if(merk==="Longrow")turf=2; if(merk==="Hazelburn")turf=0;
+  var t=[turf*4+Math.round(rnd()*2),3+Math.round(rnd()*5),2+Math.round(rnd()*5),
+         (vat[1].indexOf("sherry")>=0?6:3)+Math.round(rnd()*3),
+         (reg.r==="Islay"||reg.r==="Island"||reg.r==="Campbeltown")?5+Math.round(rnd()*4):1+Math.round(rnd()*3),
+         vat[1].indexOf("sherry")>=0?7+Math.round(rnd()*2):1+Math.round(rnd()*3)];
+  t=t.map(function(v){return Math.max(1,Math.min(10,v));});
+  var dagen=Math.floor(rnd()*540);
+  var naam=merk+" "+(leeftijd?leeftijd+" Years Old":"NAS")+(rnd()<.35?" "+(2026-(leeftijd||8)-Math.floor(rnd()*3)):"")+" "+vat[0]+(bot[0]?" — "+bot[0]:"")+(sample?" (sample 5cl)":"");
+  uit.push({id:"vb-"+i,name:naam,dist:dist,merk:merk,region:reg.r,country:reg.c,
+   age:leeftijd?leeftijd+" jr":"NAS",abv:String(abv).replace(".",",")+"%",cask:vat[0],
+   img:BOTTLE,price:prijs,was:korting,sample:sample?null:Math.round((prijs*0.13+2.2)*100)/100,
+   isNew:dagen<30,ib:!!bot[1],bott:bot[1]||undefined,rare:leeftijd>=30,
+   t:t,tags:[vat[0].toLowerCase(),turf>1?"turf":"ongeturfd"],
+   sum:"Voorbeeldproduct. Het smaakprofiel is gegenereerd om het filteren op schaal te tonen — geen proefnotitie.",
+   pair:[],demo:true,_vol:sample?5:70,_sample:sample,_leeftijd:leeftijd,_abv:abv,
+   _vaten:vat[1],_turf:turf,_dagen:dagen,_voorraad:rnd()<.93});
+ }
+ return uit;
+}
+/* normaliseren van de 20 handgemaakte producten naar hetzelfde model */
+function normEcht(p){
+ var m=(p.age||"").match(/(\d+)/);
+ p._leeftijd=(p.age==="NAS"||!m)?null:(+m[1]>1900?null:+m[1]);
+ p._abv=parseFloat((p.abv||"0").replace(",","."))||0;
+ var c=(p.cask||"").toLowerCase(),v=[];
+ if(/sherry|oloroso|px/.test(c))v.push("sherry");
+ if(/bourbon|hogshead|barrel/.test(c))v.push("bourbon");
+ if(/port/.test(c))v.push("port");
+ if(/wijn|wine|rioja|sauternes|madeira/.test(c))v.push("wijn");
+ if(/rum/.test(c))v.push("rum");
+ if(/virgin|new american|getoast|toasted|re-charred/.test(c))v.push("virgin oak");
+ p._vaten=v.length?v:["overig"];
+ p._turf=p.t[0]>=7?2:(p.t[0]>=4?1:0);
+ p._vol=70;p._sample=false;p._dagen=p.isNew?12:200;p._voorraad=!p.rare;
+ p.merk=p.merk||p.dist;
+ return p;
+}
+P.forEach(normEcht);
+var CAT=P.concat(genereer(DEMO_AANTAL));
+var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
+/* ================= FACETTEN ================= */
+function bktLeeftijd(p){if(p._leeftijd===null)return "Geen leeftijd (NAS)";var a=p._leeftijd;
+ return a<10?"Tot 10 jaar":a<15?"10 tot 15 jaar":a<21?"15 tot 21 jaar":"21 jaar en ouder";}
+function bktSterkte(p){return p._abv>=50?"Vatsterkte (50%+)":p._abv>=46?"46 tot 50%":"Tot 46%";}
+function lblTurf(p){return p._turf===2?"Uitgesproken turf":p._turf===1?"Licht turfig":"Ongeturfd";}
+/* de facetlijst is redactioneel beheerd, niet afgeleid uit de producten:
+   anders komen streek en land door elkaar te staan ("Blend" naast "Islay") */
+var STREKEN=["Islay","Speyside","Highland","Island","Lowland","Campbeltown"];
+var FACETS=[
+ {id:"streek",n:"Streek",v:function(p){return STREKEN.indexOf(p.region)>=0?p.region:null;},vast:STREKEN},
+ {id:"land",n:"Land",v:function(p){return p.country;}},
+ {id:"dist",n:"Distilleerderij",v:function(p){return p.dist;},top:10},
+ {id:"vat",n:"Vatsoort",vs:function(p){return p._vaten;}},
+ {id:"leeftijd",n:"Leeftijd",v:bktLeeftijd,vast:["Tot 10 jaar","10 tot 15 jaar","15 tot 21 jaar","21 jaar en ouder","Geen leeftijd (NAS)"]},
+ {id:"sterkte",n:"Alcohol",v:bktSterkte,vast:["Tot 46%","46 tot 50%","Vatsterkte (50%+)"]},
+ {id:"turf",n:"Turf",v:lblTurf,vast:["Ongeturfd","Licht turfig","Uitgesproken turf"]},
+ {id:"bottelaar",n:"Bottelaar",v:function(p){return p.ib?"Independent bottler":"Eigen botteling";}},
+ {id:"inhoud",n:"Inhoud",v:function(p){return p._sample?"Sample (5cl)":"Fles (70cl)";}}
+];
+function waardenVan(p,f){return f.vs?f.vs(p):(f.v(p)?[f.v(p)]:[]);}
+function facetTreffer(p,f,gekozen){
+ if(!gekozen||!gekozen.length)return true;
+ var w=waardenVan(p,f);
+ for(var i=0;i<gekozen.length;i++)if(w.indexOf(gekozen[i])>=0)return true;
+ return false;
+}
+function catTreffer(p){
+ if(F.cat==="sale")return !!p.was;
+ if(F.cat==="samples")return !!p._sample;
+ if(F.cat==="scotch")return p.country==="Schotland";
+ if(F.cat==="world")return p.country!=="Schotland";
+ if(F.cat==="ib")return !!p.ib;
+ if(F.cat==="rare")return !!p.rare;
+ return true;
+}
+function tekstTreffer(p,q){
+ if(!q)return true;
+ var hooi=(p.name+" "+p.dist+" "+p.merk+" "+p.region+" "+p.country+" "+p.cask+" "+(p.tags||[]).join(" ")).toLowerCase();
+ return q.split(/\s+/).every(function(w){return hooi.indexOf(w)>=0;});
+}
+/* selectie met de mogelijkheid één facet over te slaan (voor de aantallen) */
+function selectie(sla){
+ var q=(F.q||"").trim().toLowerCase(),max=F.max;
+ var bm=q.match(/onder\s*€?\s*(\d+)/);if(bm){max=Math.min(max,+bm[1]);q=q.replace(bm[0],"").trim();}
+ return CAT.filter(function(p){
+  if(!catTreffer(p))return false;
+  if(F.aanbieding&&!p.was)return false;
+  if(F.nieuw&&!p.isNew)return false;
+  if(p.price>max)return false;
+  if(!tekstTreffer(p,q))return false;
+  for(var i=0;i<FACETS.length;i++){
+   var f=FACETS[i];if(f.id===sla)continue;
+   if(!facetTreffer(p,f,F[f.id]))return false;
+  }
+  if(F.flavors&&F.flavors.size)for(const k of F.flavors)if(p.t[k]<6)return false;
+  return true;});
+}
+function tellingen(f){
+ var t={};selectie(f.id).forEach(function(p){
+  waardenVan(p,f).forEach(function(w){t[w]=(t[w]||0)+1;});});
+ return t;
+}
+/* ================= SORTEREN ================= */
+var SORTS=[["rel","Relevantie"],["priceAsc","Prijs oplopend"],["priceDesc","Prijs aflopend"],
+ ["ageDesc","Leeftijd aflopend"],["ageAsc","Leeftijd oplopend"],["nieuw","Nieuw binnen"],["korting","Hoogste korting"]];
+function relScore(p){
+ var s=0;
+ if(!p.demo)s+=6;                        /* redactioneel anker: echte, verrijkte flessen */
+ if(p._voorraad)s+=3;
+ if(p.isNew)s+=2;
+ if(p.was)s+=2;
+ if(p.rev)s+=1;
+ return s;
+}
+function sorteer(l){
+ var s=F.sort;
+ if(s==="match"&&PROFILE)return l.slice().sort(function(a,b){return matchPct(b,PROFILE)-matchPct(a,PROFILE);});
+ if(s==="priceAsc")return l.slice().sort(function(a,b){return a.price-b.price;});
+ if(s==="priceDesc")return l.slice().sort(function(a,b){return b.price-a.price;});
+ if(s==="ageDesc")return l.slice().sort(function(a,b){return (b._leeftijd||0)-(a._leeftijd||0);});
+ if(s==="ageAsc")return l.slice().sort(function(a,b){return (a._leeftijd||99)-(b._leeftijd||99);});
+ if(s==="nieuw")return l.slice().sort(function(a,b){return a._dagen-b._dagen;});
+ if(s==="korting")return l.slice().sort(function(a,b){
+  return ((b.was?(b.was-b.price)/b.was:0)-(a.was?(a.was-a.price)/a.was:0));});
+ return l.slice().sort(function(a,b){return relScore(b)-relScore(a);});
+}
+/* ================= FILTERSTAND IN DE URL ================= */
+function nieuwF(over){
+ var b={cat:"",sub:"",q:"",max:99999,sort:"rel",flavors:new Set(),aanbieding:false,nieuw:false};
+ FACETS.forEach(function(f){b[f.id]=[];});
+ for(var k in (over||{}))b[k]=over[k];
+ return b;
+}
+function fNaarUrl(){
+ var d=[];
+ FACETS.forEach(function(f){if(F[f.id]&&F[f.id].length)d.push(f.id+"="+encodeURIComponent(F[f.id].join("|")));});
+ if(F.q)d.push("q="+encodeURIComponent(F.q));
+ if(F.max<99999)d.push("max="+F.max);
+ if(F.sort!=="rel")d.push("sort="+F.sort);
+ if(F.cat)d.push("cat="+F.cat);
+ if(F.aanbieding)d.push("aanbieding=1");
+ if(F.nieuw)d.push("nieuw=1");
+ if(F.flavors&&F.flavors.size)d.push("smaak="+[...F.flavors].join("|"));
+ return d.length?"?"+d.join("&"):"";
+}
+function urlNaarF(qs){
+ var over={};
+ (qs||"").split("&").filter(Boolean).forEach(function(deel){
+  var i=deel.indexOf("="),k=deel.slice(0,i),v=decodeURIComponent(deel.slice(i+1));
+  if(FACETS.some(function(f){return f.id===k;}))over[k]=v.split("|");
+  else if(k==="q")over.q=v;
+  else if(k==="max")over.max=+v;
+  else if(k==="sort")over.sort=v;
+  else if(k==="cat")over.cat=v;
+  else if(k==="aanbieding")over.aanbieding=true;
+  else if(k==="nieuw")over.nieuw=true;
+  else if(k==="smaak")over.flavors=new Set(v.split("|").map(Number));
+ });
+ F=nieuwF(over);
+}
+var STIL=false;
+function pas(){ /* filterstand -> URL, zonder de pagina naar boven te springen */
+ STIL=true;
+ var basis=location.hash.split("?")[0]||"#/collectie";
+ location.replace(basis+fNaarUrl());
+ STIL=false;render();
+}
+function fTog(fid,waarde){
+ var a=F[fid]||[],i=a.indexOf(waarde);
+ if(i>=0)a.splice(i,1);else a.push(waarde);
+ F[fid]=a;pas();
+}
+function fWis(fid){if(fid)F[fid]=[];else{var c=F.cat;F=nieuwF({cat:c});}pas();}
+function fTogVlag(k){F[k]=!F[k];pas();}
+function fZet(k,v){F[k]=v;pas();}
+function fSmaak(k){F.flavors.has(k)?F.flavors.delete(k):F.flavors.add(k);pas();}
+function fPaneel(){var p=el("fpanel");if(p)p.classList.toggle("open");}
+function fAantalActief(){
+ var n=0;FACETS.forEach(function(f){n+=(F[f.id]||[]).length;});
+ if(F.q)n++;if(F.max<99999)n++;if(F.aanbieding)n++;if(F.nieuw)n++;n+=(F.flavors?F.flavors.size:0);
+ return n;
+}
+/* ================= COLLECTIEWEERGAVE ================= */
+var FOPEN={streek:true,land:false,dist:false,vat:true,leeftijd:true,sterkte:false,turf:true,bottelaar:false,inhoud:false};
+var FMEER={};
+function fGroep(f){
+ var t=tellingen(f),waarden=f.vast?f.vast.slice():Object.keys(t).sort(function(a,b){return (t[b]||0)-(t[a]||0)||a.localeCompare(b);});
+ var gekozen=F[f.id]||[],open=FOPEN[f.id]||gekozen.length>0;
+ var limiet=FMEER[f.id]?999:(f.top||999),getoond=waarden.slice(0,limiet);
+ gekozen.forEach(function(w){if(getoond.indexOf(w)<0)getoond.push(w);});
+ var h='<div class="fgroup"><button class="fhead" aria-expanded="'+open+'" onclick="FOPEN[\''+f.id+'\']=!'+open+';render()">'+f.n
+  +'<span>'+(gekozen.length?gekozen.length+" gekozen":(open?"−":"+"))+'</span></button>';
+ if(open){
+  h+='<div class="fopts">'+getoond.map(function(w){
+   var n=t[w]||0,aan=gekozen.indexOf(w)>=0;
+   return '<label class="fopt'+(n===0&&!aan?" leeg":"")+'"><input type="checkbox" '+(aan?"checked":"")
+    +(n===0&&!aan?" disabled":"")+' data-fk="'+f.id+"|"+w+'" onchange="fTog(\''+f.id+'\',this.value)" value="'+w.replace(/"/g,"&quot;")+'">'
+    +'<b>'+w+'</b><u>'+n+'</u></label>';}).join("")+'</div>';
+  if(waarden.length>limiet)h+='<button class="fmore" onclick="FMEER[\''+f.id+'\']=true;render()">Alle '+waarden.length+' tonen →</button>';
+ }
+ return h+'</div>';
+}
+function fPaneelHtml(){
+ return '<aside class="fpanel" id="fpanel" aria-label="Filters">'
+  +FACETS.map(fGroep).join("")
+  +'<div class="fgroup"><button class="fhead" aria-expanded="true">Prijs<span>'+(F.max<99999?"max "+eur(F.max):"alles")+'</span></button>'
+  +'<input type="range" min="20" max="300" step="10" value="'+(F.max<99999?Math.min(F.max,300):300)+'" style="width:100%;accent-color:var(--amber)" aria-label="Maximumprijs"'
+  +' onchange="fZet(\'max\', +this.value>=300?99999:+this.value)"></div>'
+  +'<div class="fgroup"><label class="fopt"><input type="checkbox" '+(F.aanbieding?"checked":"")+' onchange="fTogVlag(\'aanbieding\')"><b>Alleen aanbiedingen</b></label>'
+  +'<label class="fopt"><input type="checkbox" '+(F.nieuw?"checked":"")+' onchange="fTogVlag(\'nieuw\')"><b>Alleen nieuw binnen</b></label></div>'
+  +'<button class="fpanelklaar" onclick="fPaneel()">Toon resultaten</button></aside>';
+}
+function fActieveHtml(){
+ var tags=[];
+ FACETS.forEach(function(f){(F[f.id]||[]).forEach(function(w){
+  tags.push('<button class="ftag" onclick="fTog(\''+f.id+'\',\''+esc(w)+'\')">'+w+' ✕</button>');});});
+ if(F.max<99999)tags.push('<button class="ftag" onclick="fZet(\'max\',99999)">tot '+eur(F.max)+' ✕</button>');
+ if(F.aanbieding)tags.push('<button class="ftag" onclick="fTogVlag(\'aanbieding\')">aanbiedingen ✕</button>');
+ if(F.nieuw)tags.push('<button class="ftag" onclick="fTogVlag(\'nieuw\')">nieuw binnen ✕</button>');
+ if(F.flavors)[...F.flavors].forEach(function(k){
+  tags.push('<button class="ftag" onclick="fSmaak('+k+')">'+FLAVORS[k].n+' ✕</button>');});
+ if(!tags.length)return "";
+ return '<div class="factive">'+tags.join("")+'<button class="ftag wis" onclick="fWis()">alles wissen</button></div>';
+}
+
+function streekTegels(){
+ return '<div class="kicker" style="margin:4px 0 8px">Of begin bij een streek</div><div class="subs">'
+ +SCOTCHREG.map(function(s,i){
+   var n=CAT.filter(function(p){return p.region===s.id;}).length;
+   var doel=STREEK[s.id.toLowerCase()]?("location.hash=\'#/streek/"+s.id.toLowerCase()+"\'"):("fTog(\'streek\',\'"+s.id+"\')");
+   return '<div class="sub" role="button" tabindex="0" onclick="'+doel+'" onkeydown="if(event.key===\'Enter\'){'+doel+'}">'
+    +mono(s,i)+'<b>'+s.n+'</b><span>'+n+' flessen'+(STREEK[s.id.toLowerCase()]?' · streekpagina':'')+'</span></div>';
+ }).join("")+'</div>';
+}
+function vCollectie(){
+ var lijst=sorteer(selectie(null)),n=lijst.length,toon=lijst.slice(0,120);
+ return '<section><div class="wrap">'
+ +'<div class="sec-head"><h2>'+(F.cat?CATS[F.cat]:"Collectie")+'</h2></div>'
+ +'<div class="previewbar"><div><b>Preview zonder koppeling.</b> Deze weergave toont 20 echte flessen naast '
+ +DEMO_AANTAL.toLocaleString("nl-NL")+' voorbeeldproducten, zodat het filteren en sorteren op schaal te beoordelen is. '
+ +'Er zit geen sleutel in deze pagina en er wordt niets bij Lightspeed opgehaald.</div></div>'
+ +(F.cat&&CATSUB[F.cat]?'<div class="tnote">'+CATSUB[F.cat]+'</div>':"")
+ +((F.cat==="scotch"&&!(F.streek||[]).length)?streekTegels():"")
+ +'<div class="taste">'+FLAVORS.map(function(f){return '<button class="chip'+(F.flavors.has(f.k)?" on":"")+'" aria-pressed="'+F.flavors.has(f.k)+'" onclick="fSmaak('+f.k+')"><i>'+I(f.ic,15)+'</i>'+f.n+'</button>';}).join("")+'</div>'
+ +'<div class="fsort" style="margin-top:16px">'
+ +'<button class="fmobbtn" onclick="fPaneel()">'+I("search",15)+' Filters'+(fAantalActief()?" ("+fAantalActief()+")":"")+'</button>'
+ +'<input type="text" placeholder="Zoek op naam, distilleerderij, vat…" value="'+(F.q||"").replace(/"/g,"&quot;")+'" aria-label="Zoeken binnen de collectie" onchange="fZet(\'q\',this.value)">'
+ +'<select aria-label="Sorteren" onchange="fZet(\'sort\',this.value)">'
+ +(PROFILE?'<option value="match"'+(F.sort==="match"?" selected":"")+'>Beste match met jouw profiel</option>':"")
+ +SORTS.map(function(s){return '<option value="'+s[0]+'"'+(F.sort===s[0]?" selected":"")+'>'+s[1]+'</option>';}).join("")+'</select>'
+ +'<span class="fcount" role="status" aria-live="polite">'+n.toLocaleString("nl-NL")+' resultaten'+(n>toon.length?" — eerste "+toon.length+" getoond":"")+'</span></div>'
+ +fActieveHtml()
+ +'<div class="colwrap">'+fPaneelHtml()
+ +'<div>'+(n?'<div class="grid">'+toon.map(function(p){return card(p,PROFILE);}).join("")+'</div>'
+   :'<div class="empty">Geen whisky\'s gevonden.<br>Tip: haal een filter weg — de aantallen naast elk filter laten zien wat nog overblijft.</div>')
+ +'</div></div></div></section>';
+}
+/* ================= STREEKPAGINA'S (fase 3) =================
+   Elke tekst is een record met taal, status en versie — hetzelfde schema dat
+   straks in de database staat. Niets wordt automatisch gepubliceerd. */
+var STREEK={
+ campbeltown:{id:"Campbeltown",taal:"nl",status:"concept",versie:1,bijgewerkt:"2026-08-25",
+  kop:"Campbeltown — de kleinste whiskystreek van Schotland",
+  intro:["Aan het uiteinde van het schiereiland Kintyre ligt een stadje dat ooit ruim dertig distilleerderijen telde en zichzelf de whiskyhoofdstad van de wereld noemde. Daar zijn er drie van over. Precies dat maakt Campbeltown interessant: het is de enige Schotse streek die je in één middag helemaal kunt leren kennen.",
+   "Wat er nog staat, staat er met karakter. De stijl is zilt en licht olieachtig, vaak met een vleugje turf — herkenbaar genoeg dat liefhebbers er een eigen categorie voor open houden."],
+  smaak:"Zout, een olieachtige body, appel en peer onder een dun laagje rook. Niet zo medicinaal als Islay, voller dan de Lowlands. Wie Islay te uitgesproken vindt maar Speyside te braaf, komt hier vaak uit.",
+  dists:[["Springbank","Bottelt onder drie namen: Springbank zelf (licht geturfd), Longrow (zwaar geturfd) en Hazelburn (ongeturfd, drievoudig gedistilleerd)."],
+   ["Glengyle","Heropend in 2004; bottelt onder de naam Kilkerran, omdat de merknaam Glengyle al vergeven was."],
+   ["Glen Scotia","De stille kracht van de stad: maritiem, met een zoutere en soms zwaarder geturfde stijl."]],
+  vraag:["Waarom heet Kilkerran geen Glengyle?","De distilleerderij heet Glengyle, maar die merknaam was al in gebruik door een andere partij. Vandaar Kilkerran op het etiket — voor het filter betekent dit dat merk en distilleerderij twee verschillende velden zijn."]}
+};
+function vStreek(rt){
+ var s=STREEK[rt.id];
+ if(!s)return '<section><div class="wrap">Deze streekpagina bestaat nog niet. <a href="#/collectie" style="color:var(--amber)">Naar de collectie</a></div></section>';
+ var inStreek=CAT.filter(function(p){return p.region===s.id;});
+ var start=inStreek.filter(function(p){return !p.rare&&p.price<80;}).sort(function(a,b){return relScore(b)-relScore(a);}).slice(0,3);
+ return '<section><div class="wrap">'
+ +'<div class="streekhero"><span class="statuschip">'+I("pin",13)+' Concept — nog niet goedgekeurd</span>'
+ +'<h1>'+s.kop+'</h1>'+s.intro.map(function(t){return '<p style="margin-bottom:10px">'+t+'</p>';}).join("")+'</div>'
+ +'<div class="streekblok"><h2>Hoe smaakt het</h2><p>'+s.smaak+'</p></div>'
+ +'<div class="streekblok"><h2>Wie er zit</h2><div class="distgrid">'
+ +s.dists.map(function(d){return '<div class="distcard"><b>'+d[0]+'</b><span>'+d[1]+'</span></div>';}).join("")+'</div></div>'
+ +'<div class="streekblok"><h2>Waar je begint</h2><div class="grid">'+start.map(function(p){return card(p,null,{compact:true});}).join("")+'</div></div>'
+ +'<div class="streekblok"><h2>'+s.vraag[0]+'</h2><p>'+s.vraag[1]+'</p></div>'
+ +'<div class="streekblok"><h2>Alles uit '+s.id+' <span style="font-size:13px;color:var(--muted);font-weight:400">('+inStreek.length+' flessen)</span></h2>'
+ +'<p style="margin-bottom:14px">Deze knop zet het streekfilter aan in de collectie — dezelfde selectie, met alle overige filters erbij.</p>'
+ +'<button class="btn btn-a" onclick="F=nieuwF({streek:[\''+s.id+'\']});location.hash=\'#/collectie\'+fNaarUrl()">Bekijk alle '+inStreek.length+' flessen uit '+s.id+' →</button></div>'
+ +'<p style="font-size:11.5px;color:var(--muted);margin-top:26px">Tekstrecord: taal '+s.taal+' · status '+s.status+' · versie '+s.versie+' · bijgewerkt '+s.bijgewerkt+'. In de bouwomgeving staat deze tekst in de goedkeurwachtrij; hij gaat pas live als Jack of Tino hem vrijgeeft.</p>'
+ +'</div></section>';
+}
+
+var F=nieuwF();
 /* ================= ROUTER ================= */
 function go(h){location.hash=h;window.scrollTo(0,0);var mm=el("mmenu");if(mm)mm.classList.remove("open");}
 window.addEventListener("hashchange",function(){var mm=el("mmenu");if(mm)mm.classList.remove("open");});
 window.addEventListener("hashchange",render);
 function route(){
- var h=location.hash||"#/";
+ var vol=location.hash||"#/";
+ var deel=vol.split("?"),h=deel[0]||"#/";
+ if(h==="#/collectie")urlNaarF(deel[1]||"");
+ if(h.startsWith("#/streek/"))return{r:"streek",id:h.slice(9)};
  if(h.startsWith("#/product/"))return{r:"product",id:h.slice(10)};
  if(h.startsWith("#/admin"))return{r:"admin",sub:h.split("/")[2]||"dashboard"};
  var m={"#/":"home","#/ontdek":"ontdek","#/collectie":"collectie","#/vergelijk":"vergelijk","#/inspiratie":"inspiratie","#/festival":"festival"};
@@ -651,8 +1041,10 @@ function render(){
  var rt=route();
  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("act",a.dataset.r===rt.r));
  document.querySelectorAll(".catnav a").forEach(a=>a.classList.toggle("act",rt.r==="collectie"&&a.dataset.c===F.cat));
- var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin}[rt.r];
+ var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin,streek:vStreek}[rt.r];
+ var fk=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.fk:null;
  el("app").innerHTML=v(rt);
+ if(fk){var t=document.querySelector('[data-fk="'+fk.replace(/"/g,'')+'"]');if(t)t.focus();}
  updateBadges();
  if(rt.r==="admin"&&rt.sub==="voortgang"&&typeof arRender==="function")arRender();
 }
@@ -672,10 +1064,10 @@ function vHome(){
  +'<section><div class="wrap"><div class="kicker">Snel vinden</div><h2>Waar ben je naar op zoek?</h2>'
  +'<div class="qf">'
  +'<a href="#/ontdek"><i>'+I("wine",24)+'</i><b>Op smaak</b><span>Vind via smaakprofiel</span></a>'
- +'<a href="#/collectie" onclick="F={flavors:new Set(),region:\'\',max:50,q:\'\',sort:\'priceAsc\'}"><i>'+I("star",24)+'</i><b>Onder €50</b><span>Toegankelijk genieten</span></a>'
- +'<a href="#/collectie" onclick="F={flavors:new Set([3]),region:\'\',max:200,q:\'\',sort:\'rel\'}"><i>'+I("sprout",24)+'</i><b>Beginners</b><span>Zachte introducties</span></a>'
- +'<a href="#/collectie" onclick="F={flavors:new Set(),region:\'\',max:200,q:\'cadeau\',sort:\'rel\'};F.q=\'\'"><i>'+I("gift",24)+'</i><b>Cadeau</b><span>Memorabel verpakt</span></a>'
- +'<a href="#/collectie" onclick="F={flavors:new Set(),region:\'\',max:99999,q:\'rare\',sort:\'priceDesc\'}"><i>'+I("crown",24)+'</i><b>Rare &amp; Old</b><span>Voor de kenner</span></a>'
+ +'<a href="#/collectie" onclick="F=nieuwF({max:50,sort:\'priceAsc\'})"><i>'+I("star",24)+'</i><b>Onder €50</b><span>Toegankelijk genieten</span></a>'
+ +'<a href="#/collectie" onclick="F=nieuwF({flavors:new Set([3])})"><i>'+I("sprout",24)+'</i><b>Beginners</b><span>Zachte introducties</span></a>'
+ +'<a href="#/collectie" onclick="F=nieuwF({sort:\'priceDesc\',max:150})"><i>'+I("gift",24)+'</i><b>Cadeau</b><span>Memorabel verpakt</span></a>'
+ +'<a href="#/collectie" onclick="F=nieuwF({cat:\'rare\',sort:\'priceDesc\'})"><i>'+I("crown",24)+'</i><b>Rare &amp; Old</b><span>Voor de kenner</span></a>'
  +'</div></div></section>'
  +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>Zomerse aanbiedingen</h2><a class="link-a" href="#/collectie">Bekijk alles →</a></div>'
  +'<div class="grid">'+featured.map(p=>card(p,null,{compact:true})).join("")+'</div></div></section>'
@@ -707,55 +1099,6 @@ function updMatches(){
  +'<div style="font-size:11.5px;color:var(--muted)">'+o.p.tags.slice(0,2).join(" · ")+(o.p.sample?' · sample '+eur(o.p.sample):'')+'</div></div>'
  +'<div class="pr">'+eur(o.p.price)+'</div></div>').join("");
 }
-function filtered(){
- var q=F.q.trim().toLowerCase(),max=F.max;
- var bm=q.match(/onder\s*€?\s*(\d+)/);if(bm){max=Math.min(max,+bm[1]);q=q.replace(bm[0],"").trim();}
- return P.filter(p=>{
-  if(F.cat==="sale"&&!p.was)return false;
-  if(F.cat==="samples"&&!p.sample)return false;
-  if(F.cat==="scotch"&&p.country!=="Schotland")return false;
-  if(F.cat==="world"&&p.country==="Schotland")return false;
-  if(F.cat==="ib"&&!p.ib)return false;
-  if(F.cat==="rare"&&!p.rare)return false;
-  if(F.sub&&!subMatch(p,F.cat,F.sub))return false;
-  for(const k of F.flavors)if(p.t[k]<6)return false;
-  if(F.region&&p.region!==F.region)return false;
-  if(p.price>max&&!(max>=200&&p.rare))return false;
-  if(max<200&&p.rare)return false;
-  if(q){var hay=(p.name+" "+p.dist+" "+p.region+" "+p.country+" "+p.tags.join(" ")+(p.rare?" rare":"")).toLowerCase();if(!hay.includes(q))return false;}
-  return true;});
-}
-function vCollectie(){
- var list=filtered();
- if(F.sort==="match"&&PROFILE)list=list.slice().sort((a,b)=>matchPct(b,PROFILE)-matchPct(a,PROFILE));
- else if(F.sort==="priceAsc")list=list.slice().sort((a,b)=>a.price-b.price);
- else if(F.sort==="priceDesc")list=list.slice().sort((a,b)=>b.price-a.price);
- return '<section><div class="wrap"><div class="sec-head"><h2>'+(F.cat?CATS[F.cat]:"Collectie")+'</h2><span style="font-size:13px;color:var(--muted)">'+list.length+' van '+P.length+' whisky\'s (demo-selectie — live: 10.000+)</span></div>'
- +(F.cat?'<div class="tnote">'+CATSUB[F.cat]+' <a href="#/collectie" style="color:var(--amber)" onclick="setCat(\''+F.cat+'\');render()">Toon alles</a></div>':"")
- +(PROFILE?'<div class="tnote">Gesorteerd op jouw smaakprofiel uit de wizard. <a href="#/collectie" style="color:var(--amber)" onclick="PROFILE=null;F.sort=\'rel\';render()">Wis profiel</a></div>':"")
- +(SUBMAP[F.cat]?(function(){
-   var list2=SUBMAP[F.cat];
-   var html='<div class="kicker" style="margin-bottom:8px">'+SUBLABEL[F.cat]+'</div><div class="subs">'+list2.map(function(s,i){
-     var cnt=P.filter(function(p){return (F.cat!=="scotch"||p.country==="Schotland")&&(F.cat!=="world"||p.country!=="Schotland")&&(F.cat!=="ib"||p.ib)&&subMatch(p,F.cat,s.id);}).length;
-     return '<div class="sub'+(F.sub===s.id?" on":"")+'" onclick="setSub(\''+s.id+'\')">'+mono(s,i)+'<b>'+s.n+'</b><span>'+cnt+' in demo · live '+s.live+'</span></div>';
-   }).join("")+'</div>';
-   if(F.sub){var sel=null,si=0;list2.forEach(function(s,i){if(s.id===F.sub){sel=s;si=i;}});
-     if(sel)html+='<div class="subintro">'+mono(sel,si,54)+'<div><h3>'+sel.n+'</h3><p>'+sel.d+'</p>'
-       +(sel.url?'<a href="'+sel.url+'" target="_blank" rel="noopener">Meer over '+sel.n+' →</a>':"")
-       +' <a href="#/collectie" style="color:var(--muted);font-weight:500;font-size:12.5px" onclick="setSub(\''+sel.id+'\')">· terug naar overzicht</a></div></div>';
-   }
-   return html;
- })():"")
- +'<div class="taste">'+FLAVORS.map(f=>'<button class="chip'+(F.flavors.has(f.k)?" on":"")+'" onclick="togF('+f.k+')"><i>'+I(f.ic,15)+'</i>'+f.n+'</button>').join("")+'</div>'
- +'<div class="fbar">'
- +'<select onchange="F.region=this.value;render()"><option value="">Alle regio\'s</option>'+REGIONS.map(r=>'<option '+(F.region===r?"selected":"")+'>'+r+'</option>').join("")+'</select>'
- +'<input type="text" placeholder="Zoek binnen collectie…" value="'+F.q.replace(/"/g,"&quot;")+'" onchange="F.q=this.value;render()">'
- +'<label>Max <span id="maxL">'+(F.max>=200?"€200+":eur(F.max))+'</span></label><input type="range" min="30" max="200" step="10" value="'+Math.min(F.max,200)+'" oninput="F.max=+this.value>=200?99999:+this.value;el(\'maxL\').textContent=+this.value>=200?\'€200+\':eur(+this.value)" onchange="render()">'
- +'<select onchange="F.sort=this.value;render()"><option value="rel"'+(F.sort==="rel"?" selected":"")+'>Relevantie</option>'+(PROFILE?'<option value="match"'+(F.sort==="match"?" selected":"")+'>Beste match</option>':"")+'<option value="priceAsc"'+(F.sort==="priceAsc"?" selected":"")+'>Prijs ↑</option><option value="priceDesc"'+(F.sort==="priceDesc"?" selected":"")+'>Prijs ↓</option></select>'
- +'</div>'
- +'<div class="grid">'+(list.length?list.map(p=>card(p,PROFILE)).join(""):'<div class="empty">Geen whisky\'s gevonden.<br>Tip: minder smaakrichtingen of een hoger maximumbudget.</div>')+'</div></div></section>';
-}
-function togF(k){F.flavors.has(k)?F.flavors.delete(k):F.flavors.add(k);render();}
 function vProduct(rt){
  var p=byId(rt.id);if(!p)return'<section><div class="wrap">Niet gevonden. <a href="#/collectie" style="color:var(--amber)">Terug</a></div></section>';
  var sims=similar(p,3);
@@ -868,6 +1211,7 @@ var VOORTGANG=[
  {s:"Demo-concept opgeleverd",d:"Deze demo, met echte productdata en prijzen (juli 2026) in de huisstijl van de site.",st:"ok",lbl:"Afgerond"},
  {s:"Read-only API-toegang ontvangen",d:"Inhoud en producten op lezen — genoeg om de bron te inventariseren zonder risico op wijzigingen.",st:"ok",lbl:"Afgerond"},
  {s:"Inventarisatie van de catalogus",d:"Eerst de 5.000 whisky's en 1.400 samples: welke velden zijn gevuld, waar ontbreken smaakkenmerken, welke foto's voldoen niet aan even groot / scherp / witte achtergrond. Wijn en overige dranken volgen in een latere fase.",st:"warn",lbl:"Loopt"},
+ {s:"Filteren en sorteren — werkende preview",d:"De collectie filtert nu op streek, distilleerderij, vatsoort, leeftijd, alcohol, turf, bottelaar en inhoud, met bij elk filter het aantal flessen dat overblijft. Sorteren kan op relevantie, prijs, leeftijd, nieuw binnen en hoogste korting. Elke filterstand heeft een eigen webadres, dus een selectie is te delen. Op de telefoon schuift het filterpaneel van onderen open. Om te kunnen beoordelen hoe dat voelt bij duizenden flessen staan er naast de 20 echte flessen 2.000 voorbeeldproducten in; die zijn als voorbeeld gemarkeerd. Deze pagina heeft geen koppeling met de winkel en bevat geen sleutel.",st:"ok",lbl:"Te bekijken"},
  {s:"Streekpagina Campbeltown",d:"Voorstel van Jack overgenomen: kleinste Schotse regio eerst volledig af als sjabloon, daarna Islay, Speyside en de rest.",st:"warn",lbl:"Loopt"},
  {s:"Lijst met signaleringen uit de data",d:"Overzicht van producten waar iets aan mankeert — foto, omschrijving of ontbrekende kenmerken. Gaat naar Jack zodra de inventarisatie rond is.",st:"warn",lbl:"Gepland"},
  {s:"Afstemming met technische partners",d:"Kort overleg met Dennis (it2help) en Dennis (2ndchapter) over hosting, domein en de bestaande site.",st:"warn",lbl:"Gepland"},
