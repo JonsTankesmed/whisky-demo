@@ -436,31 +436,36 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 .beigen input{flex:1;min-width:240px;font:inherit;font-size:12.5px;padding:8px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
 .beigen button{font:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border:0;border-radius:9px;background:var(--amber);color:#fff}
 /* ===== kaart: wereld → Schotland → distilleerderij ===== */
-.kwrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;position:relative}
-.kkruim{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
-.kkruim button{font:inherit;font-size:12.5px;background:none;border:0;color:var(--amber);cursor:pointer;padding:0}
-.kkruim b{color:var(--text)}
-.ksvg{width:100%;height:auto;display:block;background:#eef1f3;border-radius:12px;touch-action:manipulation}
-.kland{fill:#dcd6cc;stroke:#fff;stroke-width:.6;transition:fill .15s}
-.kland.aan{fill:var(--copper);cursor:pointer}
-.kland.aan:hover,.kland.aan:focus{fill:var(--amber);outline:none}
-.kschot{fill:#e7ded2;stroke:#b7a68f;stroke-width:1}
+.kwrap{background:#efe6d4;border:1px solid #d8c9a8;border-radius:18px;padding:18px;position:relative}
+.kkruim{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8a7351;margin-bottom:12px;flex-wrap:wrap}
+.kkruim button{font:inherit;font-size:12.5px;background:none;border:0;color:#8a1c26;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
+.kkruim b{color:#5c4a35;font-weight:600}
+.ksvg{width:100%;height:auto;display:block;background:#efe6d4;border-radius:12px;touch-action:manipulation}
+.kland{fill:#e3d3b2;stroke:#efe6d4;stroke-width:.7;transition:fill .15s}
+.kland.aan{fill:#c8a97a;cursor:pointer}
+.kland.aan:hover,.kland.aan:focus{fill:#a05e2a;outline:none}
+.kschot{fill:#e3d3b2;stroke:#a2825a;stroke-width:1.3;stroke-linejoin:round}
+.kkust{fill:none;stroke:#c9b48c;stroke-width:5;opacity:.55}
+.khalo{opacity:.3}
 .kpunt{cursor:pointer;transition:opacity .15s}
-.kpunt:hover,.kpunt:focus{outline:none;stroke:#2b2118}
-.kpunt.dim{opacity:.22}
-.klabel{font-family:var(--serif);font-size:15px;fill:#5c4a35;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
-.knaam{font-size:11px;fill:#3a2f22;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:2.5px}
+.kpunt:hover,.kpunt:focus{outline:none;stroke:#2b2118;stroke-width:2}
+.kpunt.dim{opacity:.2}
+.klabel{font-family:var(--serif);font-size:15px;letter-spacing:.16em;text-transform:uppercase;fill:#6b5133;pointer-events:none;paint-order:stroke;stroke:#efe6d4;stroke-width:3.5px;stroke-linejoin:round}
+.knaam{font-size:11px;fill:#4a3a28;pointer-events:none;paint-order:stroke;stroke:#efe6d4;stroke-width:3px}
+.kroos{fill:#a2825a;opacity:.65}
+.kroostekst{font-family:var(--serif);font-size:11px;fill:#8a7351}
 .klegend{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
-.klegend button{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12px;background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:5px 12px;cursor:pointer;color:var(--text)}
-.klegend button.aan{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
+.klegend button{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12px;background:#f6efe0;border:1px solid #d8c9a8;border-radius:20px;padding:5px 12px;cursor:pointer;color:#4a3a28}
+.klegend button:hover{border-color:#a2825a}
+.klegend button.aan{border-color:#8a1c26;box-shadow:0 0 0 1px #8a1c26}
 .klegend i{width:10px;height:10px;border-radius:50%;display:inline-block}
-.klegend u{text-decoration:none;color:var(--muted);font-size:11px}
-.kinfo{position:absolute;background:var(--card);border:1px solid var(--amber2);border-radius:12px;padding:11px 14px;font-size:12.5px;box-shadow:0 10px 26px rgba(80,50,30,.16);max-width:230px;z-index:5}
-.kinfo b{display:block;font-family:var(--serif);font-size:15px;margin-bottom:2px}
-.kinfo span{color:var(--muted);display:block;margin-bottom:7px}
-.kinfo button{font:inherit;font-size:12px;font-weight:600;background:var(--amber);color:#fff;border:0;border-radius:8px;padding:6px 11px;cursor:pointer}
-.kinfo .sluit{position:absolute;top:4px;right:7px;background:none;color:var(--muted);padding:2px 4px}
-.kbron{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6}
+.klegend u{text-decoration:none;color:#8a7351;font-size:11px}
+.kinfo{position:absolute;background:#fdfaf3;border:1px solid #a2825a;border-radius:12px;padding:11px 14px;font-size:12.5px;box-shadow:0 10px 26px rgba(80,50,30,.18);max-width:230px;z-index:5}
+.kinfo b{display:block;font-family:var(--serif);font-size:15px;margin-bottom:2px;color:#2b2118}
+.kinfo span{color:#8a7351;display:block;margin-bottom:7px}
+.kinfo button{font:inherit;font-size:12px;font-weight:600;background:#8a1c26;color:#fff;border:0;border-radius:8px;padding:6px 11px;cursor:pointer}
+.kinfo .sluit{position:absolute;top:4px;right:7px;background:none;color:#8a7351;padding:2px 4px}
+.kbron{font-size:11px;color:#8a7351;margin-top:10px;line-height:1.6}
 @media(max-width:640px){.klabel{font-size:13px}.knaam{display:none}}
 </style>
 </head>
@@ -1445,7 +1450,7 @@ var KAART={"wereld":[{"naam":"Fiji","nl":"","d":"M960.0,282.8 L960.0,284.1 L956.
    de distilleerderijen die erin liggen. */
 var KNIVEAU="wereld",KSTREEK="",KGEKOZEN=null;
 var KKLEUR={Islay:"#8a1c26",Speyside:"#a05e2a",Highland:"#2f5240",Island:"#4b3a6e",
-            Lowland:"#5e4a1e",Campbeltown:"#1f4f63"};
+            Lowland:"#6b6320",Campbeltown:"#1f4f63"};
 function kStreekVan(naam){
  for(var i=0;i<VOC.regios.length;i++)if(VOC.regios[i].d.indexOf(naam)>=0)return VOC.regios[i].r;
  var p=CAT.find(function(x){return x.dist===naam;});
@@ -1482,27 +1487,51 @@ function kKlikLand(nl){
  if(nl==="Schotland"){KNIVEAU="schotland";KGEKOZEN=null;render();return;}
  snel({land:[nl]});
 }
+function kHalo(punten,r){
+ /* Een zachte vlek achter de puntenwolk. Geen grens — die bestaat niet — maar
+    wel het gevoel dat een streek een gebied is. Vorm en grootte komen uit de
+    spreiding van de distilleerderijen zelf. */
+ var g=punten.filter(function(d){return d.streek===r;});
+ if(g.length<2)return "";
+ var mx=g.reduce(function(s,d){return s+d.x;},0)/g.length;
+ var my=g.reduce(function(s,d){return s+d.y;},0)/g.length;
+ var sx=Math.sqrt(g.reduce(function(s,d){return s+(d.x-mx)*(d.x-mx);},0)/g.length);
+ var sy=Math.sqrt(g.reduce(function(s,d){return s+(d.y-my)*(d.y-my);},0)/g.length);
+ return '<ellipse class="khalo" cx="'+mx.toFixed(0)+'" cy="'+my.toFixed(0)+'"'
+  +' rx="'+Math.max(16,sx*2.1+13).toFixed(0)+'" ry="'+Math.max(16,sy*2.1+13).toFixed(0)+'"'
+  +' fill="'+KKLEUR[r]+'" filter="url(#kvlek)"></ellipse>';
+}
 function kSchotland(){
  var v=kVak(),punten=kPunten();
- var labels=STREKEN.filter(function(r){return !KSTREEK||r===KSTREEK;}).map(function(r){
+ var tonen=STREKEN.filter(function(r){return !KSTREEK||r===KSTREEK;});
+ var halos=tonen.map(function(r){return kHalo(punten,r);}).join("");
+ var labels=tonen.map(function(r){
   var groep=punten.filter(function(d){return d.streek===r;});
   if(!groep.length)return "";
   var mx=groep.reduce(function(s,d){return s+d.x;},0)/groep.length;
   var my=groep.reduce(function(s,d){return s+d.y;},0)/groep.length;
-  return '<text class="klabel" x="'+mx.toFixed(0)+'" y="'+(my-18).toFixed(0)+'" text-anchor="middle">'+r+'</text>';
+  var dy=(r==="Islay"||r==="Campbeltown")?26:-24;
+  return '<text class="klabel" x="'+mx.toFixed(0)+'" y="'+(my+dy).toFixed(0)+'" text-anchor="middle">'+r+'</text>';
  }).join("");
  var stippen=punten.map(function(d){
   var aan=!KSTREEK||d.streek===KSTREEK;
-  var r=Math.min(11,4+Math.sqrt(d.flessen||1));
+  var r=Math.min(10,3.4+Math.sqrt(d.flessen||1));
   return '<circle class="kpunt'+(aan?"":" dim")+'" cx="'+d.x+'" cy="'+d.y+'" r="'+r.toFixed(1)+'"'
-   +' fill="'+(KKLEUR[d.streek]||"#7d7265")+'" fill-opacity=".82" stroke="#fff" stroke-width="1.4"'
+   +' fill="'+(KKLEUR[d.streek]||"#7d7265")+'" stroke="#efe6d4" stroke-width="1.3"'
    +' tabindex="0" role="button" aria-label="'+esc(d.naam)+', '+d.streek+', '+d.flessen+' flessen"'
    +' onclick="kKies(\''+esc(d.naam)+'\')" onkeydown="if(event.key===\'Enter\')kKies(\''+esc(d.naam)+'\')"></circle>';
  }).join("");
  var namen=KSTREEK?punten.filter(function(d){return d.streek===KSTREEK;}).map(function(d){
    return '<text class="knaam" x="'+d.x+'" y="'+(d.y-11)+'" text-anchor="middle">'+d.naam+'</text>';}).join(""):"";
+ var rx=v[0]+v[2]-30,ry=v[1]+34;   /* kompasroos rechtsboven */
+ var roos='<g class="kroos"><path d="M'+rx+','+(ry-13)+' L'+(rx+4)+','+ry+' L'+rx+','+(ry+13)+' L'+(rx-4)+','+ry+'Z"></path>'
+  +'<path d="M'+(rx-13)+','+ry+' L'+rx+','+(ry-4)+' L'+(rx+13)+','+ry+' L'+rx+','+(ry+4)+'Z" opacity=".45"></path></g>'
+  +'<text class="kroostekst" x="'+rx+'" y="'+(ry-18)+'" text-anchor="middle">N</text>';
  return '<svg class="ksvg" viewBox="'+v.join(" ")+'" role="img" aria-label="Kaart van Schotland met de distilleerderijen die we voeren">'
-  +'<path class="kschot" d="'+KAART.schotland+'"></path>'+stippen+labels+namen+'</svg>';
+  +'<defs><filter id="kvlek" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13"></feGaussianBlur></filter></defs>'
+  +'<path class="kkust" d="'+KAART.schotland+'"></path>'
+  +'<path class="kschot" d="'+KAART.schotland+'"></path>'
+  +halos+stippen+labels+namen+roos+'</svg>';
 }
 function kKies(naam){
  var d=kPunten().filter(function(x){return x.naam===naam;})[0];
