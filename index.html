@@ -413,6 +413,28 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 .beeldnav button.aan{background:rgba(255,255,255,.85)}
 .beeldnav button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.sherolaag{transition:none}}
+/* beeldvoorstellen in de beheeromgeving */
+.bblok{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px;background:var(--bg2)}
+.bkop{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.bkop b{font-family:var(--serif);font-size:17px}
+.bkandidaten{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px}
+.bkaart{margin:0;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.bkaart.goed{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+.bkaart img{width:100%;height:118px;object-fit:cover;display:block;background:#e9e2d4}
+.bkaart figcaption{padding:9px 10px;display:flex;flex-direction:column;gap:5px;font-size:11.5px}
+.bkaart figcaption b{font-size:12px;line-height:1.3}
+.bkaart figcaption span{color:var(--muted)}
+.bkaart a{color:var(--amber)}
+.bknop{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.bknop button{font:inherit;font-size:11px;font-weight:600;padding:5px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+.bknop button:hover{border-color:var(--amber2)}
+.bknop button.aan{background:var(--green);border-color:var(--green);color:#fff}
+.bknop button.weg:hover{border-color:var(--red);color:var(--red)}
+.bweg{font-size:11.5px;color:var(--muted);margin-top:9px}
+.bweg button{font:inherit;font-size:11.5px;background:none;border:0;color:var(--amber);cursor:pointer;padding:0}
+.beigen{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.beigen input{flex:1;min-width:240px;font:inherit;font-size:12.5px;padding:8px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
+.beigen button{font:inherit;font-size:12.5px;font-weight:600;padding:8px 14px;border:0;border-radius:9px;background:var(--amber);color:#fff}
 </style>
 </head>
 <body>
@@ -1025,19 +1047,18 @@ function vCollectie(){
    met licentie en al in de goedkeurwachtrij. Wat hier staat is het resultaat
    van die stap. */
 var UP="?auto=format&fit=crop&w=1600&q=70";
-var BEELD={
+var BEELDVOORSTEL={
  "campbeltown": [
   {
-   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Springbank_Distillery%2C_Campbeltown_-_geograph.org.uk_-_3585933.jpg/1920px-Springbank_Distillery%2C_Campbeltown_-_geograph.org.uk_-_3585933.jpg",
-   "plek": "Springbank Distillery, Campbeltown",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Glengyle_Distillery_Buildings%2C_Campbeltown_%28geograph_3587866%29.jpg/1920px-Glengyle_Distillery_Buildings%2C_Campbeltown_%28geograph_3587866%29.jpg",
+   "plek": "Glengyle Distillery Buildings, Campbeltown",
    "soort": "foto van de plek",
    "maker": "Leslie Barrie",
    "licentie": "CC BY-SA 2.0",
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
    "bron": "Wikimedia Commons",
-   "bronUrl": "https://commons.wikimedia.org/wiki/File:Springbank_Distillery,_Campbeltown_-_geograph.org.uk_-_3585933.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Glengyle_Distillery_Buildings,_Campbeltown_(geograph_3587866).jpg",
+   "bewerking": "alleen verkleind"
   },
   {
    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Glen_Scotia_Distillery%2C_Campbeltown_-_geograph.org.uk_-_3590249.jpg",
@@ -1048,20 +1069,51 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:Glen_Scotia_Distillery,_Campbeltown_-_geograph.org.uk_-_3590249.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
   },
   {
-   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Glengyle_Distillery_Buildings%2C_Campbeltown_%28geograph_3587866%29.jpg/1920px-Glengyle_Distillery_Buildings%2C_Campbeltown_%28geograph_3587866%29.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Glen_Scotia_Distillery%2C_Campbeltown_-_geograph.org.uk_-_3590255.jpg",
+   "plek": "Glen Scotia Distillery, Campbeltown",
+   "soort": "foto van de plek",
+   "maker": "Leslie Barrie",
+   "licentie": "CC BY-SA 2.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Glen_Scotia_Distillery,_Campbeltown_-_geograph.org.uk_-_3590255.jpg",
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Glengyle_Distillery_Buildings%2C_Campbeltown_%28geograph_3592618%29.jpg",
    "plek": "Glengyle Distillery Buildings, Campbeltown",
    "soort": "foto van de plek",
    "maker": "Leslie Barrie",
    "licentie": "CC BY-SA 2.0",
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
    "bron": "Wikimedia Commons",
-   "bronUrl": "https://commons.wikimedia.org/wiki/File:Glengyle_Distillery_Buildings,_Campbeltown_(geograph_3587866).jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Glengyle_Distillery_Buildings,_Campbeltown_(geograph_3592618).jpg",
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Springbank_Distillery%2C_Campbeltown_-_geograph.org.uk_-_3585933.jpg/1920px-Springbank_Distillery%2C_Campbeltown_-_geograph.org.uk_-_3585933.jpg",
+   "plek": "Springbank Distillery, Campbeltown",
+   "soort": "foto van de plek",
+   "maker": "Leslie Barrie",
+   "licentie": "CC BY-SA 2.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Springbank_Distillery,_Campbeltown_-_geograph.org.uk_-_3585933.jpg",
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Springbank_Distillery_Buildings%2C_Campbeltown_-_geograph.org.uk_-_3587898.jpg/1920px-Springbank_Distillery_Buildings%2C_Campbeltown_-_geograph.org.uk_-_3587898.jpg",
+   "plek": "Springbank Distillery Buildings, Campbeltown",
+   "soort": "foto van de plek",
+   "maker": "Leslie Barrie",
+   "licentie": "CC BY-SA 2.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Springbank_Distillery_Buildings,_Campbeltown_-_geograph.org.uk_-_3587898.jpg",
+   "bewerking": "alleen verkleind"
   }
  ],
  "islay": [
@@ -1074,8 +1126,29 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/4.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:Scotland_Argyll_Bute_Islay_Port_Ellen_Distillery.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Port_Ellen_Distillery.jpg/1920px-Port_Ellen_Distillery.jpg",
+   "plek": "Port Ellen Distillery",
+   "soort": "foto van de plek",
+   "maker": "Ayack",
+   "licentie": "CC BY-SA 3.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Port_Ellen_Distillery.jpg",
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Port_Ellen_Distillery_and_Maltings%2C_%28May_2001%29_-_panoramio.jpg/1920px-Port_Ellen_Distillery_and_Maltings%2C_%28May_2001%29_-_panoramio.jpg",
+   "plek": "Port Ellen Distillery and Maltings, (May 2001)",
+   "soort": "foto van de plek",
+   "maker": "Heikki Immonen",
+   "licentie": "CC BY 3.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by/3.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Port_Ellen_Distillery_and_Maltings,_(May_2001)_-_panoramio.jpg",
+   "bewerking": "alleen verkleind"
   },
   {
    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/The_Harbour_at_Port_Askaig%2C_Islay_-_geograph.org.uk_-_2629409.jpg",
@@ -1086,8 +1159,18 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:The_Harbour_at_Port_Askaig,_Islay_-_geograph.org.uk_-_2629409.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Laphroaig_Distillery_-_panoramio_%284%29.jpg/1920px-Laphroaig_Distillery_-_panoramio_%284%29.jpg",
+   "plek": "Laphroaig Distillery",
+   "soort": "foto van de plek",
+   "maker": "Bjarne Henning Kvaal…",
+   "licentie": "CC BY-SA 3.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Laphroaig_Distillery_-_panoramio_(4).jpg",
+   "bewerking": "alleen verkleind"
   },
   {
    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Islay_Hill_-_panoramio.jpg/1920px-Islay_Hill_-_panoramio.jpg",
@@ -1098,8 +1181,7 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by/3.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:Islay_Hill_-_panoramio.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
   }
  ],
  "speyside": [
@@ -1112,8 +1194,18 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by/2.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:Glenrothes_Distillery,_Rothes,_Speyside.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Glenffidich_Distillery%28RLH%291979%2C_Dufftown%2C_Speyside%2C_Scotland.jpg",
+   "plek": "Glenffidich Distillery(RLH)1979, Dufftown, Speyside, Scotland",
+   "soort": "foto van de plek",
+   "maker": "Richard Harvey",
+   "licentie": "CC BY-SA 3.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:Glenffidich_Distillery(RLH)1979,_Dufftown,_Speyside,_Scotland.jpg",
+   "bewerking": "alleen verkleind"
   },
   {
    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/The_Dalmunach_Distillery_from_the_Speyside_Way_-_geograph.org.uk_-_5542656.jpg/1920px-The_Dalmunach_Distillery_from_the_Speyside_Way_-_geograph.org.uk_-_5542656.jpg",
@@ -1124,8 +1216,7 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:The_Dalmunach_Distillery_from_the_Speyside_Way_-_geograph.org.uk_-_5542656.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
   },
   {
    "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Tamdhu_Distillery_and_the_Speyside_Way_-_geograph.org.uk_-_5543124.jpg",
@@ -1136,11 +1227,109 @@ var BEELD={
    "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
    "bron": "Wikimedia Commons",
    "bronUrl": "https://commons.wikimedia.org/wiki/File:Tamdhu_Distillery_and_the_Speyside_Way_-_geograph.org.uk_-_5543124.jpg",
-   "bewerking": "alleen verkleind",
-   "status": "voorstel"
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/The_Speyside_Way_near_the_Tamdhu_Distillery_-_geograph.org.uk_-_5546750.jpg/1920px-The_Speyside_Way_near_the_Tamdhu_Distillery_-_geograph.org.uk_-_5546750.jpg",
+   "plek": "The Speyside Way near the Tamdhu Distillery",
+   "soort": "foto van de plek",
+   "maker": "Dave Kelly",
+   "licentie": "CC BY-SA 2.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:The_Speyside_Way_near_the_Tamdhu_Distillery_-_geograph.org.uk_-_5546750.jpg",
+   "bewerking": "alleen verkleind"
+  },
+  {
+   "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/The_fermentation_room_at_the_Glenrothes_Distillery_%28Speyside%2C_Scotland%29.jpg/1920px-The_fermentation_room_at_the_Glenrothes_Distillery_%28Speyside%2C_Scotland%29.jpg",
+   "plek": "The fermentation room at the Glenrothes Distillery (Speyside, Scotland",
+   "soort": "foto van de plek",
+   "maker": "Ashley Coates",
+   "licentie": "CC BY-SA 2.0",
+   "licentieUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+   "bron": "Wikimedia Commons",
+   "bronUrl": "https://commons.wikimedia.org/wiki/File:The_fermentation_room_at_the_Glenrothes_Distillery_(Speyside,_Scotland).jpg",
+   "bewerking": "alleen verkleind"
   }
  ]
 };
+/* Wat er is goedgekeurd, afgewezen of zelf toegevoegd. In de bouwomgeving staat
+   dit in de database; hier houdt de demo het in het geheugen vast, zodat Jack
+   kan zien hoe het werkt zonder dat er iets echt gepubliceerd wordt. */
+var BEELDSTATUS={};
+function bs(id){return BEELDSTATUS[id]||(BEELDSTATUS[id]={goed:[],weg:[],eigen:[]});}
+function beeldPool(id){
+ var s=bs(id),lijst=(BEELDVOORSTEL[id]||[]).concat(s.eigen);
+ return lijst.filter(function(b){return s.weg.indexOf(b.url)<0;});
+}
+function beeldVoor(id){
+ var s=bs(id),pool=beeldPool(id);
+ var goed=pool.filter(function(b){return s.goed.indexOf(b.url)>=0;});
+ goed.sort(function(a,b){return s.goed.indexOf(a.url)-s.goed.indexOf(b.url);});
+ if(goed.length)return goed.map(function(b){return Object.assign({},b,{status:"goedgekeurd"});});
+ return pool.slice(0,3).map(function(b){return Object.assign({},b,{status:"voorstel"});});
+}
+function beeldGoed(id,url){
+ var s=bs(id),i=s.goed.indexOf(url);
+ if(i>=0)s.goed.splice(i,1);else s.goed.push(url);
+ var w=s.weg.indexOf(url);if(w>=0)s.weg.splice(w,1);
+ render();
+}
+function beeldWeg(id,url){
+ var s=bs(id),i=s.weg.indexOf(url);
+ if(i>=0)s.weg.splice(i,1);else{s.weg.push(url);var g=s.goed.indexOf(url);if(g>=0)s.goed.splice(g,1);}
+ render();
+}
+function beeldEerst(id,url){
+ var s=bs(id),i=s.goed.indexOf(url);
+ if(i<0)s.goed.unshift(url);else{s.goed.splice(i,1);s.goed.unshift(url);}
+ render();
+}
+function beeldEigen(id){
+ var v=el("eigen-"+id);if(!v||!v.value.trim())return;
+ var u=v.value.trim();
+ if(!/^https:\/\//.test(u)){toast("Alleen een https-adres, en let op de rechten van de foto");return;}
+ bs(id).eigen.push({url:u,plek:"Eigen aangeleverd beeld",soort:"eigen beeld",maker:"Whiskysite",
+  licentie:"eigen rechten",licentieUrl:"#",bron:"handmatig toegevoegd",bronUrl:"#",bewerking:""});
+ bs(id).goed.unshift(u);v.value="";toast("Toegevoegd en vooraan gezet");render();
+}
+function beeldOpen(){
+ var n=0;Object.keys(BEELDVOORSTEL).forEach(function(id){if(!bs(id).goed.length)n++;});
+ return n;
+}
+function vAdminBeeld(){
+ var streken=Object.keys(BEELDVOORSTEL);
+ return '<h3 style="font-size:20px;margin-bottom:6px">Beeldvoorstellen</h3>'
+ +'<p style="font-size:12.5px;color:var(--muted);max-width:78ch;margin-bottom:18px">'
+ +'De tool zoekt zelf een passende foto bij elke streek of distilleerderij en zet die hier klaar — met maker, '
+ +'licentie en bronpagina erbij. Niets komt online voordat het hier is goedgekeurd. Past er niets bij, dan plak '
+ +'je onderaan een eigen foto. <b>'+beeldOpen()+' van de '+streken.length+' pagina\'s wacht nog op een keuze.</b></p>'
+ +streken.map(function(id){
+   var s=bs(id),pool=beeldPool(id),actief=beeldVoor(id),weg=(BEELDVOORSTEL[id]||[]).filter(function(b){return s.weg.indexOf(b.url)>=0;});
+   return '<div class="bblok"><div class="bkop"><b>'+id.charAt(0).toUpperCase()+id.slice(1)+'</b>'
+    +'<span class="st '+(s.goed.length?"ok":"warn")+'">'+(s.goed.length?s.goed.length+" goedgekeurd":"voorstel — nog niet beoordeeld")+'</span>'
+    +'<span style="font-size:11.5px;color:var(--muted);margin-left:auto">Op de pagina: '+actief.map(function(b){return b.plek;}).join(" · ")+'</span></div>'
+    +'<div class="bkandidaten">'+pool.map(function(b){
+      var goed=s.goed.indexOf(b.url)>=0,eerst=s.goed[0]===b.url;
+      return '<figure class="bkaart'+(goed?" goed":"")+'"><img loading="lazy" src="'+b.url+'" alt="">'
+       +'<figcaption><b>'+b.plek+'</b>'
+       +'<span>'+b.maker+' · <a href="'+b.licentieUrl+'" target="_blank" rel="noopener">'+b.licentie+'</a>'
+       +' · <a href="'+b.bronUrl+'" target="_blank" rel="noopener">bron</a></span>'
+       +'<div class="bknop">'
+       +'<button class="'+(goed?"aan":"")+'" onclick="beeldGoed(\''+id+'\',\''+esc(b.url)+'\')">'+(goed?"✓ goedgekeurd":"Goedkeuren")+'</button>'
+       +(goed&&!eerst?'<button onclick="beeldEerst(\''+id+'\',\''+esc(b.url)+'\')">Als eerste</button>':"")
+       +'<button class="weg" onclick="beeldWeg(\''+id+'\',\''+esc(b.url)+'\')">Afwijzen</button>'
+       +'</div></figcaption></figure>';}).join("")+'</div>'
+    +(weg.length?'<p class="bweg">'+weg.length+' afgewezen · <button onclick="beeldWeg(\''+id+'\',\''+esc(weg[0].url)+'\')">laatste terugzetten</button></p>':"")
+    +'<div class="beigen"><input id="eigen-'+id+'" type="url" placeholder="https://… eigen foto van Whiskysite of van de distilleerderij">'
+    +'<button onclick="beeldEigen(\''+id+'\')">Toevoegen</button></div>'
+    +'</div>';
+ }).join("")
+ +'<p style="font-size:11.5px;color:var(--muted);margin-top:18px">In de bouwomgeving draait deze zoekactie automatisch mee met de nachtelijke verversing: '
+ +'duikt er een streek, distilleerderij of serie op zonder beeld, dan staan de voorstellen hier de volgende ochtend klaar. '
+ +'Wat hier wordt goedgekeurd, krijgt een versienummer; een volgende ronde overschrijft dat nooit.</p>';
+}
+
 var BEELDTIMER=null,BEELDIX=0;
 function beeldStop(){if(BEELDTIMER){clearInterval(BEELDTIMER);BEELDTIMER=null;}}
 function beeldLagen(lijst){
@@ -1153,7 +1342,7 @@ function beeldCredit(lijst){
  if(!lijst||!lijst.length)return "";
  var b=lijst[BEELDIX]||lijst[0];
  return '<div class="beeldcredit" id="beeldcredit">'
-  +'<span class="bstatus">'+(b.soort==="sfeerbeeld"?"Sfeerbeeld — nog geen foto van de plek":"Foto van de plek")+'</span>'
+  +'<span class="bstatus">'+(b.status==="goedgekeurd"?"Goedgekeurd beeld":"Voorstel — nog niet goedgekeurd")+'</span>'
   +'<span>'+b.plek+' · '+b.maker+' · <a href="'+b.licentieUrl+'" target="_blank" rel="noopener">'+b.licentie+'</a>'
   +' via <a href="'+b.bronUrl+'" target="_blank" rel="noopener">'+b.bron+'</a>'+(b.bewerking?' · '+b.bewerking:'')+'</span>'
   +(lijst.length>1?'<div class="beeldnav">'+lijst.map(function(x,i){
@@ -1165,12 +1354,12 @@ function beeldToon(i,handmatig){
  BEELDIX=i%lagen.length;
  lagen.forEach(function(l,j){l.classList.toggle("aan",j===BEELDIX);});
  var c=el("beeldcredit");
- if(c){var lijst=BEELD[(route().id||"").toLowerCase()]||[];c.outerHTML=beeldCredit(lijst);}
+ if(c){var lijst=beeldVoor((route().id||"").toLowerCase());c.outerHTML=beeldCredit(lijst);}
  if(handmatig)beeldStop();
 }
 function beeldStart(id){
  beeldStop();BEELDIX=0;
- var lijst=BEELD[id]||[];
+ var lijst=beeldVoor(id);
  if(lijst.length<2)return;
  var stil=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  if(stil)return;                      /* geen beweging voor wie dat heeft uitgezet */
@@ -1199,7 +1388,7 @@ function vStreek(rt){
  if(!s)return '<section><div class="wrap">Deze streekpagina bestaat nog niet. <a href="#/collectie" style="color:var(--amber)">Naar de collectie</a></div></section>';
  var inStreek=CAT.filter(function(p){return p.region===s.id;});
  var start=inStreek.filter(function(p){return !p.rare&&p.price<80;}).sort(function(a,b){return relScore(b)-relScore(a);}).slice(0,3);
- var beelden=BEELD[rt.id]||[];
+ var beelden=beeldVoor(rt.id);
  return '<section><div class="wrap">'
  +'<div class="streekhero'+(beelden.length?" metbeeld":"")+'">'+beeldLagen(beelden)
  +'<span class="statuschip">'+I("pin",13)+' Concept — nog niet goedgekeurd</span>'
@@ -1440,28 +1629,23 @@ var VRAAGLOG=[
  {d:"24 aug",o:"Vallen wijn en overige dranken ook onder de ontdeklaag?",a:"Whisky en samples nu; wijn en overige dranken in een latere fase. De opzet wordt zo gebouwd dat uitbreiden later geen verbouwing vraagt.",st:"ok",lbl:"Beantwoord"},
  {d:"24 aug",o:"Accounts en facturen op naam van Whiskysite — akkoord?",a:"—",st:"warn",lbl:"Open",
   h:"Twee externe accounts zijn nodig, en ik wil precies zeggen welke en wat ze kosten. Het eerste is Cloudflare: daar draait de ontdeksite en daar staat de database met de smaakprofielen en de goedkeurstatus. Ongeveer $5 per maand, zo'n €55 tot €60 per jaar — dat is inclusief de afgeschermde bouwomgeving waarin we hem eerst opbouwen, daar komt niets bovenop. Het tweede is een account bij Anthropic — de makers van Claude — voor het aanmaken van de smaakprofielen: eenmalig €20 tot €40 om je hele whiskycatalogus in één keer door te rekenen, daarna €1 tot €2 per maand voor de nieuwe flessen die erbij komen. Dat is een technisch account waar alleen mijn programma gebruik van maakt, geen abonnement waar iemand mee zit te chatten — een ChatGPT- of Claude-abonnement werkt hier dus niet voor, ook niet als jullie dat al hebben. We zetten er een vast tegoed op in plaats van automatisch bijladen, zodat de rekening niet kan weglopen. Hebben jullie toevallig al een zákelijk account bij OpenAI of een andere AI-leverancier, met facturen op naam van het bedrijf? Zeg het dan even — dan gebruiken we dat, scheelt een leverancier. Beide op naam van Whiskysite met jullie eigen betaalgegevens: jullie krijgen rechtstreeks hun facturen, betalen de kale kostprijs zonder opslag van mij, en als onze samenwerking ooit stopt draait de site gewoon door — ik heb alleen beheertoegang. Er komt geen tweede winkelabonnement bij; aan Lightspeed verandert niets. Deze partijen rekenen af in dollars, dus het eurobedrag beweegt mee met de koers — vandaar 'ongeveer'.",tp:"select",
-  opts:["Akkoord, zet ze op onze naam","Liever eerst bespreken","Anders — zie toelichting hieronder"]},
- {d:"24 aug",o:"Streek- en distilleerderijteksten: hoe wil je ze beoordelen?",a:"—",st:"warn",lbl:"Open",
-  h:"Het plan is dat de tool zelf een tekstvoorstel maakt zodra er een nieuwe streek of distilleerderij in de catalogus opduikt — net als bij de smaakprofielen. Jij of Tino beoordeelt en publiceert. Hoe wil je dat in de praktijk?",tp:"select",
-  opts:["Elk voorstel apart bekijken en goedkeuren","Verzamelen en per week in één keer doorlopen","Publiceer maar, ik grijp in als iets niet klopt"]},
- {d:"24 aug",o:"Wijs je beste en slechtste productteksten aan",a:"—",st:"warn",lbl:"Open",
-  h:"De vier vragen hierna gaan allemaal over één ding: zorgen dat de teksten straks klinken als Whiskysite en niet als een computer. Deze eerste kost je alleen je oog, niet je pen. Noem vier of vijf producten waarvan je de tekst goed vindt — precies de toon die je bedoelt — en één of twee die je juist niet goed vindt. Namen of links volstaan; uitleggen waaróm hoeft niet, dat haal ik er zelf uit.",tp:"area",
-  ph:"Goed: ...\nNiet goed: ..."},
- {d:"24 aug",o:"Plak hier een stuk tekst dat je zélf hebt geschreven",a:"—",st:"warn",lbl:"Open",
-  h:"De vorige vraag laat zien wat je mooi vindt. Deze laat zien hoe jíj schrijft, en dat is niet hetzelfde. Plak iets wat uit je eigen pen komt: een stukje uit een nieuwsbrief, een mail aan een klant, de aankondiging van een bottling. Eén of twee alinea's is genoeg. Let op: tekst die van de importeur of de leverancier komt heeft geen zin — die klinkt juist als iedereen. En niets bijschaven graag; ruwe tekst is voor mij bruikbaarder dan gepoetste.",tp:"area",
-  ph:"Plak hier..."},
- {d:"24 aug",o:"Beveel één fles aan alsof je tegenover een klant staat",a:"—",st:"warn",lbl:"Open",
-  h:"Dit is het enige waar ik je echt even om laat schrijven, en het levert het meeste op. Kies een fles die je graag verkoopt en beschrijf hem in drie tot vijf zinnen zoals je het in de winkel zou zeggen: waar hij naar smaakt, voor wie hij is, waarom juist deze. Geen productbeschrijving, geen mooie zinnen — gewoon zoals het uit je mond zou komen. Typefouten maken niet uit. Liever inspreken dan typen? Doe dat en stuur me het geluidsbestand, dan haal ik de tekst er zelf uit.",tp:"area",
-  ph:"Fles: ...\n\n..."},
- {d:"24 aug",o:"Wat zeg je nóóit over een whisky?",a:"—",st:"warn",lbl:"Open",
-  h:"Even bepalend als wat er wél moet staan. Woorden, claims of clichés waar je jeuk van krijgt en die niet bij Whiskysite passen — 'exclusief', 'ultieme smaakbeleving', cijfers of sterren geven, vergelijken met flessen die tien keer duurder zijn. Noem er gerust een paar. Dit voorkomt dat ik ze er straks duizenden keren in zet.",tp:"area",
-  ph:"Liever niet: ..."},
- {d:"24 aug",o:"Voor wie schrijven we?",a:"—",st:"warn",lbl:"Open",
-  h:"Dit bepaalt hoeveel een tekst mag veronderstellen. Schrijf je voor iemand die weet wat een sherryvat met de smaak doet, of leg je dat elke keer uit? Het verschil is groot: 'first-fill oloroso' tegenover 'gerijpt op een vat waar eerder zoete sherry in heeft gezeten'.",tp:"select",
-  opts:["Voor de liefhebber — die weet dit","Voor de nieuwsgierige beginner — leg het uit","Allebei: kort voor de kenner, uitleg binnen handbereik"]},
- {d:"24 aug",o:"Spreken we klanten aan met 'u' of met 'je'?",a:"—",st:"warn",lbl:"Open",
-  h:"Klein maar bepalend: het moet overal hetzelfde zijn, anders valt het meteen op. Als het nu door elkaar loopt op de site, is dit het moment om te kiezen.",tp:"select",
-  opts:["Je — informeel, zoals onder liefhebbers","U — netjes en op afstand","Kijk maar wat er nu het meest staat"]}
+  opts:["Akkoord, zet ze op onze naam","Liever eerst bespreken","Anders — zie toelichting hieronder"],
+  a2:"Jack noemde een betaald ChatGPT-account. Nagevraagd: dat is een abonnement om zelf mee te chatten en niet bruikbaar voor de site — zie de vervolgvraag."},
+ {d:"24 aug",o:"Je ChatGPT-account: welk soort is het?",a:"—",st:"warn",lbl:"Open",
+  h:"Je noemde een betaald ChatGPT-account. Belangrijk verschil: een abonnement om zelf mee te chatten is iets anders dan een technisch account waar een programma gebruik van maakt. Het eerste kan de site niet aansturen, hoe duur het ook is. Het tweede rekent per gebruik af en heeft een aparte facturatie. Soms kunnen ze wel onder hetzelfde bedrijfsaccount hangen — dat scheelt een leverancier. Kijk even of jullie ChatGPT op een privémailadres staat of op de zaak met bedrijfsfacturen, dan weet ik of we het kunnen gebruiken.",tp:"select",
+  opts:["Persoonlijk abonnement, staat op een privéadres","Zakelijk, met facturen op naam van het bedrijf","Weet ik niet — ik zoek het uit","Doe jij maar wat het handigst is"]},
+ {d:"24 aug",o:"Streek- en distilleerderijteksten: hoe wil je ze beoordelen?",a:"Elk voorstel apart bekijken en goedkeuren. Werkbaar: het gaat om een handvol streken en distilleerderijen per jaar.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"En de smaakprofielen — ook stuk voor stuk?",a:"—",st:"warn",lbl:"Open",
+  h:"Je gaf aan streek- en distilleerderijteksten stuk voor stuk te willen beoordelen. Dat is prima: dat zijn er een handvol per jaar. Bij de smaakprofielen ligt het anders, want dat zijn er 5.000 in de eerste ronde. Eén per minuut is al ruim tachtig uur werk. Mijn voorstel: ik laat je eerst honderd profielen zien zodat je kunt bijsturen, en daarna keur je per batch goed — bijvoorbeeld tweehonderd tegelijk, met de twijfelgevallen er apart uitgelicht. Nieuwe flessen die er later bij komen kun je dan wel gewoon stuk voor stuk doen, dat zijn er weinig per week.",tp:"select",
+  opts:["Goed plan — eerst honderd, daarna per batch","Ik wil ze toch allemaal apart zien","Laten we dit even bespreken"]},
+ {d:"24 aug",o:"Wijs je beste en slechtste productteksten aan",a:"Lastig: de productteksten komen meestal van de leverancier. Voorstel van Jack: eerst kijken wat de tool bij de Campbeltown-flessen neerzet en daarop voortborduren. Overgenomen.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Voorbeeldtekst — zo zou het eruit moeten zien",a:"Clynelish 8 years Duncan Taylor: opbouw van karakter naar geur, smaak en afdronk, zintuiglijk en concreet, zonder superlatieven of scores. Vastgelegd als ijkpunt.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Hoe adviseer je in de winkel?",a:"Uitleg over houtsoorten en vaten, onafhankelijke bottelingen, cask strength en wel of geen turf. Plus een eerlijk eigen oordeel, ook over de prijs.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Voor wie schrijven we?",a:"Voor de nieuwsgierige beginner — vaktermen uitleggen in plaats van veronderstellen.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Spreken we klanten aan met 'u' of met 'je'?",a:"Je — informeel, zoals onder liefhebbers.",st:"ok",lbl:"Beantwoord"},
+ {d:"24 aug",o:"Mogen de teksten op de ontdeksite anders zijn dan in de webshop?",a:"—",st:"warn",lbl:"Open",
+  h:"Je zei dat de productteksten meestal van de leverancier komen. Dat betekent dat dezelfde tekst bij tientallen andere webshops staat, en daar rekent Google jullie op af: wie dezelfde tekst heeft als de rest valt niet op. Dat is meteen een kans. Op de ontdeksite kan bij elke fles een eigen tekst komen — in jullie toon, uitleg erbij voor de beginner — terwijl in de webshop gewoon blijft staan wat er nu staat. Aan Lightspeed verandert dan niets. Wil je dat?",tp:"select",
+  opts:["Ja, eigen teksten op de ontdeksite","Nee, overal dezelfde tekst houden","Leg me eerst uit wat dat kost aan tijd"]}
 ];
 function arLijst(){
  var a=[];
@@ -1533,9 +1717,11 @@ function vgCopy(){
 function vgToon(t){var o=el("vgOut");if(!o)return;o.value=t;o.style.display="block";o.select();}
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"],["voortgang","Voortgang project"]];
+ var side=[["dashboard","Dashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["sync","Lightspeed-sync"],["voortgang","Voortgang project"]];
  var body;
- if(sub==="producten"){
+ if(sub==="beeld"){
+  body=vAdminBeeld();
+ }else if(sub==="producten"){
   body='<h3 style="font-size:20px;margin-bottom:16px">Producten <span style="font-size:12px;color:var(--muted);font-weight:400">(demo: '+P.length+' · live: 10.482)</span></h3>'
   +'<table class="atable"><tr><th>Product</th><th>Regio</th><th>Prijs</th><th>Sample</th><th>Smaakprofiel</th><th>Status</th></tr>'
   +P.map(p=>'<tr><td><b>'+p.name+'</b><br><span style="color:var(--muted)">'+p.dist+'</span></td><td>'+p.region+'</td><td>'+eur(p.price)+'</td><td>'+(p.sample?eur(p.sample):"—")+'</td>'
