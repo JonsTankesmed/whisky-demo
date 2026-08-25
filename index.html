@@ -398,6 +398,21 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
  .streekhero{padding:26px 20px}.streekhero h1{font-size:27px}
 }
 @media(min-width:901px){.fpanelklaar{display:none}}
+/* ===== beeld bij streek- en distilleerderijpagina's ===== */
+.streekhero{position:relative;overflow:hidden;isolation:isolate}
+.sherolagen{position:absolute;inset:0;z-index:-2}
+.sherolaag{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.1s ease}
+.sherolaag.aan{opacity:1}
+.streekhero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(28,18,11,.93) 0%,rgba(38,25,15,.82) 46%,rgba(43,29,18,.42) 100%)}
+.streekhero.metbeeld{min-height:330px;display:flex;flex-direction:column;justify-content:center}
+.beeldcredit{margin-top:18px;font-size:11px;color:rgba(246,239,230,.72);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.beeldcredit a{color:rgba(246,239,230,.9);text-decoration:underline;text-underline-offset:2px}
+.beeldcredit .bstatus{border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:2px 9px}
+.beeldnav{display:flex;gap:6px;margin-left:auto}
+.beeldnav button{width:22px;height:6px;border-radius:4px;border:0;background:rgba(255,255,255,.3);cursor:pointer;padding:0}
+.beeldnav button.aan{background:rgba(255,255,255,.85)}
+.beeldnav button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.sherolaag{transition:none}}
 </style>
 </head>
 <body>
@@ -1002,6 +1017,65 @@ function vCollectie(){
    :'<div class="empty">Geen whisky\'s gevonden.<br>Tip: haal een filter weg — de aantallen naast elk filter laten zien wat nog overblijft.</div>')
  +'</div></div></div></section>';
 }
+/* ================= BEELD BIJ STREEK EN DISTILLEERDERIJ =================
+   Elk beeld is een record met herkomst, maker, licentie en status — net als de
+   teksten. Zonder compleet spoor gaat een foto niet online: een automatisch
+   opgehaalde afbeelding met de verkeerde licentie is een rekening voor Jack.
+   De picker (beeld_picker.py) zoekt kandidaten bij Wikimedia Commons en zet ze
+   met licentie en al in de goedkeurwachtrij. Wat hier staat is het resultaat
+   van die stap. */
+var UP="?auto=format&fit=crop&w=1600&q=70";
+var BEELD={
+ campbeltown:[
+  {url:"https://images.unsplash.com/photo-1548013146-72479768bada"+UP,
+   plek:"Sfeerbeeld — Schotse westkust",soort:"sfeerbeeld",
+   maker:"Unsplash",licentie:"Unsplash-licentie",licentieUrl:"https://unsplash.com/license",
+   bron:"Unsplash",bronUrl:"https://unsplash.com",status:"voorstel"},
+  {url:"https://images.unsplash.com/photo-1516905041604-7935af78b405"+UP,
+   plek:"Sfeerbeeld — vaten in een warehouse",soort:"sfeerbeeld",
+   maker:"Unsplash",licentie:"Unsplash-licentie",licentieUrl:"https://unsplash.com/license",
+   bron:"Unsplash",bronUrl:"https://unsplash.com",status:"voorstel"}
+ ]
+};
+var BEELDTIMER=null,BEELDIX=0;
+function beeldStop(){if(BEELDTIMER){clearInterval(BEELDTIMER);BEELDTIMER=null;}}
+function beeldLagen(lijst){
+ if(!lijst||!lijst.length)return "";
+ return '<div class="sherolagen">'+lijst.map(function(b,i){
+  return '<div class="sherolaag'+(i===0?" aan":"")+'" data-b="'+i+'" style="background-image:url(\''+b.url+'\')"></div>';
+ }).join("")+'</div>';
+}
+function beeldCredit(lijst){
+ if(!lijst||!lijst.length)return "";
+ var b=lijst[BEELDIX]||lijst[0];
+ return '<div class="beeldcredit" id="beeldcredit">'
+  +'<span class="bstatus">'+(b.soort==="sfeerbeeld"?"Sfeerbeeld — nog geen foto van de plek":"Foto van de plek")+'</span>'
+  +'<span>'+b.plek+' · '+b.maker+' · <a href="'+b.licentieUrl+'" target="_blank" rel="noopener">'+b.licentie+'</a>'
+  +' via <a href="'+b.bronUrl+'" target="_blank" rel="noopener">'+b.bron+'</a></span>'
+  +(lijst.length>1?'<div class="beeldnav">'+lijst.map(function(x,i){
+     return '<button aria-label="Toon beeld '+(i+1)+' van '+lijst.length+'" class="'+(i===BEELDIX?"aan":"")+'" onclick="beeldToon('+i+',true)"></button>';}).join("")+'</div>':"")
+  +'</div>';
+}
+function beeldToon(i,handmatig){
+ var lagen=document.querySelectorAll(".sherolaag");if(!lagen.length)return;
+ BEELDIX=i%lagen.length;
+ lagen.forEach(function(l,j){l.classList.toggle("aan",j===BEELDIX);});
+ var c=el("beeldcredit");
+ if(c){var lijst=BEELD[(route().id||"").toLowerCase()]||[];c.outerHTML=beeldCredit(lijst);}
+ if(handmatig)beeldStop();
+}
+function beeldStart(id){
+ beeldStop();BEELDIX=0;
+ var lijst=BEELD[id]||[];
+ if(lijst.length<2)return;
+ var stil=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ if(stil)return;                      /* geen beweging voor wie dat heeft uitgezet */
+ BEELDTIMER=setInterval(function(){
+  if(document.hidden)return;
+  beeldToon((BEELDIX+1)%lijst.length,false);
+ },8000);
+}
+
 /* ================= STREEKPAGINA'S (fase 3) =================
    Elke tekst is een record met taal, status en versie — hetzelfde schema dat
    straks in de database staat. Niets wordt automatisch gepubliceerd. */
@@ -1021,9 +1095,12 @@ function vStreek(rt){
  if(!s)return '<section><div class="wrap">Deze streekpagina bestaat nog niet. <a href="#/collectie" style="color:var(--amber)">Naar de collectie</a></div></section>';
  var inStreek=CAT.filter(function(p){return p.region===s.id;});
  var start=inStreek.filter(function(p){return !p.rare&&p.price<80;}).sort(function(a,b){return relScore(b)-relScore(a);}).slice(0,3);
+ var beelden=BEELD[rt.id]||[];
  return '<section><div class="wrap">'
- +'<div class="streekhero"><span class="statuschip">'+I("pin",13)+' Concept — nog niet goedgekeurd</span>'
- +'<h1>'+s.kop+'</h1>'+s.intro.map(function(t){return '<p style="margin-bottom:10px">'+t+'</p>';}).join("")+'</div>'
+ +'<div class="streekhero'+(beelden.length?" metbeeld":"")+'">'+beeldLagen(beelden)
+ +'<span class="statuschip">'+I("pin",13)+' Concept — nog niet goedgekeurd</span>'
+ +'<h1>'+s.kop+'</h1>'+s.intro.map(function(t){return '<p style="margin-bottom:10px">'+t+'</p>';}).join("")
+ +beeldCredit(beelden)+'</div>'
  +'<div class="streekblok"><h2>Hoe smaakt het</h2><p>'+s.smaak+'</p></div>'
  +'<div class="streekblok"><h2>Wie er zit</h2><div class="distgrid">'
  +s.dists.map(function(d){return '<div class="distcard"><b>'+d[0]+'</b><span>'+d[1]+'</span></div>';}).join("")+'</div></div>'
@@ -1032,7 +1109,8 @@ function vStreek(rt){
  +'<div class="streekblok"><h2>Alles uit '+s.id+' <span style="font-size:13px;color:var(--muted);font-weight:400">('+inStreek.length+' flessen)</span></h2>'
  +'<p style="margin-bottom:14px">Deze knop zet het streekfilter aan in de collectie — dezelfde selectie, met alle overige filters erbij.</p>'
  +'<button class="btn btn-a" onclick="F=nieuwF({streek:[\''+s.id+'\']});location.hash=\'#/collectie\'+fNaarUrl()">Bekijk alle '+inStreek.length+' flessen uit '+s.id+' →</button></div>'
- +'<p style="font-size:11.5px;color:var(--muted);margin-top:26px">Tekstrecord: taal '+s.taal+' · status '+s.status+' · versie '+s.versie+' · bijgewerkt '+s.bijgewerkt+'. In de bouwomgeving staat deze tekst in de goedkeurwachtrij; hij gaat pas live als Jack of Tino hem vrijgeeft.</p>'
+ +'<p style="font-size:11.5px;color:var(--muted);margin-top:26px">Tekstrecord: taal '+s.taal+' · status '+s.status+' · versie '+s.versie+' · bijgewerkt '+s.bijgewerkt+'. '
+ +(beelden.length?'Beeld: '+beelden.length+' voorstel(len), status '+beelden[0].status+', met herkomst en licentie per foto. ':'Beeld: nog geen voorstel. ')+'In de bouwomgeving staat deze tekst in de goedkeurwachtrij; hij gaat pas live als Jack of Tino hem vrijgeeft.</p>'
  +'</div></section>';
 }
 
@@ -1057,7 +1135,9 @@ function render(){
  document.querySelectorAll(".catnav a").forEach(a=>a.classList.toggle("act",rt.r==="collectie"&&a.dataset.c===F.cat));
  var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin,streek:vStreek}[rt.r];
  var fk=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.fk:null;
+ beeldStop();
  el("app").innerHTML=v(rt);
+ if(rt.r==="streek")beeldStart(rt.id);
  if(fk){var t=document.querySelector('[data-fk="'+fk.replace(/"/g,'')+'"]');if(t)t.focus();}
  updateBadges();
  if(rt.r==="admin"&&rt.sub==="voortgang"&&typeof arRender==="function")arRender();
