@@ -2042,6 +2042,17 @@ var VRAAGLOG=[
  {d:"24 aug",o:"Hoe adviseer je in de winkel?",a:"Uitleg over houtsoorten en vaten, onafhankelijke bottelingen, cask strength en wel of geen turf. Plus een eerlijk eigen oordeel, ook over de prijs.",st:"ok",lbl:"Beantwoord"},
  {d:"24 aug",o:"Voor wie schrijven we?",a:"Voor de nieuwsgierige beginner — vaktermen uitleggen in plaats van veronderstellen.",st:"ok",lbl:"Beantwoord"},
  {d:"24 aug",o:"Spreken we klanten aan met 'u' of met 'je'?",a:"Je — informeel, zoals onder liefhebbers.",st:"ok",lbl:"Beantwoord"},
+ {d:"29 aug",o:"Nemen we het Whiskybase-nummer mee naast het Lightspeed-nummer?",a:"—",st:"warn",lbl:"Open",g:"bronnen",tp:"select",
+  h:"Whiskybase is de grote whiskydatabase uit Rotterdam en heeft voor elke fles een eigen nummer. Dat nummer is in de praktijk de standaard geworden waar de hele sector op teruggrijpt. Als we het naast jullie eigen Lightspeed-nummer opslaan, spreekt jullie data dezelfde taal als de rest van de markt: prijzen vergelijken, beoordelingen ophalen of ooit overstappen wordt dan een kwestie van koppelen in plaats van uitzoeken. Het kost mij nu weinig extra werk; achteraf toevoegen betekent twaalfduizend producten opnieuw langslopen. Er zit geen abonnement aan vast en het verandert niets aan jullie webshop.",
+  opts:["Akkoord, neem het mee","Liever eerst bespreken","Nee, niet nodig"]},
+ {d:"29 aug",o:"Beginnen we klein of meteen breed met de whiskyschrijvers?",a:"—",st:"warn",lbl:"Open",g:"bronnen",tp:"select",
+  h:"Voor de smaakteksten willen we reviews van whiskyschrijvers kunnen tonen, altijd met hun naam en een link naar hun eigen artikel. Daar is toestemming voor nodig, en dat zijn jouw gesprekken. Klein betekent: Ruben Luyten van WhiskyNotes — die beveelt Whiskysite al aan op zijn site — Thijs Klaverstijn van Words of Whisky, het magazine Whisky Passion, en Whiskybase. Vier gesprekken, allemaal in het Nederlands of Vlaams, hoge kans van slagen, en we leren meteen hoe zo'n afspraak in de praktijk werkt. Breed betekent: diezelfde vier plus de grote internationale namen zoals Whiskyfun, The Whisky Philes en The Dramble. Veel meer tekst, maar koude mails in het Engels en een langere doorlooptijd. Mijn advies is klein beginnen en breed erachteraan zodra de eerste afspraak staat — maar jij kent deze wereld beter dan ik.",
+  opts:["Klein: Ruben, Thijs, Whisky Passion en Whiskybase","Meteen breed, ook de internationale namen","Liever eerst bespreken"]},
+ {d:"29 aug",o:"Onder welke naam benaderen we de schrijvers?",a:"—",st:"warn",lbl:"Open",g:"bronnen",tp:"select",
+  h:"Deze mensen kennen elkaar en reageren beter op een bekende dan op een bedrijf. Ik heb een doorstuurtekst klaarliggen die je kunt gebruiken: wat we vragen, wat we bieden (bronvermelding met link, een eigen plek op de site, en altijd intrekbaar) en wat we níet doen. Vraag is alleen van wie het bericht komt.",
+  opts:["Jack persoonlijk, met mijn tekst als basis","Namens Whiskysite, met een algemeen adres","Jack introduceert, John schrijft het inhoudelijke deel"]},
+ {d:"29 aug",o:"Wie benader jij zelf, en waar wil je dat ik meekijk?",a:"—",st:"warn",lbl:"Open",g:"bronnen",tp:"area",ph:"Bijvoorbeeld: Ruben bel ik zelf, bij Whiskybase schuif jij aan, Whisky Passion doet Tino…",
+  h:"Bij Whiskybase gaat het niet over teksten maar over twee praktische dingen: jullie shoppagina daar uitbreiden van 847 naar de volledige catalogus, en het flesnummer hierboven. Ik schuif graag aan bij dat gesprek. Bij de schrijvers is jouw naam juist het beste visitekaartje."},
 ];
 function arLijst(){
  var a=[];
@@ -2192,12 +2203,6 @@ var BRONACT=[
  {t:"De gestopte archieven aanvragen",d:"Malt Fascination, Onversneden, Malt Review en ScotchWhisky.com. Geen commercieel belang meer, dus de vraag is klein en het antwoord vaak ja. Malt Review het eerst: die site is al offline.",w:"Jack",f:"contentfase · lage inspanning"},
  {t:"Festivalpagina richten op 13–15 november",d:"International Whisky Festival, Grote Kerk Den Haag. Agenda voeden vanuit Whisky Passion. Geeft de livegang een datum die niet van onze eigen planning afhangt.",w:"Samen",f:"contentfase en livegang"}
 ];
-var BRONVRAAG=[
- "Akkoord om het Whiskybase-nummer mee te nemen als tweede koppelnummer?",
- "Beginnen we klein — Ruben, Thijs, Whisky Passion en Whiskybase — of gaan we meteen breder, inclusief de grote internationale namen?",
- "Wie benader jij zelf, en waar wil je dat ik meekijk of meeschrijf?",
- "Welk e-mailadres komt op de publieke bronnenpagina te staan?"
-];
 var BRONVOOR=[
  "De bezoekcijfers zijn schattingen van een extern meetbureau over 2025, gepubliceerd door een partij die zichzelf in dat overzicht op nummer één zet. De volgorde is bruikbaar, de absolute getallen maar beperkt.",
  "Volgersaantallen op sociale media verouderen binnen maanden. Behandel die tabel als richting, niet als meting.",
@@ -2260,8 +2265,10 @@ function vAdminBronnen(){
 
  +'<h3 style="font-size:16px;margin:26px 0 8px">Wat ik nog van je nodig heb</h3>'
  +'<table class="atable"><tr><th>Vraag</th><th>Status</th></tr>'
- +BRONVRAAG.map(function(q){return '<tr><td>'+q+'</td><td><span class="st warn">Open</span></td></tr>';}).join("")+'</table>'
- +'<p style="font-size:12px;color:var(--muted);margin-top:8px">Antwoorden kun je kwijt via het formulier onder Voortgang project, of gewoon per mail.</p>'
+ +VRAAGLOG.filter(function(q){return q.g==="bronnen";}).map(function(q){
+  return '<tr><td><b>'+q.o+'</b>'+(q.st==="ok"&&q.a&&q.a!=="—"?'<br><span style="color:var(--muted)">'+q.a+'</span>':'')+'</td>'
+   +'<td style="white-space:nowrap"><span class="st '+q.st+'">'+q.lbl+'</span></td></tr>';}).join("")+'</table>'
+ +'<p style="font-size:12px;color:var(--muted);margin-top:8px">Deze vragen staan ook in het formulier onder <a href="#/admin/voortgang" style="color:var(--amber)">Voortgang project</a>, met toelichting en keuzeopties. Daar beantwoord je ze in één keer — of gewoon per mail als je dat prettiger vindt.</p>'
 
  +'<div style="border-top:1px solid var(--line);margin:30px 0 0;padding-top:22px">'
  +'<h3 style="font-size:16px;margin:0 0 8px">Waar ik niet zeker van ben</h3>'
