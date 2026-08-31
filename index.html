@@ -1932,6 +1932,28 @@ function vVergelijk(){
  +row("",p=>'<td><button class="btn btn-a btn-s" onclick="add(\''+esc(p.name)+'\')">In winkelwagen</button></td>')
  +'</table></div></div></section>';
 }
+/* Schrijvers wier proefnotities bij de flessen komen te staan.
+   Zolang er geen toestemming is, staat deze sectie als voorbeeld gemarkeerd. */
+var BIJDRAGERS=[
+ {n:"WhiskyNotes",ini:"WN",u:"whiskynotes.be",w:"Ruben Luyten · België · sinds 2008",d:"Een van de langstlopende whiskyblogs ter wereld. Sterk op sherryvaten, oude bottelingen en onafhankelijke bottelaars."},
+ {n:"Words of Whisky",ini:"WW",u:"wordsofwhisky.com",w:"Thijs Klaverstijn · Nederland · sinds 2013",d:"Vakjournalist en jurylid bij internationale awards. Werkt met een transparant scoresysteem en is open over ontvangen samples."},
+ {n:"Dramface",ini:"DF",u:"dramface.com",w:"Meerdere schrijvers · Schotland",d:"Onafhankelijk en zelf gefinancierd. Uitgesproken oordelen, geen gelakte marketingtaal."},
+ {n:"The Whisky Philes",ini:"WP",u:"thewhiskyphiles.com",w:"Verenigd Koninkrijk",d:"Duizenden proefnotities, geordend per streek en distilleerderij. Toegankelijk voor wie net begint."},
+ {n:"Whisky Passion",ini:"PA",u:"whiskypassion.nl",w:"Magazine · Nederland en België · sinds 2006",d:"Het eerste onafhankelijke Nederlandstalige whiskymagazine, met proefnotities, distilleerderijverhalen en interviews."},
+ {n:"Whisky Saga",ini:"SA",u:"whiskysaga.com",w:"Thomas Øhrbom · Noorwegen",d:"Advertentievrij en onafhankelijk. Sterk op Noordse en wereldwhisky — het deel waar het minste over geschreven wordt."}
+];
+function vBijdragers(){
+ return '<div class="sec-head" style="margin-top:48px"><h2>Bijdragers</h2><span class="rmeta">De schrijvers wier proefnotities je bij de flessen terugvindt</span></div>'
+ +'<p style="color:var(--muted);font-size:14px;max-width:720px;margin-bottom:18px">Inspiratie om iets nieuws te proeven komt niet alleen van ons. Deze schrijvers proeven, beschrijven en beoordelen al jaren — en waar hun woorden bij een fles staan, staat hun naam er ook bij, met een link naar hun eigen artikel. <span class="demoflag">voorbeeld · nog geen toestemming</span></p>'
+ +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">'
+ +BIJDRAGERS.map(function(b,i){return '<div style="background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:16px;display:flex;gap:14px;align-items:flex-start">'
+  +mono(b,i,44)
+  +'<div><div style="font-family:var(--serif);font-size:16px;font-weight:600">'+b.n+'</div>'
+  +'<div style="font-size:11.5px;color:var(--muted);margin-bottom:6px">'+b.w+'</div>'
+  +'<p style="font-size:12.5px;color:var(--muted);line-height:1.5">'+b.d+'</p>'
+  +'<a href="https://'+b.u+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px;font-weight:600;display:inline-block;margin-top:8px">'+b.u+' →</a></div></div>';}).join("")
+ +'</div>';
+}
 function vInspiratie(){
  var UP="?auto=format&fit=crop&w=800&q=70";
  var items=[
@@ -1950,7 +1972,9 @@ function vInspiratie(){
  +'<div class="sec-head"><h2>Verhalen, gidsen &amp; kennis</h2><span class="rmeta">Een platform deelt kennis — en verdient daarmee vertrouwen én vindbaarheid (SEO)</span></div>'
  +'<div class="insp">'+items.map(x=>'<div class="icard" onclick="toast(\'Artikel-detail volgt in de volgende iteratie\')"><div class="art sm" style="background:'+x.g+'"><img src="'+x.img+'" loading="lazy" alt=""><span class="ibadge">'+I(x.ic,15)+'</span></div>'
  +'<div class="icard-body"><div class="kicker" style="font-size:10px">'+x.k+'</div><h3>'+x.t+'</h3><p>'+x.p+'</p>'
- +'<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><span class="lees" style="margin:0">Lees verder →</span><span class="rmeta">· '+x.m+'</span></div></div></div>').join("")+'</div></div></section>';
+ +'<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><span class="lees" style="margin:0">Lees verder →</span><span class="rmeta">· '+x.m+'</span></div></div></div>').join("")+'</div>'
+ +vBijdragers()
+ +'</div></section>';
 }
 /* ================= FESTIVAL ================= */
 var FESTDATE=new Date("2027-06-05T12:00:00");
