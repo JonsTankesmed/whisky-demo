@@ -1949,7 +1949,7 @@ function vProduct(rt){
  +(p.rev?'<div class="revbox"><span style="color:var(--muted)">Hier komt de proefnotitie van de schrijver — zijn eigen woorden, een fragment of de hele tekst.</span>'
   +'<div class="revsrc">— <b>'+p.rev.s+'</b> · <a href="'+revLink(p)+'" target="_blank" rel="noopener">'+p.rev.u+' →</a>'
   +'<span class="demoflag">voorbeeld · nog geen toestemming</span></div></div>':"")
- +'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
+ +'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +'<button class="btn btn-g" onclick="cmpAdd(\''+p.id+'\')">+ Vergelijk</button>'
@@ -1957,7 +1957,9 @@ function vProduct(rt){
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="add(\'Sample: '+esc(p.name)+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
  +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+p.region+' ('+p.country+')</td></tr><tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+p.abv+'</td></tr><tr><th>Vatsoort</th><td>'+p.cask+'</td></tr><tr><th>Inhoud</th><td>0,70 ltr</td></tr></table>'
- +'<h3 style="font-size:18px">Lekker bij</h3><div class="pair">'+p.pair.map(x=>'<span>'+x+'</span>').join("")+'</div>'
+ /* De 20 handgemaakte producten hebben een spijsadvies, de 6.371 uit de winkel
+    niet. Dan valt de hele kop weg — een lege 'Lekker bij' is erger dan geen. */
+ +((p.pair&&p.pair.length)?'<h3 style="font-size:18px">Lekker bij</h3><div class="pair">'+p.pair.map(x=>'<span>'+x+'</span>').join("")+'</div>':"")
  +'</div></div>'
  +'<div style="margin-top:52px"><div class="sec-head"><h2>Vergelijkbare whisky\'s</h2><span style="font-size:13px;color:var(--muted)">op basis van smaakprofiel</span></div>'
  +'<div class="grid">'+sims.map(x=>card(x)).join("")+'</div></div>'
@@ -1975,7 +1977,7 @@ function vVergelijk(){
  +row("Vatsoort",p=>'<td>'+p.cask+'</td>')
  +row("Review",p=>'<td>'+(p.rev?'<span style="color:var(--muted);font-size:12px">proefnotitie voorzien</span><br><a href="'+revLink(p)+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px">'+p.rev.s+' ('+p.rev.u+') →</a>':"—")+'</td>')
  +DIMS.map((d,i)=>row(d,p=>p.geenprofiel?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*9)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
- +row("Karakter",p=>'<td>'+p.tags.join(", ")+'</td>')
+ +row("Karakter",p=>'<td>'+((p.tags||[]).join(", ")||"—")+'</td>')
  +row("",p=>'<td><button class="btn btn-a btn-s" onclick="add(\''+esc(p.name)+'\')">In winkelwagen</button></td>')
  +'</table></div></div></section>';
 }
