@@ -767,7 +767,18 @@ function esc(s){return s.replace(/'/g,"\\'");}
    regel rekent de match tegen de neutrale [5,5,5,5,5,5] die normEcht invult, en
    dan staat er een percentage op een kaart waar niets onder ligt. */
 function matchPct(p,prof){if(p.geenprofiel)return null;var d=0;for(var i=0;i<6;i++)d+=Math.pow(p.t[i]-prof[i],2);return Math.max(0,Math.round(100-Math.sqrt(d)*7));}
-function similar(p,n){return P.filter(x=>x.id!==p.id&&!x.rare).map(x=>({x,d:x.t.reduce((s,v,i)=>s+Math.abs(v-p.t[i]),0)})).sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
+/* Vergelijkbaar op smaak kan alleen tussen flessen die allebei een gelezen
+   profiel hebben. Zocht eerst alleen in de 20 handgemaakte producten; nu in de
+   hele catalogus, maar zonder de flessen waarvan het profiel nog ontbreekt. */
+function similar(p,n){
+ if(p.geenprofiel)return[];
+ return CAT.filter(x=>x.id!==p.id&&!x.rare&&!x.geenprofiel)
+  .map(x=>({x,d:x.t.reduce((s,v,i)=>s+Math.abs(v-p.t[i]),0)}))
+  .sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
+/* Zonder smaakprofiel is 'vergelijkbaar' een loze belofte. Dan tonen we wat we
+   wél zeker weten: andere flessen van dezelfde distilleerderij. */
+function zelfdeStokerij(p,n){
+ return CAT.filter(x=>x.id!==p.id&&x.dist===p.dist&&p.dist!=="Onbekend").slice(0,n);}
 function bars(t,geen){
  if(geen)return '<div class="geenprofiel">Nog geen smaakprofiel — deze fles wacht op beoordeling.</div>';
  return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*10)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
@@ -1931,21 +1942,30 @@ function vOntdek(){
 function updMatches(){
  var box=el("mlist");if(!box)return;
  var prof=[SL[0],SL[1],SL[2],SL[3],SL[4],SL[5]];
- var top=P.filter(p=>!p.rare).map(p=>({p,m:matchPct(p,prof)})).sort((a,b)=>b.m-a.m).slice(0,3);
+ /* De smaakprofiel-wizard zocht in de 20 handgemaakte producten. Dat is de
+    kernbelofte van de site, dus die zoekt nu in alle flessen met een gelezen
+    profiel — 1.379 in plaats van 20. */
+ var top=CAT.filter(p=>!p.rare&&!p.geenprofiel).map(p=>({p,m:matchPct(p,prof)})).sort((a,b)=>b.m-a.m).slice(0,3);
  box.innerHTML=top.map(o=>'<div class="mcard" onclick="go(\'#/product/'+o.p.id+'\')">'
  +'<div class="mring">'+o.m+'%</div><div><div class="rg">'+o.p.region+'</div><div class="nm">'+o.p.name+'</div>'
  +'<div style="font-size:11.5px;color:var(--muted)">'+o.p.tags.slice(0,2).join(" · ")+(o.p.sample?' · sample '+eur(o.p.sample):'')+'</div></div>'
  +'<div class="pr">'+eur(o.p.price)+'</div></div>').join("");
 }
+/* Streek en land zijn bij Japan, Taiwan en Nederland hetzelfde woord; die twee
+   keer naast elkaar zetten leest als een fout. */
+function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+')';}
+/* De inhoud stond hard op 0,70 ltr. Deze catalogus heeft 3cl-samples,
+   halve flessen en literflessen; dan is een vaste tekst gewoon onjuist. */
+function volTekst(p){var v=p._vol||70;return (v/100).toFixed(2).replace(".",",")+" ltr";}
 function vProduct(rt){
  var p=byId(rt.id);if(!p)return'<section><div class="wrap">Niet gevonden. <a href="#/collectie" style="color:var(--amber)">Terug</a></div></section>';
  var sims=similar(p,3);
  return '<section><div class="wrap">'
  +'<a class="back" href="#/collectie">← Terug naar collectie</a>'
  +'<div class="pd" style="margin-top:22px"><div class="pd-img"><img src="'+p.img+'" alt=""></div><div>'
- +'<div class="kicker">'+p.region+' · '+p.country+'</div><h1>'+p.name+'</h1>'
- +'<div class="pmeta">'+p.dist+' · '+p.age+' · '+p.abv+' · 0,70 ltr</div>'
- +'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>'
+ +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
+ +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
+ +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
  +(p.rev?'<div class="revbox"><span style="color:var(--muted)">Hier komt de proefnotitie van de schrijver — zijn eigen woorden, een fragment of de hele tekst.</span>'
   +'<div class="revsrc">— <b>'+p.rev.s+'</b> · <a href="'+revLink(p)+'" target="_blank" rel="noopener">'+p.rev.u+' →</a>'
   +'<span class="demoflag">voorbeeld · nog geen toestemming</span></div></div>':"")
@@ -1956,17 +1976,24 @@ function vProduct(rt){
  +'<button class="btn btn-g" style="gap:8px" onclick="wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+(wish.has(p.id)?" Bewaard":" Bewaar")+'</button></div>'
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="add(\'Sample: '+esc(p.name)+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
- +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+p.region+' ('+p.country+')</td></tr><tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+p.abv+'</td></tr><tr><th>Vatsoort</th><td>'+p.cask+'</td></tr><tr><th>Inhoud</th><td>0,70 ltr</td></tr></table>'
+ +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+plaats(p)+'</td></tr><tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+(p.abv||"—")+'</td></tr><tr><th>Vatsoort</th><td>'+(p.cask||"—")+'</td></tr><tr><th>Inhoud</th><td>'+volTekst(p)+'</td></tr></table>'
  /* De 20 handgemaakte producten hebben een spijsadvies, de 6.371 uit de winkel
     niet. Dan valt de hele kop weg — een lege 'Lekker bij' is erger dan geen. */
  +((p.pair&&p.pair.length)?'<h3 style="font-size:18px">Lekker bij</h3><div class="pair">'+p.pair.map(x=>'<span>'+x+'</span>').join("")+'</div>':"")
  +'</div></div>'
- +'<div style="margin-top:52px"><div class="sec-head"><h2>Vergelijkbare whisky\'s</h2><span style="font-size:13px;color:var(--muted)">op basis van smaakprofiel</span></div>'
- +'<div class="grid">'+sims.map(x=>card(x)).join("")+'</div></div>'
+ +(sims.length
+   ?'<div style="margin-top:52px"><div class="sec-head"><h2>Vergelijkbare whisky\'s</h2><span style="font-size:13px;color:var(--muted)">op basis van smaakprofiel</span></div>'
+    +'<div class="grid">'+sims.map(x=>card(x)).join("")+'</div></div>'
+   :(function(){var z=zelfdeStokerij(p,3);return z.length
+     ?'<div style="margin-top:52px"><div class="sec-head"><h2>Meer van '+p.dist+'</h2><span style="font-size:13px;color:var(--muted)">deze fles heeft nog geen smaakprofiel</span></div>'
+      +'<div class="grid">'+z.map(x=>card(x)).join("")+'</div></div>'
+     :"";})())
  +'</div></section>';
 }
 function vVergelijk(){
- var ps=P.filter(p=>compareSet.has(p.id));
+ /* Zocht in de 20 handgemaakte producten; wie twee echte flessen aanvinkt kreeg
+    een lege vergelijkpagina. */
+ var ps=CAT.filter(p=>compareSet.has(p.id));
  if(!ps.length)return'<section><div class="wrap"><h2>Vergelijk whisky\'s</h2><p class="sec-sub" style="margin-top:10px">Nog niets geselecteerd. Vink "Vergelijk" aan op maximaal drie productkaarten in de <a href="#/collectie" style="color:var(--amber)">collectie</a>.</p></div></section>';
  var row=(lbl,fn)=>'<tr><th>'+lbl+'</th>'+ps.map(fn).join("")+'</tr>';
  return '<section><div class="wrap"><div class="sec-head"><h2>Vergelijk whisky\'s</h2><button class="btn btn-g btn-s" onclick="clearCompare();render()">Alles wissen</button></div>'
@@ -2443,7 +2470,9 @@ function updateBadges(){
 function somToggle(){el("som").classList.toggle("show");}
 function best(scoreFn,exclude,budget){
  exclude=exclude||[];
- return P.filter(p=>!p.rare&&exclude.indexOf(p.id)<0&&(budget==null||p.price<=budget))
+ /* Ook de AI-sommelier adviseerde uit 20 flessen. Alleen flessen met een gelezen
+    profiel, want zijn hele redenering gaat over smaak. */
+ return CAT.filter(p=>!p.rare&&!p.geenprofiel&&exclude.indexOf(p.id)<0&&(budget==null||p.price<=budget))
   .map(p=>({p,s:scoreFn(p)})).sort((a,b)=>b.s-a.s).slice(0,2).map(o=>o.p);
 }
 function recHtml(list,why){
