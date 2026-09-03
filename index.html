@@ -140,6 +140,17 @@ h2{font-size:29px}
 .bbtn.aan.nee{background:#8c2f2f;border-color:#8c2f2f}
 .bbtn.aan.neutraal{background:#6b6259;border-color:#6b6259}
 .bstatus{width:100%;text-align:right;font-size:10.5px;color:var(--muted);margin-top:4px}
+.brij.prof{align-items:flex-start}
+.passen{margin-top:7px;display:grid;gap:3px}
+.pas{display:grid;grid-template-columns:120px 92px 1fr;gap:10px;align-items:center;font-size:11.5px}
+.pnaam{color:var(--text)}
+.pnaam em{color:var(--muted);font-style:normal;font-size:10px}
+.pbol{display:flex;gap:3px}
+.pbol b{width:13px;height:13px;border-radius:50%;background:var(--line);cursor:pointer;display:inline-block}
+.pbol b:hover{outline:2px solid var(--amber);outline-offset:1px}
+.pbol b.aan{background:var(--amber)}
+.pbew{color:var(--muted);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:720px){.pas{grid-template-columns:90px 92px;}.pbew{grid-column:1/-1}}
 .bacties{display:flex;gap:10px;margin-top:22px}
 @media(max-width:720px){.brij{grid-template-columns:44px 1fr}.bkeuze{grid-column:1/-1;justify-content:flex-start;max-width:none}}
 .tbars{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-items:end;height:24px}
@@ -2423,6 +2434,19 @@ function bAlles(soort,waarde){
  rij.forEach(function(x){BSLT[x.id]={w:waarde,op:new Date().toISOString().slice(0,16),groep:true};});
  bBewaar();render();
 }
+var BASSEN=["rook","zoet","fruit","kruidig","lichaam","zilt"];
+var BHERK={eigen:"uit de eigen proefnotitie",zuster:"geschat uit andere flessen van dit merk",review:"uit een externe proefnotitie","":"niet gelezen"};
+/* Een as bijstellen is geen ja/nee. Jack proeft deze whisky's; als hij zegt dat
+   rook een 3 is en geen 5, dan is dat de waarde — niet 'afgekeurd'. Het besluit
+   bewaart daarom de hele reeks, met de oorspronkelijke waarden ernaast zodat
+   achteraf te zien is wat hij veranderd heeft. */
+function bAs(id,i,v){
+ var it=BEOORDELING.items.filter(function(x){return x.id===id;})[0];if(!it)return;
+ var huidig=(BSLT[id]&&BSLT[id].w&&BSLT[id].w.a)?BSLT[id].w.a.slice():it.assen.slice();
+ huidig[i]=(huidig[i]===v)?null:v;
+ BSLT[id]={w:{a:huidig,was:it.assen},op:new Date().toISOString().slice(0,16)};
+ bBewaar();render();
+}
 function bFilter(f){BFILTER=f;render();}
 function bWis(){if(confirm("Alle eigen besluiten wissen? Dit kan niet ongedaan worden gemaakt.")){BSLT={};bBewaar();render();}}
 function bUitvoer(){
@@ -2442,11 +2466,14 @@ function bKopieer(){var ta=document.querySelector("#buitvoer textarea");ta.selec
 function vAdminBeoordeel(){
  if(typeof BEOORDELING==="undefined")return '<h3 style="font-size:20px">Beoordelen</h3><p style="color:var(--muted)">De beoordeelrij is niet geladen.</p>';
  var alle=BEOORDELING.items, gedaan=Object.keys(BSLT).length;
- var soorten=[["herkomst","Herkomst van een stokerij"],["turf","Turflabel"],["vat","Vatsoort"]];
+ var soorten=[["herkomst","Herkomst van een stokerij"],["profiel","Smaakprofiel"],["turf","Turflabel"],["vat","Vatsoort"]];
  var tel={};soorten.forEach(function(s){tel[s[0]]=alle.filter(function(x){return x.k===s[0];}).length;});
  var open=alle.filter(function(x){return !BSLT[x.id];});
  var lijst=BFILTER==="open"?open:BFILTER==="gedaan"?alle.filter(function(x){return BSLT[x.id];}):alle.filter(function(x){return x.k===BFILTER;});
- var TOON=60,rest=Math.max(0,lijst.length-TOON);
+ /* Een profielkaart is zes regels hoog; twintig daarvan is al een volle pagina.
+    De andere soorten zijn eenregelig, daar kunnen er zestig op. */
+ var TOON=(BFILTER==="profiel"||lijst.filter(function(x){return x.k==="profiel";}).length>lijst.length/2)?20:60;
+ var rest=Math.max(0,lijst.length-TOON);
 
  var knop=function(id,w,lbl,kl){var a=BSLT[id]&&BSLT[id].w===w;
   return '<button class="bbtn'+(a?" aan":"")+(kl?" "+kl:"")+'" onclick="bZet(\''+id+'\','+(a?'null':JSON.stringify(w).replace(/"/g,"&quot;"))+')">'+lbl+'</button>';};
@@ -2463,8 +2490,27 @@ function vAdminBeoordeel(){
     +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+x.id+'\',v)">Ander land…</button>'
     +(x.twijfel?knop(x.id,"bottelaar","Is een bottelaar","neutraal")+knop(x.id,"geen naam","Geen naam","neutraal"):"")
     +knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }else if(x.k==="profiel"){
+   keuzes=knop(x.id,"ja","Klopt","ja")+knop(x.id,"onbekend","Weet ik niet","neutraal");
   }else{
    keuzes=knop(x.id,"ja","Overnemen","ja")+knop(x.id,"nee","Niet overnemen","nee")+knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }
+  if(x.k==="profiel"){
+   var w=(b&&b.w&&b.w.a)?b.w.a:x.assen;
+   var assen=BASSEN.map(function(naam,i){
+    var bw=(x.bew[i]||[]).join(", ");
+    return '<div class="pas"><span class="pnaam" title="'+(BHERK[x.herk[i]]||"")+'">'+naam
+     +(x.herk[i]==="zuster"?' <em>geschat</em>':x.herk[i]===""?' <em>—</em>':'')+'</span>'
+     +'<span class="pbol">'+[0,1,2,3,4,5].map(function(n){
+        return '<b class="'+(w[i]===n?"aan":"")+'" title="'+n+'" onclick="bAs(\''+x.id+'\','+i+','+n+')"></b>';}).join("")+'</span>'
+     +'<span class="pbew">'+(bw||(x.herk[i]==="zuster"?"geen woorden op deze fles gelezen":""))+'</span></div>';
+   }).join("");
+   return '<div class="brij prof'+(b?" af":"")+'">'
+    +(x.foto?'<img loading="lazy" src="'+x.foto+'" alt="">':'<div class="bgeen"></div>')
+    +'<div class="bmid"><div class="btitel">'+x.titel+'</div>'
+    +(x.uitleg?'<div class="buit">'+x.uitleg+'</div>':"")
+    +'<div class="passen">'+assen+'</div></div>'
+    +'<div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.w&&b.w.a?"bijgesteld":"")+' '+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
   }
   return '<div class="brij'+(b?" af":"")+'">'
    +(x.foto?'<img loading="lazy" src="'+x.foto+'" alt="">':'<div class="bgeen">'+(x.flessen||"")+(x.k==="herkomst"?'<small>flessen</small>':'')+'</div>')
