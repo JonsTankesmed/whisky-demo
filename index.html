@@ -116,6 +116,58 @@ h2{font-size:29px}
 .pmeta{font-size:12px;color:var(--muted)}
 .tags{display:flex;gap:5px;flex-wrap:wrap}
 .tag{font-size:10.5px;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:2px 8px}
+.geenprofiel{font-size:11.5px;color:var(--muted);font-style:italic;padding:6px 0;line-height:1.4}
+/* beoordeelrij */
+.bvoortgang{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+.bvoortgang>div{height:100%;background:var(--amber);transition:width .3s}
+.bfilters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.bfil{font:inherit;font-size:12px;padding:6px 11px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:20px;cursor:pointer}
+.bfil.aan{background:var(--amber);border-color:var(--amber);color:#fff}
+.bbulk{font-size:12.5px;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.brij{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line)}
+.brij.af{opacity:.5}
+.brij img{width:52px;height:52px;object-fit:contain;background:var(--card2);border-radius:8px}
+.bgeen{width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card2);border-radius:8px;font-size:15px;font-weight:600;color:var(--amber);line-height:1}
+.bgeen small{font-size:8px;color:var(--muted);font-weight:400;letter-spacing:.04em}
+.btitel{font-size:13.5px;font-weight:600;line-height:1.3}
+.buit{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.bvoor{font-size:11.5px;margin-top:4px;color:var(--muted)}
+.bvoor b{color:var(--text)}
+.bkeuze{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:340px}
+.bbtn{font:inherit;font-size:11.5px;padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;cursor:pointer;white-space:nowrap}
+.bbtn:hover{border-color:var(--amber)}
+.bbtn.aan{background:var(--amber);border-color:var(--amber);color:#fff}
+.bbtn.aan.nee{background:#8c2f2f;border-color:#8c2f2f}
+.bbtn.aan.neutraal{background:#6b6259;border-color:#6b6259}
+.bstatus{width:100%;text-align:right;font-size:10.5px;color:var(--muted);margin-top:4px}
+.brij.prof{align-items:flex-start}
+.passen{margin-top:7px;display:grid;gap:3px}
+.pas{display:grid;grid-template-columns:120px 92px 1fr;gap:10px;align-items:center;font-size:11.5px}
+.pnaam{color:var(--text)}
+.pnaam em{color:var(--muted);font-style:normal;font-size:10px}
+.pbol{display:flex;gap:3px}
+.pbol b{width:13px;height:13px;border-radius:50%;background:var(--line);cursor:pointer;display:inline-block}
+.pbol b:hover{outline:2px solid var(--amber);outline-offset:1px}
+.pbol b.aan{background:var(--amber)}
+.pbew{color:var(--muted);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:720px){.pas{grid-template-columns:90px 92px;}.pbew{grid-column:1/-1}}
+.pblok{margin-top:9px}
+.pkop{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.pkop span{text-transform:none;letter-spacing:0;font-size:10.5px;opacity:.75;margin-left:6px}
+.poms{font-size:12.5px;line-height:1.5;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.poms.gewijzigd{border-color:var(--amber)}
+.pkn{display:flex;gap:6px;margin-top:6px}
+.pleeg{font-size:11.5px;color:var(--muted);font-style:italic;line-height:1.45}
+.pbron{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.pbron a{color:var(--amber);text-decoration:none}
+.bacties{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.bpaneel{background:var(--card2);border:1px solid var(--amber);border-radius:14px;padding:14px 16px;margin-top:16px}
+.bpkop{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.bpkop b{font-size:14px}
+.bpkop span{font-size:11.5px;color:var(--muted);flex:1}
+.bpaneel .pas{grid-template-columns:110px 92px 1fr}
+
+@media(max-width:720px){.brij{grid-template-columns:44px 1fr}.bkeuze{grid-column:1/-1;justify-content:flex-start;max-width:none}}
 .tbars{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-items:end;height:24px}
 .tbar{position:relative;background:var(--line);border-radius:2px;overflow:hidden;height:100%}
 .tbar b{position:absolute;bottom:0;left:0;right:0;background:var(--gold);display:block}
@@ -599,14 +651,37 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
       <li><a href="#/ontdek" style="color:var(--amber)">Smaakprofiel-wizard</a></li>
       <li><a href="#/vergelijk" style="color:var(--amber)">Vergelijkpagina</a></li>
       <li><a href="#/kaart" style="color:var(--amber)">Distilleerderijkaart</a></li>
+      <li><a href="#/admin/voortgang" style="color:var(--amber)">Voortgang project</a></li>
     </ul></div>
   </div>
-  <div class="wrap f18">Geen 18, geen alcohol. © 2026 Whiskysite.nl — demo-concept, geen officiële website.</div>
+  <div class="wrap f18">Geen 18, geen alcohol. © 2026 Whiskysite.nl — demo-concept, geen officiële website.<span id="beheerlink"></span></div>
 </footer>
+<script>
+/* Discrete ingang naar de beheeromgeving. De beheerkant blijft uit de footer en
+   uit de zoekmachines (commit c08a1e7); dit toont alleen een klein linkje aan wie
+   #/admin al kent, zodat je die URL niet elke keer hoeft in te typen.
+   Weghalen: localStorage.removeItem("wsadmin") in de console van die browser. */
+(function(){
+ function toon(){
+  var el=document.getElementById("beheerlink");
+  if(!el||el.firstChild)return;
+  el.innerHTML=' · <a href="#/admin" style="color:var(--muted);text-decoration:none">Beheer</a>';
+ }
+ function check(){
+  try{
+   if((location.hash||"").indexOf("#/admin")===0)localStorage.setItem("wsadmin","1");
+   if(localStorage.getItem("wsadmin")==="1")toon();
+  }catch(e){}
+ }
+ window.addEventListener("hashchange",check);
+ check();
+})();
+</script>
 
 <div class="toast" id="toast"></div>
 
 <script src="catalogus-lokaal.js" onerror="void 0"></script>
+<script src="beoordeling.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
@@ -740,9 +815,25 @@ var byId=id=>CAT.find(p=>p.id===id);
 function toast(m){var t=el("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("show"),1900);}
 function esc(s){return s.replace(/'/g,"\\'");}
 /* ================= HELPERS ================= */
-function matchPct(p,prof){var d=0;for(var i=0;i<6;i++)d+=Math.pow(p.t[i]-prof[i],2);return Math.max(0,Math.round(100-Math.sqrt(d)*7));}
-function similar(p,n){return P.filter(x=>x.id!==p.id&&!x.rare).map(x=>({x,d:x.t.reduce((s,v,i)=>s+Math.abs(v-p.t[i]),0)})).sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
-function bars(t){return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*10)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
+/* Een fles zonder gelezen smaakprofiel krijgt geen matchpercentage. Zonder deze
+   regel rekent de match tegen de neutrale [5,5,5,5,5,5] die normEcht invult, en
+   dan staat er een percentage op een kaart waar niets onder ligt. */
+function matchPct(p,prof){if(p.geenprofiel)return null;var d=0;for(var i=0;i<6;i++)d+=Math.pow(p.t[i]-prof[i],2);return Math.max(0,Math.round(100-Math.sqrt(d)*7));}
+/* Vergelijkbaar op smaak kan alleen tussen flessen die allebei een gelezen
+   profiel hebben. Zocht eerst alleen in de 20 handgemaakte producten; nu in de
+   hele catalogus, maar zonder de flessen waarvan het profiel nog ontbreekt. */
+function similar(p,n){
+ if(p.geenprofiel)return[];
+ return CAT.filter(x=>x.id!==p.id&&!x.rare&&!x.geenprofiel)
+  .map(x=>({x,d:x.t.reduce((s,v,i)=>s+Math.abs(v-p.t[i]),0)}))
+  .sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
+/* Zonder smaakprofiel is 'vergelijkbaar' een loze belofte. Dan tonen we wat we
+   wél zeker weten: andere flessen van dezelfde distilleerderij. */
+function zelfdeStokerij(p,n){
+ return CAT.filter(x=>x.id!==p.id&&x.dist===p.dist&&p.dist!=="Onbekend").slice(0,n);}
+function bars(t,geen){
+ if(geen)return '<div class="geenprofiel">Nog geen smaakprofiel — deze fles wacht op beoordeling.</div>';
+ return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*10)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
 function card(p,prof,opt){
  var m=prof?matchPct(p,prof):null;
  /* compact: rustige kaart voor de homepage — smaaktags en smaakbalkjes staan op de productpagina */
@@ -755,7 +846,7 @@ function card(p,prof,opt){
  +'<div class="pbody"><div class="pname" onclick="go(\'#/product/'+p.id+'\')">'+p.name+(p.demo?'<span class="demoflag" title="Gegenereerd voorbeeldproduct, geen echte botteling">voorbeeld</span>':'')+'</div>'
  +'<div class="pmeta">'+p.region+' · '+p.age+' · '+p.abv+'</div>'
  +(p.rev?'<div class="rev" style="color:var(--muted);font-weight:500">Proefnotitie voorzien · '+p.rev.s+'</div>':"")
- +(compact?"":'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'+bars(p.t))
+ +(compact?"":'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'+bars(p.t,p.geenprofiel))
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div class="prow"><button class="add" '+(p.rare?"disabled":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +(p.sample?'<button class="smp" onclick="add(\'Sample: '+esc(p.name)+'\')">Sample '+eur(p.sample)+'</button>':"")+'</div>'
@@ -842,10 +933,17 @@ function normEcht(p){
  if(/rum/.test(c))v.push("rum");
  if(/virgin|new american|getoast|toasted|re-charred/.test(c))v.push("virgin oak");
  p._vaten=v.length?v:["overig"];
- p._turf=p.t[0]>=7?2:(p.t[0]>=4?1:0);
- p._vol=70;p._sample=/sample|5cl|3cl/i.test(p.name||"");p._dagen=p.isNew?12:200;p._voorraad=!p.rare;
- if(!p.img)p.img=BOTTLE;
+ /* Zonder gelezen smaakprofiel is de turfwaarde niet af te leiden. Hem op 0
+    zetten zou 'ongeturfd' beweren over 4.992 flessen die we niet gelezen hebben;
+    null geeft ze een eigen filterwaarde 'Nog niet bepaald'. */
+ p.geenprofiel=!p.t;
  if(!p.t)p.t=[5,5,5,5,5,5];
+ p._turf=p.geenprofiel?null:(p.t[0]>=7?2:(p.t[0]>=4?1:0));
+ if(p._vol==null)p._vol=70;
+ if(p._sample==null)p._sample=/sample|5cl|3cl/i.test(p.name||"");
+ p._dagen=p.isNew?12:200;
+ if(p._voorraad==null)p._voorraad=!p.rare;
+ if(!p.img)p.img=BOTTLE;
  p.merk=p.merk||p.dist;
  return p;
 }
@@ -861,7 +959,7 @@ var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
 function bktLeeftijd(p){if(p._leeftijd===null)return "Geen leeftijd (NAS)";var a=p._leeftijd;
  return a<10?"Tot 10 jaar":a<15?"10 tot 15 jaar":a<21?"15 tot 21 jaar":"21 jaar en ouder";}
 function bktSterkte(p){return p._abv>=50?"Vatsterkte (50%+)":p._abv>=46?"46 tot 50%":"Tot 46%";}
-function lblTurf(p){return p._turf===2?"Uitgesproken turf":p._turf===1?"Licht turfig":"Ongeturfd";}
+function lblTurf(p){return p._turf==null?"Nog niet bepaald":p._turf===2?"Uitgesproken turf":p._turf===1?"Licht turfig":"Ongeturfd";}
 /* de facetlijst is redactioneel beheerd, niet afgeleid uit de producten:
    anders komen streek en land door elkaar te staan ("Blend" naast "Islay") */
 var STREKEN=["Islay","Speyside","Highland","Island","Lowland","Campbeltown"];
@@ -872,9 +970,13 @@ var FACETS=[
  {id:"vat",n:"Vatsoort",vs:function(p){return p._vaten;}},
  {id:"leeftijd",n:"Leeftijd",v:bktLeeftijd,vast:["Tot 10 jaar","10 tot 15 jaar","15 tot 21 jaar","21 jaar en ouder","Geen leeftijd (NAS)"]},
  {id:"sterkte",n:"Alcohol",v:bktSterkte,vast:["Tot 46%","46 tot 50%","Vatsterkte (50%+)"]},
- {id:"turf",n:"Turf",v:lblTurf,vast:["Ongeturfd","Licht turfig","Uitgesproken turf"]},
+ {id:"turf",n:"Turf",v:lblTurf,vast:["Ongeturfd","Licht turfig","Uitgesproken turf","Nog niet bepaald"]},
  {id:"bottelaar",n:"Bottelaar",v:function(p){return p.ib?"Independent bottler":"Eigen botteling";}},
- {id:"inhoud",n:"Inhoud",v:function(p){return p._sample?"Sample (5cl)":"Fles (70cl)";}}
+ {id:"inhoud",n:"Inhoud",v:function(p){
+   /* De echte catalogus kent meer maten dan 5cl en 70cl: 3cl-samples,
+      halve flessen, literflessen voor de taxfree. Vandaar de werkelijke maat. */
+   if(p._sample)return "Sample ("+(p._vol||5)+"cl)";
+   return "Fles ("+(p._vol||70)+"cl)";}}
 ];
 function waardenVan(p,f){return f.vs?f.vs(p):(f.v(p)?[f.v(p)]:[]);}
 function facetTreffer(p,f,gekozen){
@@ -933,7 +1035,12 @@ function relScore(p){
 }
 function sorteer(l){
  var s=F.sort;
- if(s==="match"&&PROFILE)return l.slice().sort(function(a,b){return matchPct(b,PROFILE)-matchPct(a,PROFILE);});
+ /* Flessen zonder profiel hebben geen match en gaan achteraan, niet in het
+    midden — anders duwt een ontbrekende meting ze tussen de echte treffers. */
+ if(s==="match"&&PROFILE)return l.slice().sort(function(a,b){
+  var x=matchPct(a,PROFILE),y=matchPct(b,PROFILE);
+  if(x===null&&y===null)return 0; if(x===null)return 1; if(y===null)return -1;
+  return y-x;});
  if(s==="priceAsc")return l.slice().sort(function(a,b){return a.price-b.price;});
  if(s==="priceDesc")return l.slice().sort(function(a,b){return b.price-a.price;});
  if(s==="ageDesc")return l.slice().sort(function(a,b){return (b._leeftijd||0)-(a._leeftijd||0);});
@@ -1055,7 +1162,7 @@ function vCollectie(){
  var lijst=sorteer(selectie(null)),n=lijst.length,toon=lijst.slice(0,120);
  return '<section><div class="wrap">'
  +'<div class="sec-head"><h2>'+(F.cat?CATS[F.cat]:"Collectie")+'</h2></div>'
- +'<div class="previewbar"><div>'+(LOKAAL?'<b>Lokale weergave met de echte catalogus.</b> '+CAT.length.toLocaleString("nl-NL")+' producten uit de export van fase 0. Dit bestand staat alleen op deze computer.'
+ +'<div class="previewbar"><div>'+(LOKAAL?'<b>De echte catalogus.</b> '+CAT.length.toLocaleString("nl-NL")+' producten uit de Lightspeed-export van fase 0, met omschrijvingen en smaakprofielen uit de pijplijn. Van '+LOKAAL.filter(function(p){return !p.geenprofiel;}).length.toLocaleString("nl-NL")+' flessen is het smaakprofiel uit de eigen proefnotities gelezen; de rest wacht op beoordeling en toont geen profiel.'
   :'<b>Preview zonder koppeling.</b> Deze weergave toont 20 echte flessen naast '+DEMO_AANTAL.toLocaleString("nl-NL")
   +' voorbeeldproducten, zodat het filteren en sorteren op schaal te beoordelen is. Er zit geen sleutel in deze pagina en er wordt niets bij Lightspeed opgehaald.')+'</div></div>'
  +(F.cat&&CATSUB[F.cat]?'<div class="tnote">'+CATSUB[F.cat]+'</div>':"")
@@ -1887,40 +1994,95 @@ function vOntdek(){
 function updMatches(){
  var box=el("mlist");if(!box)return;
  var prof=[SL[0],SL[1],SL[2],SL[3],SL[4],SL[5]];
- var top=P.filter(p=>!p.rare).map(p=>({p,m:matchPct(p,prof)})).sort((a,b)=>b.m-a.m).slice(0,3);
+ /* De smaakprofiel-wizard zocht in de 20 handgemaakte producten. Dat is de
+    kernbelofte van de site, dus die zoekt nu in alle flessen met een gelezen
+    profiel — 1.379 in plaats van 20. */
+ var top=CAT.filter(p=>!p.rare&&!p.geenprofiel).map(p=>({p,m:matchPct(p,prof)})).sort((a,b)=>b.m-a.m).slice(0,3);
  box.innerHTML=top.map(o=>'<div class="mcard" onclick="go(\'#/product/'+o.p.id+'\')">'
  +'<div class="mring">'+o.m+'%</div><div><div class="rg">'+o.p.region+'</div><div class="nm">'+o.p.name+'</div>'
  +'<div style="font-size:11.5px;color:var(--muted)">'+o.p.tags.slice(0,2).join(" · ")+(o.p.sample?' · sample '+eur(o.p.sample):'')+'</div></div>'
  +'<div class="pr">'+eur(o.p.price)+'</div></div>').join("");
+}
+/* Streek en land zijn bij Japan, Taiwan en Nederland hetzelfde woord; die twee
+   keer naast elkaar zetten leest als een fout. */
+function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+')';}
+/* De inhoud stond hard op 0,70 ltr. Deze catalogus heeft 3cl-samples,
+   halve flessen en literflessen; dan is een vaste tekst gewoon onjuist. */
+function volTekst(p){var v=p._vol||70;return (v/100).toFixed(2).replace(".",",")+" ltr";}
+/* Het beoordeelpaneel op de productpagina zelf. Dezelfde besluiten als in de
+   lijst, maar naast de pagina die de klant straks ziet. */
+function bPaneel(p){
+ if(!BMODUS)return "";
+ var x=bItemVan(p.id);
+ if(!x)return '<div class="bpaneel"><b>Beoordelen staat aan</b><p>Voor dit product ligt geen beoordeling klaar.</p>'
+  +'<div class="pkn"><button class="bbtn" onclick="bVolgende()">Volgende →</button>'
+  +'<button class="bbtn" onclick="bModus(false)">Beoordelen uit</button></div></div>';
+ var b=BSLT[x.id], oms=b&&b.w&&b.w.oms;
+ var w=(b&&b.w&&b.w.a)?b.w.a:(x.assen||null);
+ var rij=BEOORDELING.items.filter(function(i){return i.k==="product";});
+ var gedaan=rij.filter(function(i){return BSLT[i.id];}).length;
+ var assen=x.assen?BASSEN.map(function(naam,i){
+   var bw=(x.bew[i]||[]).join(", ");
+   return '<div class="pas"><span class="pnaam" title="'+(BHERK[x.herk[i]]||"")+'">'+naam
+    +(x.herk[i]==="zuster"?' <em>geschat</em>':'')+'</span>'
+    +'<span class="pbol">'+[0,1,2,3,4,5].map(function(n){
+       return '<b class="'+(w&&w[i]===n?"aan":"")+'" onclick="bAs(\''+x.id+'\','+i+','+n+')"></b>';}).join("")+'</span>'
+    +'<span class="pbew">'+(bw||"geen woorden op deze fles gelezen")+'</span></div>';}).join("")
+  :'<div class="pleeg">Geen smaakprofiel — geen proefnotitie bij dit product en te weinig zusterflessen.</div>';
+ return '<div class="bpaneel">'
+  +'<div class="bpkop"><b>Beoordelen</b> <span>'+gedaan+' van '+rij.length+' gedaan</span>'
+  +'<button class="bbtn" onclick="bModus(false)">Uitzetten</button></div>'
+  +'<div class="pblok"><div class="pkop">Omschrijving <span>de tekst hierboven</span></div><div class="pkn">'
+  +'<button class="bbtn'+(oms==="ja"?" aan ja":"")+'" onclick="bOms(\''+x.id+'\',\'ja\')">Akkoord</button>'
+  +'<button class="bbtn" onclick="bOmsTekst(\''+x.id+'\')">Aanpassen…</button>'
+  +'<button class="bbtn'+(oms==="nee"?" aan nee":"")+'" onclick="bOms(\''+x.id+'\',\'nee\')">Niet plaatsen</button></div></div>'
+  +'<div class="pblok"><div class="pkop">Smaakprofiel <span>klik om bij te stellen</span></div><div class="passen">'+assen+'</div></div>'
+  +((x.bronnen&&x.bronnen.length)?'<div class="pblok"><div class="pkop">Waar dit vandaan komt</div><div class="pbron">'
+    +x.bronnen.map(function(bn){return bn.u?'<a href="'+bn.u+'" target="_blank" rel="noopener">'+bn.n+' ↗</a>':'<span>'+bn.n+'</span>';}).join("")
+    +'</div></div>':"")
+  +'<div class="pkn" style="margin-top:12px">'
+  +'<button class="bbtn'+(b&&b.w==="ja"?" aan ja":"")+'" onclick="bZet(\''+x.id+'\',\'ja\')">Alles klopt</button>'
+  +'<button class="bbtn" onclick="bVolgende()">Volgende te beoordelen →</button>'
+  +'<a class="bbtn" href="#/admin/beoordeel" style="text-decoration:none">Naar de lijst</a></div></div>';
 }
 function vProduct(rt){
  var p=byId(rt.id);if(!p)return'<section><div class="wrap">Niet gevonden. <a href="#/collectie" style="color:var(--amber)">Terug</a></div></section>';
  var sims=similar(p,3);
  return '<section><div class="wrap">'
  +'<a class="back" href="#/collectie">← Terug naar collectie</a>'
+ +bPaneel(p)
  +'<div class="pd" style="margin-top:22px"><div class="pd-img"><img src="'+p.img+'" alt=""></div><div>'
- +'<div class="kicker">'+p.region+' · '+p.country+'</div><h1>'+p.name+'</h1>'
- +'<div class="pmeta">'+p.dist+' · '+p.age+' · '+p.abv+' · 0,70 ltr</div>'
- +'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>'
+ +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
+ +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
+ +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
  +(p.rev?'<div class="revbox"><span style="color:var(--muted)">Hier komt de proefnotitie van de schrijver — zijn eigen woorden, een fragment of de hele tekst.</span>'
   +'<div class="revsrc">— <b>'+p.rev.s+'</b> · <a href="'+revLink(p)+'" target="_blank" rel="noopener">'+p.rev.u+' →</a>'
   +'<span class="demoflag">voorbeeld · nog geen toestemming</span></div></div>':"")
- +'<div class="tags">'+p.tags.map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
+ +'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +'<button class="btn btn-g" onclick="cmpAdd(\''+p.id+'\')">+ Vergelijk</button>'
  +'<button class="btn btn-g" style="gap:8px" onclick="wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+(wish.has(p.id)?" Bewaard":" Bewaar")+'</button></div>'
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="add(\'Sample: '+esc(p.name)+'\')">Bestel sample</button></div>':"")
- +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t)+'</div>'
- +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+p.region+' ('+p.country+')</td></tr><tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+p.abv+'</td></tr><tr><th>Vatsoort</th><td>'+p.cask+'</td></tr><tr><th>Inhoud</th><td>0,70 ltr</td></tr></table>'
- +'<h3 style="font-size:18px">Lekker bij</h3><div class="pair">'+p.pair.map(x=>'<span>'+x+'</span>').join("")+'</div>'
+ +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
+ +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+plaats(p)+'</td></tr><tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+(p.abv||"—")+'</td></tr><tr><th>Vatsoort</th><td>'+(p.cask||"—")+'</td></tr><tr><th>Inhoud</th><td>'+volTekst(p)+'</td></tr></table>'
+ /* De 20 handgemaakte producten hebben een spijsadvies, de 6.371 uit de winkel
+    niet. Dan valt de hele kop weg — een lege 'Lekker bij' is erger dan geen. */
+ +((p.pair&&p.pair.length)?'<h3 style="font-size:18px">Lekker bij</h3><div class="pair">'+p.pair.map(x=>'<span>'+x+'</span>').join("")+'</div>':"")
  +'</div></div>'
- +'<div style="margin-top:52px"><div class="sec-head"><h2>Vergelijkbare whisky\'s</h2><span style="font-size:13px;color:var(--muted)">op basis van smaakprofiel</span></div>'
- +'<div class="grid">'+sims.map(x=>card(x)).join("")+'</div></div>'
+ +(sims.length
+   ?'<div style="margin-top:52px"><div class="sec-head"><h2>Vergelijkbare whisky\'s</h2><span style="font-size:13px;color:var(--muted)">op basis van smaakprofiel</span></div>'
+    +'<div class="grid">'+sims.map(x=>card(x)).join("")+'</div></div>'
+   :(function(){var z=zelfdeStokerij(p,3);return z.length
+     ?'<div style="margin-top:52px"><div class="sec-head"><h2>Meer van '+p.dist+'</h2><span style="font-size:13px;color:var(--muted)">deze fles heeft nog geen smaakprofiel</span></div>'
+      +'<div class="grid">'+z.map(x=>card(x)).join("")+'</div></div>'
+     :"";})())
  +'</div></section>';
 }
 function vVergelijk(){
- var ps=P.filter(p=>compareSet.has(p.id));
+ /* Zocht in de 20 handgemaakte producten; wie twee echte flessen aanvinkt kreeg
+    een lege vergelijkpagina. */
+ var ps=CAT.filter(p=>compareSet.has(p.id));
  if(!ps.length)return'<section><div class="wrap"><h2>Vergelijk whisky\'s</h2><p class="sec-sub" style="margin-top:10px">Nog niets geselecteerd. Vink "Vergelijk" aan op maximaal drie productkaarten in de <a href="#/collectie" style="color:var(--amber)">collectie</a>.</p></div></section>';
  var row=(lbl,fn)=>'<tr><th>'+lbl+'</th>'+ps.map(fn).join("")+'</tr>';
  return '<section><div class="wrap"><div class="sec-head"><h2>Vergelijk whisky\'s</h2><button class="btn btn-g btn-s" onclick="clearCompare();render()">Alles wissen</button></div>'
@@ -1930,8 +2092,8 @@ function vVergelijk(){
  +row("Sample",p=>'<td>'+(p.sample?eur(p.sample):"—")+'</td>')
  +row("Vatsoort",p=>'<td>'+p.cask+'</td>')
  +row("Review",p=>'<td>'+(p.rev?'<span style="color:var(--muted);font-size:12px">proefnotitie voorzien</span><br><a href="'+revLink(p)+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px">'+p.rev.s+' ('+p.rev.u+') →</a>':"—")+'</td>')
- +DIMS.map((d,i)=>row(d,p=>'<td><span class="mini"><i style="width:'+(p.t[i]*9)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
- +row("Karakter",p=>'<td>'+p.tags.join(", ")+'</td>')
+ +DIMS.map((d,i)=>row(d,p=>p.geenprofiel?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*9)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
+ +row("Karakter",p=>'<td>'+((p.tags||[]).join(", ")||"—")+'</td>')
  +row("",p=>'<td><button class="btn btn-a btn-s" onclick="add(\''+esc(p.name)+'\')">In winkelwagen</button></td>')
  +'</table></div></div></section>';
 }
@@ -2296,11 +2458,207 @@ function vAdminBronnen(){
  +BRONVOOR.map(function(v){return '<li>'+v+'</li>';}).join("")+'</ul>'
  +'<p style="font-size:12px;color:var(--muted);margin-top:14px">Verkenning bij het voorstel van 17 augustus 2026 · Jons Tankesmed · kenmerk JT-VERK-2026-02</p></div>';
 }
+/* ================= BEOORDEELRIJ =================
+   Alles waar een mens iets over moet zeggen. Besluiten worden in de browser
+   bewaard en aan het eind als bestand teruggegeven; er is geen database, en
+   voor eenmalig werk is die de kosten niet waard. Daarom drie eigenschappen:
+   het onthoudt tussentijds, het toont hoeveel er nog ligt, en het geeft alles
+   in één keer terug. */
+var BSLT=(function(){try{return JSON.parse(localStorage.getItem("wsbeoordeling")||"{}");}catch(e){return{};}})();
+var BFILTER="open";
+function bBewaar(){try{localStorage.setItem("wsbeoordeling",JSON.stringify(BSLT));}catch(e){}}
+function bZet(id,waarde){
+ if(waarde===null)delete BSLT[id]; else BSLT[id]={w:waarde,op:new Date().toISOString().slice(0,16)};
+ bBewaar();render();
+}
+function bAlles(soort,waarde){
+ var rij=BEOORDELING.items.filter(function(x){return x.k===soort&&!BSLT[x.id];});
+ if(!rij.length)return;
+ if(!confirm("Dit zet in één keer "+rij.length+" openstaande voorstellen op “"+waarde+"”.\n\nHet wordt in de teruggave als groepsbesluit gemarkeerd, zodat achteraf zichtbaar is dat ze niet stuk voor stuk zijn bekeken.\n\nDoorgaan?"))return;
+ rij.forEach(function(x){BSLT[x.id]={w:waarde,op:new Date().toISOString().slice(0,16),groep:true};});
+ bBewaar();render();
+}
+/* Beoordelen op de pagina zelf.
+   De lijst is goed voor bulk — 726 vatvoorstellen achter elkaar wegtikken. Maar
+   'klopt dit product' beoordeel je niet uit een tabel: dan kijk je naar de
+   pagina zoals de klant hem straks ziet, met de foto, de tekst op zijn plek en
+   het profiel eronder. Daarom kan de beoordeling ook áán staan terwijl je door
+   de winkel loopt. */
+var BMODUS=(function(){try{return localStorage.getItem("wsbeoordeelmodus")==="1";}catch(e){return false;}})();
+function bModus(aan,spring){
+ BMODUS=!!aan;
+ try{localStorage.setItem("wsbeoordeelmodus",BMODUS?"1":"0");}catch(e){}
+ if(BMODUS&&spring)return bVolgende();
+ render();
+}
+function bItemVan(pid){
+ if(typeof BEOORDELING==="undefined")return null;
+ var r=BEOORDELING.items.filter(function(x){return x.k==="product"&&x.pid===String(pid);});
+ return r.length?r[0]:null;
+}
+function bVolgende(){
+ if(typeof BEOORDELING==="undefined")return;
+ var nu=(route().r==="product")?route().id:null, gezien=!nu;
+ var rij=BEOORDELING.items.filter(function(x){return x.k==="product";});
+ for(var i=0;i<rij.length;i++){
+  if(!gezien){if(rij[i].pid===String(nu))gezien=true;continue;}
+  if(!BSLT[rij[i].id]){location.hash="#/product/"+rij[i].pid;window.scrollTo(0,0);return;}
+ }
+ var open=rij.filter(function(x){return !BSLT[x.id];});
+ if(open.length){location.hash="#/product/"+open[0].pid;window.scrollTo(0,0);return;}
+ toast("Alles beoordeeld.");
+}
+var BASSEN=["rook","zoet","fruit","kruidig","lichaam","zilt"];
+var BHERK={eigen:"uit de eigen proefnotitie",zuster:"geschat uit andere flessen van dit merk",review:"uit een externe proefnotitie","":"niet gelezen"};
+/* Een as bijstellen is geen ja/nee. Jack proeft deze whisky's; als hij zegt dat
+   rook een 3 is en geen 5, dan is dat de waarde — niet 'afgekeurd'. Het besluit
+   bewaart daarom de hele reeks, met de oorspronkelijke waarden ernaast zodat
+   achteraf te zien is wat hij veranderd heeft. */
+function bAs(id,i,v){
+ var it=BEOORDELING.items.filter(function(x){return x.id===id;})[0];if(!it)return;
+ var huidig=(BSLT[id]&&BSLT[id].w&&BSLT[id].w.a)?BSLT[id].w.a.slice():it.assen.slice();
+ huidig[i]=(huidig[i]===v)?null:v;
+ BSLT[id]={w:{a:huidig,was:it.assen},op:new Date().toISOString().slice(0,16)};
+ bBewaar();render();
+}
+/* De omschrijving is onze tekst, niet die van de winkel: die hoort langs een
+   mens voordat hij op een productpagina staat. Drie uitkomsten — akkoord, een
+   eigen tekst, of niet plaatsen. Een eigen tekst is waardevoller dan een
+   afkeuring, want die kan zo de winkel in. */
+function bOms(id,waarde){
+ var h=BSLT[id]&&BSLT[id].w&&BSLT[id].w.a?BSLT[id].w.a:null;
+ BSLT[id]={w:{oms:waarde,a:h},op:new Date().toISOString().slice(0,16)};
+ bBewaar();render();
+}
+function bOmsTekst(id){
+ var it=BEOORDELING.items.filter(function(x){return x.id===id;})[0];if(!it)return;
+ var p=byId(it.pid)||{};
+ var nu=(BSLT[id]&&BSLT[id].w&&typeof BSLT[id].w.oms==="string"&&BSLT[id].w.oms!=="ja"&&BSLT[id].w.oms!=="nee")?BSLT[id].w.oms:(p.sum||"");
+ var v=prompt("Pas de omschrijving aan zoals hij op de productpagina moet staan:",nu);
+ if(v!==null&&v.trim())bOms(id,v.trim());
+}
+function bFilter(f){BFILTER=f;render();}
+function bWis(){if(confirm("Alle eigen besluiten wissen? Dit kan niet ongedaan worden gemaakt.")){BSLT={};bBewaar();render();}}
+function bUitvoer(){
+ var uit={gemaakt:new Date().toISOString().slice(0,16),bron:BEOORDELING.gemaakt,
+  besluiten:Object.keys(BSLT).map(function(k){var x=BEOORDELING.items.filter(function(i){return i.id===k;})[0]||{};
+   return{id:k,soort:x.k||"?",titel:x.titel||"",voorstel:x.voorstel||"",besluit:BSLT[k].w,wanneer:BSLT[k].op,groepsbesluit:!!BSLT[k].groep};})};
+ var t=JSON.stringify(uit,null,1);
+ var d=document.getElementById("buitvoer");
+ d.style.display="block";d.querySelector("textarea").value=t;
+ var a=d.querySelector("a.dl");
+ a.href=URL.createObjectURL(new Blob([t],{type:"application/json"}));
+ a.download="beoordeling-"+new Date().toISOString().slice(0,10)+".json";
+ d.querySelector("textarea").select();
+}
+function bKopieer(){var ta=document.querySelector("#buitvoer textarea");ta.select();
+ try{document.execCommand("copy");toast("Gekopieerd — plak het in een bericht aan John.");}catch(e){toast("Selecteer de tekst en kopieer met Ctrl+C.");}}
+function vAdminBeoordeel(){
+ if(typeof BEOORDELING==="undefined")return '<h3 style="font-size:20px">Beoordelen</h3><p style="color:var(--muted)">De beoordeelrij is niet geladen.</p>';
+ var alle=BEOORDELING.items, gedaan=Object.keys(BSLT).length;
+ var soorten=[["herkomst","Herkomst van een stokerij"],["product","Per product"],["turf","Turflabel"],["vat","Vatsoort"]];
+ var tel={};soorten.forEach(function(s){tel[s[0]]=alle.filter(function(x){return x.k===s[0];}).length;});
+ var open=alle.filter(function(x){return !BSLT[x.id];});
+ var lijst=BFILTER==="open"?open:BFILTER==="gedaan"?alle.filter(function(x){return BSLT[x.id];}):alle.filter(function(x){return x.k===BFILTER;});
+ /* Een profielkaart is zes regels hoog; twintig daarvan is al een volle pagina.
+    De andere soorten zijn eenregelig, daar kunnen er zestig op. */
+ var TOON=(BFILTER==="product"||lijst.filter(function(x){return x.k==="product";}).length>lijst.length/2)?15:60;
+ var rest=Math.max(0,lijst.length-TOON);
+
+ var knop=function(id,w,lbl,kl){var a=BSLT[id]&&BSLT[id].w===w;
+  return '<button class="bbtn'+(a?" aan":"")+(kl?" "+kl:"")+'" onclick="bZet(\''+id+'\','+(a?'null':JSON.stringify(w).replace(/"/g,"&quot;"))+')">'+lbl+'</button>';};
+
+ var rijen=lijst.slice(0,TOON).map(function(x){
+  var b=BSLT[x.id];
+  var keuzes;
+  if(x.k==="herkomst"){
+   /* De landkeuze, en daarnaast een uitweg. Bij namen waarvan niet vaststaat
+      dát het een stokerij is (Boutique-y, Seagram's) is 'welk land' niet te
+      beantwoorden: hun flessen komen van tientallen stokerijen. Dan hoort de
+      knop er te staan om dat te zeggen, in plaats van een gok af te dwingen. */
+   keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
+    +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+x.id+'\',v)">Ander land…</button>'
+    +(x.twijfel?knop(x.id,"bottelaar","Is een bottelaar","neutraal")+knop(x.id,"geen naam","Geen naam","neutraal"):"")
+    +knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }else if(x.k==="product"){
+   keuzes=knop(x.id,"ja","Alles klopt","ja")+knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }else{
+   keuzes=knop(x.id,"ja","Overnemen","ja")+knop(x.id,"nee","Niet overnemen","nee")+knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }
+  if(x.k==="product"){
+   /* Titel, foto en omschrijving staan al in de catalogus; die twee keer
+      versturen zou 6.371 titels dupliceren. Hier opzoeken dus. */
+   var p=byId(x.pid)||{};
+   var w=(b&&b.w&&b.w.a)?b.w.a:(x.assen||null);
+   var omsOordeel=b&&b.w&&b.w.oms;
+   var assen=x.assen?BASSEN.map(function(naam,i){
+    var bw=(x.bew[i]||[]).join(", ");
+    return '<div class="pas"><span class="pnaam" title="'+(BHERK[x.herk[i]]||"")+'">'+naam
+     +(x.herk[i]==="zuster"?' <em>geschat</em>':x.herk[i]===""?' <em>—</em>':'')+'</span>'
+     +'<span class="pbol">'+[0,1,2,3,4,5].map(function(n){
+        return '<b class="'+(w&&w[i]===n?"aan":"")+'" title="'+n+'" onclick="bAs(\''+x.id+'\','+i+','+n+')"></b>';}).join("")+'</span>'
+     +'<span class="pbew">'+(bw||(x.herk[i]==="zuster"?"geen woorden op deze fles gelezen":"niet gelezen"))+'</span></div>';
+   }).join(""):'<div class="pleeg">Nog geen smaakprofiel — er stond geen proefnotitie bij dit product en er zijn te weinig zusterflessen om er een te schatten.</div>';
+
+   var bronnen=(x.bronnen||[]).map(function(bn){
+    return bn.u?'<a href="'+bn.u+'" target="_blank" rel="noopener">'+bn.n+' ↗</a>':'<span>'+bn.n+'</span>';}).join("");
+
+   return '<div class="brij prof'+(b?" af":"")+'">'
+    +(p.img?'<img loading="lazy" src="'+p.img+'" alt="">':'<div class="bgeen"></div>')
+    +'<div class="bmid"><div class="btitel">'+(p.name||x.pid)+'</div>'
+    +'<div class="pblok"><div class="pkop">Omschrijving <span>staat straks op de productpagina</span></div>'
+     +'<div class="poms'+(omsOordeel&&omsOordeel!=="ja"?" gewijzigd":"")+'">'
+     +((omsOordeel&&omsOordeel!=="ja"&&omsOordeel!=="nee")?omsOordeel:(p.sum||"— geen omschrijving —"))+'</div>'
+     +'<div class="pkn">'
+     +'<button class="bbtn'+(omsOordeel==="ja"?" aan ja":"")+'" onclick="bOms(\''+x.id+'\',\'ja\')">Akkoord</button>'
+     +'<button class="bbtn" onclick="bOmsTekst(\''+x.id+'\')">Aanpassen…</button>'
+     +'<button class="bbtn'+(omsOordeel==="nee"?" aan nee":"")+'" onclick="bOms(\''+x.id+'\',\'nee\')">Niet plaatsen</button>'
+     +'</div></div>'
+    +'<div class="pblok"><div class="pkop">Smaakprofiel <span>0 tot 5 per as · klik om bij te stellen</span></div>'
+     +'<div class="passen">'+assen+'</div></div>'
+    +(bronnen?'<div class="pblok"><div class="pkop">Waar dit vandaan komt</div><div class="pbron">'+bronnen+'</div></div>':"")
+    +'</div>'
+    +'<div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.w&&b.w.a?"bijgesteld · ":"")+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
+  }
+  return '<div class="brij'+(b?" af":"")+'">'
+   +(x.foto?'<img loading="lazy" src="'+x.foto+'" alt="">':'<div class="bgeen">'+(x.flessen||"")+(x.k==="herkomst"?'<small>flessen</small>':'')+'</div>')
+   +'<div class="bmid"><div class="btitel">'+x.titel+'</div>'
+   +'<div class="buit">'+x.uitleg+'</div>'
+   +(x.voorstel?'<div class="bvoor"><span>'+(x.huidig||"leeg")+'</span> → <b>'+x.voorstel+'</b></div>':"")
+   +'</div><div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.groep?"groepsbesluit · ":"")+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
+ }).join("");
+
+ return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Wat je hier beslist, wordt in deze browser bewaard — je kunt tussendoor stoppen. Aan het eind geef je alles in één keer terug; er gaat niets automatisch naar de winkel. De lijsten hieronder zijn voor bulk — hele stapels tegelijk. Wil je per product oordelen, gebruik dan <b>Beoordelen op de site zelf</b>: dan loop je door de winkel en zie je elke fles zoals de klant hem straks ziet, met de beoordeling ernaast.</p>'
+ +'<div class="bvoortgang"><div style="width:'+Math.round(gedaan/alle.length*100)+'%"></div></div>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' beoordeeld · '+open.length+' nog te doen</p>'
+ +'<div class="bfilters">'
+ +['open|Nog te doen ('+open.length+')','gedaan|Gedaan ('+gedaan+')']
+   .concat(soorten.map(function(s){return s[0]+'|'+s[1]+' ('+tel[s[0]]+')';}))
+   .map(function(f){var d=f.split("|");return '<button class="bfil'+(BFILTER===d[0]?" aan":"")+'" onclick="bFilter(\''+d[0]+'\')">'+d[1]+'</button>';}).join("")
+ +'</div>'
+ +(BFILTER==="vat"||BFILTER==="turf"?'<div class="bbulk">Alle openstaande '+(BFILTER==="vat"?"vatvoorstellen":"turflabels")+' in één keer: '
+   +'<button class="bbtn ja" onclick="bAlles(\''+BFILTER+'\',\'ja\')">Overnemen</button>'
+   +'<button class="bbtn nee" onclick="bAlles(\''+BFILTER+'\',\'nee\')">Niet overnemen</button>'
+   +'<span> — wordt als groepsbesluit gemarkeerd.</span></div>':"")
+ +(rijen||'<p style="color:var(--muted);padding:20px 0">Niets in deze lijst.</p>')
+ +(rest?'<p style="color:var(--muted);font-size:12.5px;padding:14px 0">Nog '+rest+' meer in deze lijst. Beoordeel de bovenste, dan schuiven ze door.</p>':"")
+ +'<div class="bacties"><button class="btn btn-a" onclick="bModus(true,true)">Beoordelen op de site zelf →</button>'
+ +'<button class="btn btn-g" onclick="bUitvoer()">Besluiten teruggeven</button>'
+ +'<button class="btn btn-g" onclick="bWis()">Alles wissen</button></div>'
+ +'<div id="buitvoer" style="display:none;margin-top:16px">'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Kopieer dit blok of bewaar het als bestand, en stuur het naar John. Daarna staan de besluiten in de volgende versie van de site.</p>'
+ +'<textarea readonly style="width:100%;height:180px;font:12px ui-monospace,monospace;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text)"></textarea>'
+ +'<div style="display:flex;gap:10px;margin-top:8px"><button class="btn btn-g btn-s" onclick="bKopieer()">Kopieer</button>'
+ +'<a class="btn btn-g btn-s dl" href="#">Bewaar als bestand</a></div></div>';
+}
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
+ var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
  var body;
- if(sub==="beeld"){
+ if(sub==="beoordeel"){
+  body=vAdminBeoordeel();
+ }else if(sub==="beeld"){
   body=vAdminBeeld();
  }else if(sub==="producten"){
   body='<h3 style="font-size:20px;margin-bottom:16px">Producten <span style="font-size:12px;color:var(--muted);font-weight:400">(demo: '+P.length+' · live: 10.482)</span></h3>'
@@ -2389,7 +2747,9 @@ function updateBadges(){
 function somToggle(){el("som").classList.toggle("show");}
 function best(scoreFn,exclude,budget){
  exclude=exclude||[];
- return P.filter(p=>!p.rare&&exclude.indexOf(p.id)<0&&(budget==null||p.price<=budget))
+ /* Ook de AI-sommelier adviseerde uit 20 flessen. Alleen flessen met een gelezen
+    profiel, want zijn hele redenering gaat over smaak. */
+ return CAT.filter(p=>!p.rare&&!p.geenprofiel&&exclude.indexOf(p.id)<0&&(budget==null||p.price<=budget))
   .map(p=>({p,s:scoreFn(p)})).sort((a,b)=>b.s-a.s).slice(0,2).map(o=>o.p);
 }
 function recHtml(list,why){
