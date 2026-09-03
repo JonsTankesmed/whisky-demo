@@ -2455,8 +2455,13 @@ function vAdminBeoordeel(){
   var b=BSLT[x.id];
   var keuzes;
   if(x.k==="herkomst"){
+   /* De landkeuze, en daarnaast een uitweg. Bij namen waarvan niet vaststaat
+      dát het een stokerij is (Boutique-y, Seagram's) is 'welk land' niet te
+      beantwoorden: hun flessen komen van tientallen stokerijen. Dan hoort de
+      knop er te staan om dat te zeggen, in plaats van een gok af te dwingen. */
    keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
     +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+x.id+'\',v)">Ander land…</button>'
+    +(x.twijfel?knop(x.id,"bottelaar","Is een bottelaar","neutraal")+knop(x.id,"geen naam","Geen naam","neutraal"):"")
     +knop(x.id,"onbekend","Weet ik niet","neutraal");
   }else{
    keuzes=knop(x.id,"ja","Overnemen","ja")+knop(x.id,"nee","Niet overnemen","nee")+knop(x.id,"onbekend","Weet ik niet","neutraal");
