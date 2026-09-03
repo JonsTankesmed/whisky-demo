@@ -117,6 +117,31 @@ h2{font-size:29px}
 .tags{display:flex;gap:5px;flex-wrap:wrap}
 .tag{font-size:10.5px;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:2px 8px}
 .geenprofiel{font-size:11.5px;color:var(--muted);font-style:italic;padding:6px 0;line-height:1.4}
+/* beoordeelrij */
+.bvoortgang{height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+.bvoortgang>div{height:100%;background:var(--amber);transition:width .3s}
+.bfilters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.bfil{font:inherit;font-size:12px;padding:6px 11px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:20px;cursor:pointer}
+.bfil.aan{background:var(--amber);border-color:var(--amber);color:#fff}
+.bbulk{font-size:12.5px;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.brij{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line)}
+.brij.af{opacity:.5}
+.brij img{width:52px;height:52px;object-fit:contain;background:var(--card2);border-radius:8px}
+.bgeen{width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card2);border-radius:8px;font-size:15px;font-weight:600;color:var(--amber);line-height:1}
+.bgeen small{font-size:8px;color:var(--muted);font-weight:400;letter-spacing:.04em}
+.btitel{font-size:13.5px;font-weight:600;line-height:1.3}
+.buit{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.bvoor{font-size:11.5px;margin-top:4px;color:var(--muted)}
+.bvoor b{color:var(--text)}
+.bkeuze{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:340px}
+.bbtn{font:inherit;font-size:11.5px;padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;cursor:pointer;white-space:nowrap}
+.bbtn:hover{border-color:var(--amber)}
+.bbtn.aan{background:var(--amber);border-color:var(--amber);color:#fff}
+.bbtn.aan.nee{background:#8c2f2f;border-color:#8c2f2f}
+.bbtn.aan.neutraal{background:#6b6259;border-color:#6b6259}
+.bstatus{width:100%;text-align:right;font-size:10.5px;color:var(--muted);margin-top:4px}
+.bacties{display:flex;gap:10px;margin-top:22px}
+@media(max-width:720px){.brij{grid-template-columns:44px 1fr}.bkeuze{grid-column:1/-1;justify-content:flex-start;max-width:none}}
 .tbars{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-items:end;height:24px}
 .tbar{position:relative;background:var(--line);border-radius:2px;overflow:hidden;height:100%}
 .tbar b{position:absolute;bottom:0;left:0;right:0;background:var(--gold);display:block}
@@ -630,6 +655,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 <div class="toast" id="toast"></div>
 
 <script src="catalogus-lokaal.js" onerror="void 0"></script>
+<script src="beoordeling.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
@@ -2377,11 +2403,102 @@ function vAdminBronnen(){
  +BRONVOOR.map(function(v){return '<li>'+v+'</li>';}).join("")+'</ul>'
  +'<p style="font-size:12px;color:var(--muted);margin-top:14px">Verkenning bij het voorstel van 17 augustus 2026 · Jons Tankesmed · kenmerk JT-VERK-2026-02</p></div>';
 }
+/* ================= BEOORDEELRIJ =================
+   Alles waar een mens iets over moet zeggen. Besluiten worden in de browser
+   bewaard en aan het eind als bestand teruggegeven; er is geen database, en
+   voor eenmalig werk is die de kosten niet waard. Daarom drie eigenschappen:
+   het onthoudt tussentijds, het toont hoeveel er nog ligt, en het geeft alles
+   in één keer terug. */
+var BSLT=(function(){try{return JSON.parse(localStorage.getItem("wsbeoordeling")||"{}");}catch(e){return{};}})();
+var BFILTER="open";
+function bBewaar(){try{localStorage.setItem("wsbeoordeling",JSON.stringify(BSLT));}catch(e){}}
+function bZet(id,waarde){
+ if(waarde===null)delete BSLT[id]; else BSLT[id]={w:waarde,op:new Date().toISOString().slice(0,16)};
+ bBewaar();render();
+}
+function bAlles(soort,waarde){
+ var rij=BEOORDELING.items.filter(function(x){return x.k===soort&&!BSLT[x.id];});
+ if(!rij.length)return;
+ if(!confirm("Dit zet in één keer "+rij.length+" openstaande voorstellen op “"+waarde+"”.\n\nHet wordt in de teruggave als groepsbesluit gemarkeerd, zodat achteraf zichtbaar is dat ze niet stuk voor stuk zijn bekeken.\n\nDoorgaan?"))return;
+ rij.forEach(function(x){BSLT[x.id]={w:waarde,op:new Date().toISOString().slice(0,16),groep:true};});
+ bBewaar();render();
+}
+function bFilter(f){BFILTER=f;render();}
+function bWis(){if(confirm("Alle eigen besluiten wissen? Dit kan niet ongedaan worden gemaakt.")){BSLT={};bBewaar();render();}}
+function bUitvoer(){
+ var uit={gemaakt:new Date().toISOString().slice(0,16),bron:BEOORDELING.gemaakt,
+  besluiten:Object.keys(BSLT).map(function(k){var x=BEOORDELING.items.filter(function(i){return i.id===k;})[0]||{};
+   return{id:k,soort:x.k||"?",titel:x.titel||"",voorstel:x.voorstel||"",besluit:BSLT[k].w,wanneer:BSLT[k].op,groepsbesluit:!!BSLT[k].groep};})};
+ var t=JSON.stringify(uit,null,1);
+ var d=document.getElementById("buitvoer");
+ d.style.display="block";d.querySelector("textarea").value=t;
+ var a=d.querySelector("a.dl");
+ a.href=URL.createObjectURL(new Blob([t],{type:"application/json"}));
+ a.download="beoordeling-"+new Date().toISOString().slice(0,10)+".json";
+ d.querySelector("textarea").select();
+}
+function bKopieer(){var ta=document.querySelector("#buitvoer textarea");ta.select();
+ try{document.execCommand("copy");toast("Gekopieerd — plak het in een bericht aan John.");}catch(e){toast("Selecteer de tekst en kopieer met Ctrl+C.");}}
+function vAdminBeoordeel(){
+ if(typeof BEOORDELING==="undefined")return '<h3 style="font-size:20px">Beoordelen</h3><p style="color:var(--muted)">De beoordeelrij is niet geladen.</p>';
+ var alle=BEOORDELING.items, gedaan=Object.keys(BSLT).length;
+ var soorten=[["herkomst","Herkomst van een stokerij"],["turf","Turflabel"],["vat","Vatsoort"]];
+ var tel={};soorten.forEach(function(s){tel[s[0]]=alle.filter(function(x){return x.k===s[0];}).length;});
+ var open=alle.filter(function(x){return !BSLT[x.id];});
+ var lijst=BFILTER==="open"?open:BFILTER==="gedaan"?alle.filter(function(x){return BSLT[x.id];}):alle.filter(function(x){return x.k===BFILTER;});
+ var TOON=60,rest=Math.max(0,lijst.length-TOON);
+
+ var knop=function(id,w,lbl,kl){var a=BSLT[id]&&BSLT[id].w===w;
+  return '<button class="bbtn'+(a?" aan":"")+(kl?" "+kl:"")+'" onclick="bZet(\''+id+'\','+(a?'null':JSON.stringify(w).replace(/"/g,"&quot;"))+')">'+lbl+'</button>';};
+
+ var rijen=lijst.slice(0,TOON).map(function(x){
+  var b=BSLT[x.id];
+  var keuzes;
+  if(x.k==="herkomst"){
+   keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
+    +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+x.id+'\',v)">Ander land…</button>'
+    +knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }else{
+   keuzes=knop(x.id,"ja","Overnemen","ja")+knop(x.id,"nee","Niet overnemen","nee")+knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }
+  return '<div class="brij'+(b?" af":"")+'">'
+   +(x.foto?'<img loading="lazy" src="'+x.foto+'" alt="">':'<div class="bgeen">'+(x.flessen||"")+(x.k==="herkomst"?'<small>flessen</small>':'')+'</div>')
+   +'<div class="bmid"><div class="btitel">'+x.titel+'</div>'
+   +'<div class="buit">'+x.uitleg+'</div>'
+   +(x.voorstel?'<div class="bvoor"><span>'+(x.huidig||"leeg")+'</span> → <b>'+x.voorstel+'</b></div>':"")
+   +'</div><div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.groep?"groepsbesluit · ":"")+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
+ }).join("");
+
+ return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Wat je hier beslist, wordt in deze browser bewaard — je kunt tussendoor stoppen. Aan het eind geef je alles in één keer terug; er gaat niets automatisch naar de winkel.</p>'
+ +'<div class="bvoortgang"><div style="width:'+Math.round(gedaan/alle.length*100)+'%"></div></div>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' beoordeeld · '+open.length+' nog te doen</p>'
+ +'<div class="bfilters">'
+ +['open|Nog te doen ('+open.length+')','gedaan|Gedaan ('+gedaan+')']
+   .concat(soorten.map(function(s){return s[0]+'|'+s[1]+' ('+tel[s[0]]+')';}))
+   .map(function(f){var d=f.split("|");return '<button class="bfil'+(BFILTER===d[0]?" aan":"")+'" onclick="bFilter(\''+d[0]+'\')">'+d[1]+'</button>';}).join("")
+ +'</div>'
+ +(BFILTER==="vat"||BFILTER==="turf"?'<div class="bbulk">Alle openstaande '+(BFILTER==="vat"?"vatvoorstellen":"turflabels")+' in één keer: '
+   +'<button class="bbtn ja" onclick="bAlles(\''+BFILTER+'\',\'ja\')">Overnemen</button>'
+   +'<button class="bbtn nee" onclick="bAlles(\''+BFILTER+'\',\'nee\')">Niet overnemen</button>'
+   +'<span> — wordt als groepsbesluit gemarkeerd.</span></div>':"")
+ +(rijen||'<p style="color:var(--muted);padding:20px 0">Niets in deze lijst.</p>')
+ +(rest?'<p style="color:var(--muted);font-size:12.5px;padding:14px 0">Nog '+rest+' meer in deze lijst. Beoordeel de bovenste, dan schuiven ze door.</p>':"")
+ +'<div class="bacties"><button class="btn btn-a" onclick="bUitvoer()">Besluiten teruggeven</button>'
+ +'<button class="btn btn-g" onclick="bWis()">Alles wissen</button></div>'
+ +'<div id="buitvoer" style="display:none;margin-top:16px">'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Kopieer dit blok of bewaar het als bestand, en stuur het naar John. Daarna staan de besluiten in de volgende versie van de site.</p>'
+ +'<textarea readonly style="width:100%;height:180px;font:12px ui-monospace,monospace;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text)"></textarea>'
+ +'<div style="display:flex;gap:10px;margin-top:8px"><button class="btn btn-g btn-s" onclick="bKopieer()">Kopieer</button>'
+ +'<a class="btn btn-g btn-s dl" href="#">Bewaar als bestand</a></div></div>';
+}
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
+ var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
  var body;
- if(sub==="beeld"){
+ if(sub==="beoordeel"){
+  body=vAdminBeoordeel();
+ }else if(sub==="beeld"){
   body=vAdminBeeld();
  }else if(sub==="producten"){
   body='<h3 style="font-size:20px;margin-bottom:16px">Producten <span style="font-size:12px;color:var(--muted);font-weight:400">(demo: '+P.length+' · live: 10.482)</span></h3>'
