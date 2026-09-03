@@ -160,7 +160,13 @@ h2{font-size:29px}
 .pleeg{font-size:11.5px;color:var(--muted);font-style:italic;line-height:1.45}
 .pbron{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
 .pbron a{color:var(--amber);text-decoration:none}
-.bacties{display:flex;gap:10px;margin-top:22px}
+.bacties{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.bpaneel{background:var(--card2);border:1px solid var(--amber);border-radius:14px;padding:14px 16px;margin-top:16px}
+.bpkop{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.bpkop b{font-size:14px}
+.bpkop span{font-size:11.5px;color:var(--muted);flex:1}
+.bpaneel .pas{grid-template-columns:110px 92px 1fr}
+
 @media(max-width:720px){.brij{grid-template-columns:44px 1fr}.bkeuze{grid-column:1/-1;justify-content:flex-start;max-width:none}}
 .tbars{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-items:end;height:24px}
 .tbar{position:relative;background:var(--line);border-radius:2px;overflow:hidden;height:100%}
@@ -2003,11 +2009,48 @@ function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+
 /* De inhoud stond hard op 0,70 ltr. Deze catalogus heeft 3cl-samples,
    halve flessen en literflessen; dan is een vaste tekst gewoon onjuist. */
 function volTekst(p){var v=p._vol||70;return (v/100).toFixed(2).replace(".",",")+" ltr";}
+/* Het beoordeelpaneel op de productpagina zelf. Dezelfde besluiten als in de
+   lijst, maar naast de pagina die de klant straks ziet. */
+function bPaneel(p){
+ if(!BMODUS)return "";
+ var x=bItemVan(p.id);
+ if(!x)return '<div class="bpaneel"><b>Beoordelen staat aan</b><p>Voor dit product ligt geen beoordeling klaar.</p>'
+  +'<div class="pkn"><button class="bbtn" onclick="bVolgende()">Volgende →</button>'
+  +'<button class="bbtn" onclick="bModus(false)">Beoordelen uit</button></div></div>';
+ var b=BSLT[x.id], oms=b&&b.w&&b.w.oms;
+ var w=(b&&b.w&&b.w.a)?b.w.a:(x.assen||null);
+ var rij=BEOORDELING.items.filter(function(i){return i.k==="product";});
+ var gedaan=rij.filter(function(i){return BSLT[i.id];}).length;
+ var assen=x.assen?BASSEN.map(function(naam,i){
+   var bw=(x.bew[i]||[]).join(", ");
+   return '<div class="pas"><span class="pnaam" title="'+(BHERK[x.herk[i]]||"")+'">'+naam
+    +(x.herk[i]==="zuster"?' <em>geschat</em>':'')+'</span>'
+    +'<span class="pbol">'+[0,1,2,3,4,5].map(function(n){
+       return '<b class="'+(w&&w[i]===n?"aan":"")+'" onclick="bAs(\''+x.id+'\','+i+','+n+')"></b>';}).join("")+'</span>'
+    +'<span class="pbew">'+(bw||"geen woorden op deze fles gelezen")+'</span></div>';}).join("")
+  :'<div class="pleeg">Geen smaakprofiel — geen proefnotitie bij dit product en te weinig zusterflessen.</div>';
+ return '<div class="bpaneel">'
+  +'<div class="bpkop"><b>Beoordelen</b> <span>'+gedaan+' van '+rij.length+' gedaan</span>'
+  +'<button class="bbtn" onclick="bModus(false)">Uitzetten</button></div>'
+  +'<div class="pblok"><div class="pkop">Omschrijving <span>de tekst hierboven</span></div><div class="pkn">'
+  +'<button class="bbtn'+(oms==="ja"?" aan ja":"")+'" onclick="bOms(\''+x.id+'\',\'ja\')">Akkoord</button>'
+  +'<button class="bbtn" onclick="bOmsTekst(\''+x.id+'\')">Aanpassen…</button>'
+  +'<button class="bbtn'+(oms==="nee"?" aan nee":"")+'" onclick="bOms(\''+x.id+'\',\'nee\')">Niet plaatsen</button></div></div>'
+  +'<div class="pblok"><div class="pkop">Smaakprofiel <span>klik om bij te stellen</span></div><div class="passen">'+assen+'</div></div>'
+  +((x.bronnen&&x.bronnen.length)?'<div class="pblok"><div class="pkop">Waar dit vandaan komt</div><div class="pbron">'
+    +x.bronnen.map(function(bn){return bn.u?'<a href="'+bn.u+'" target="_blank" rel="noopener">'+bn.n+' ↗</a>':'<span>'+bn.n+'</span>';}).join("")
+    +'</div></div>':"")
+  +'<div class="pkn" style="margin-top:12px">'
+  +'<button class="bbtn'+(b&&b.w==="ja"?" aan ja":"")+'" onclick="bZet(\''+x.id+'\',\'ja\')">Alles klopt</button>'
+  +'<button class="bbtn" onclick="bVolgende()">Volgende te beoordelen →</button>'
+  +'<a class="bbtn" href="#/admin/beoordeel" style="text-decoration:none">Naar de lijst</a></div></div>';
+}
 function vProduct(rt){
  var p=byId(rt.id);if(!p)return'<section><div class="wrap">Niet gevonden. <a href="#/collectie" style="color:var(--amber)">Terug</a></div></section>';
  var sims=similar(p,3);
  return '<section><div class="wrap">'
  +'<a class="back" href="#/collectie">← Terug naar collectie</a>'
+ +bPaneel(p)
  +'<div class="pd" style="margin-top:22px"><div class="pd-img"><img src="'+p.img+'" alt=""></div><div>'
  +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
  +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
@@ -2443,6 +2486,36 @@ function bAlles(soort,waarde){
  rij.forEach(function(x){BSLT[x.id]={w:waarde,op:new Date().toISOString().slice(0,16),groep:true};});
  bBewaar();render();
 }
+/* Beoordelen op de pagina zelf.
+   De lijst is goed voor bulk — 726 vatvoorstellen achter elkaar wegtikken. Maar
+   'klopt dit product' beoordeel je niet uit een tabel: dan kijk je naar de
+   pagina zoals de klant hem straks ziet, met de foto, de tekst op zijn plek en
+   het profiel eronder. Daarom kan de beoordeling ook áán staan terwijl je door
+   de winkel loopt. */
+var BMODUS=(function(){try{return localStorage.getItem("wsbeoordeelmodus")==="1";}catch(e){return false;}})();
+function bModus(aan,spring){
+ BMODUS=!!aan;
+ try{localStorage.setItem("wsbeoordeelmodus",BMODUS?"1":"0");}catch(e){}
+ if(BMODUS&&spring)return bVolgende();
+ render();
+}
+function bItemVan(pid){
+ if(typeof BEOORDELING==="undefined")return null;
+ var r=BEOORDELING.items.filter(function(x){return x.k==="product"&&x.pid===String(pid);});
+ return r.length?r[0]:null;
+}
+function bVolgende(){
+ if(typeof BEOORDELING==="undefined")return;
+ var nu=(route().r==="product")?route().id:null, gezien=!nu;
+ var rij=BEOORDELING.items.filter(function(x){return x.k==="product";});
+ for(var i=0;i<rij.length;i++){
+  if(!gezien){if(rij[i].pid===String(nu))gezien=true;continue;}
+  if(!BSLT[rij[i].id]){location.hash="#/product/"+rij[i].pid;window.scrollTo(0,0);return;}
+ }
+ var open=rij.filter(function(x){return !BSLT[x.id];});
+ if(open.length){location.hash="#/product/"+open[0].pid;window.scrollTo(0,0);return;}
+ toast("Alles beoordeeld.");
+}
 var BASSEN=["rook","zoet","fruit","kruidig","lichaam","zilt"];
 var BHERK={eigen:"uit de eigen proefnotitie",zuster:"geschat uit andere flessen van dit merk",review:"uit een externe proefnotitie","":"niet gelezen"};
 /* Een as bijstellen is geen ja/nee. Jack proeft deze whisky's; als hij zegt dat
@@ -2564,7 +2637,7 @@ function vAdminBeoordeel(){
  }).join("");
 
  return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'
- +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Wat je hier beslist, wordt in deze browser bewaard — je kunt tussendoor stoppen. Aan het eind geef je alles in één keer terug; er gaat niets automatisch naar de winkel.</p>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Wat je hier beslist, wordt in deze browser bewaard — je kunt tussendoor stoppen. Aan het eind geef je alles in één keer terug; er gaat niets automatisch naar de winkel. De lijsten hieronder zijn voor bulk — hele stapels tegelijk. Wil je per product oordelen, gebruik dan <b>Beoordelen op de site zelf</b>: dan loop je door de winkel en zie je elke fles zoals de klant hem straks ziet, met de beoordeling ernaast.</p>'
  +'<div class="bvoortgang"><div style="width:'+Math.round(gedaan/alle.length*100)+'%"></div></div>'
  +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' beoordeeld · '+open.length+' nog te doen</p>'
  +'<div class="bfilters">'
@@ -2578,7 +2651,8 @@ function vAdminBeoordeel(){
    +'<span> — wordt als groepsbesluit gemarkeerd.</span></div>':"")
  +(rijen||'<p style="color:var(--muted);padding:20px 0">Niets in deze lijst.</p>')
  +(rest?'<p style="color:var(--muted);font-size:12.5px;padding:14px 0">Nog '+rest+' meer in deze lijst. Beoordeel de bovenste, dan schuiven ze door.</p>':"")
- +'<div class="bacties"><button class="btn btn-a" onclick="bUitvoer()">Besluiten teruggeven</button>'
+ +'<div class="bacties"><button class="btn btn-a" onclick="bModus(true,true)">Beoordelen op de site zelf →</button>'
+ +'<button class="btn btn-g" onclick="bUitvoer()">Besluiten teruggeven</button>'
  +'<button class="btn btn-g" onclick="bWis()">Alles wissen</button></div>'
  +'<div id="buitvoer" style="display:none;margin-top:16px">'
  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Kopieer dit blok of bewaar het als bestand, en stuur het naar John. Daarna staan de besluiten in de volgende versie van de site.</p>'
