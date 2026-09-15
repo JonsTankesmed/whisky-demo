@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Whiskysite.nl — productbeelden (demo)</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --bg2:#f7f3ee; --card:#ffffff;
+  --amber:#8a1c26; --amber2:#6e141d; --copper:#a05e2a; --gold:#c9963f;
+  --text:#2b2118; --muted:#7d7265; --line:#e4dcd2;
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  --wit:#ffffff; --grijs:#f7f3ee; --donker:#241b16; --tegel:var(--grijs);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.55}
+img{max-width:100%}
+.demo-banner{background:var(--amber);color:#fff;text-align:center;font-size:12px;
+             font-weight:600;padding:6px 12px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.kop-blok{background:radial-gradient(1000px 500px at 75% -10%,rgba(138,28,38,.05),transparent),
+          var(--bg2);border-bottom:1px solid var(--line);padding:46px 0 38px}
+.kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--amber);
+        font-weight:600}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,44px);line-height:1.14;
+   margin:10px 0 14px}
+h2{font-family:var(--serif);font-weight:600;font-size:26px;margin:52px 0 6px}
+.lead{color:var(--muted);max-width:64ch;font-size:16.5px}
+.uitleg{color:var(--muted);margin:0 0 24px;max-width:64ch;font-size:15px}
+.kiezer{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 18px;
+        background:var(--card);border:1px solid var(--line);border-radius:26px;
+        margin:26px 0 0;position:sticky;top:14px;z-index:5;
+        box-shadow:0 2px 14px rgba(43,33,24,.05)}
+.kiezer span{color:var(--muted);font-size:14px;margin-right:4px}
+button{font-family:var(--sans);font-size:13px;font-weight:600;padding:9px 18px;
+       border-radius:26px;cursor:pointer;border:1px solid var(--line);background:none;
+       color:var(--text)}
+button:hover{border-color:var(--amber2)}
+button[aria-pressed=true]{background:var(--amber);color:#fff;border-color:var(--amber)}
+.paren{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;
+       margin-top:24px}
+.paar{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.beelden{display:grid;grid-template-columns:1fr 1fr}
+.vak{aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:12px;
+     background:var(--tegel)}
+.vak.voor{background:#fff;border-right:1px solid var(--line)}
+.vak img{max-width:100%;max-height:100%;display:block}
+.kop{display:grid;grid-template-columns:1fr 1fr;font-size:10px;letter-spacing:.16em;
+     text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);
+     font-weight:600}
+.kop div{padding:9px 13px}
+.kop div+div{border-left:1px solid var(--line);color:var(--amber)}
+.naam{padding:12px 14px;font-size:13.5px;border-top:1px solid var(--line)}
+.slot{margin-top:56px;padding:26px 28px;background:var(--bg2);border:1px solid var(--line);
+      border-radius:14px;max-width:74ch}
+.slot h3{font-family:var(--serif);margin:0 0 10px;font-size:19px}
+.slot p{margin:0 0 11px;color:var(--muted);font-size:15px}
+.slot p:last-child{margin-bottom:0}
+footer{margin-top:56px;border-top:1px solid var(--line);padding:20px 0 40px;
+       color:var(--muted);font-size:13px}
+.inhoud{padding-bottom:10px}
+@media(max-width:560px){.wrap{padding:0 14px}.kop-blok{padding:30px 0 26px}}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">DEMO-CONCEPT — herontwerp Whiskysite.nl · echte productfoto's uit de winkel · beeldbewerking op een steekproef</div>
+
+<div class="kop-blok">
+  <div class="wrap">
+    <div class="kicker">Productbeelden</div>
+    <h1>Dezelfde foto's, <em style="color:var(--amber);font-style:normal">rustiger in beeld</em></h1>
+    <p class="lead">Links het beeld zoals het nu uit de winkel komt, rechts zoals het op de
+    ontdeksite komt te staan. Zelfde fles, zelfde foto — alleen vrijgemaakt van zijn
+    achtergrond en op een vaste hoogte gezet, zodat een rij flessen rustig oogt.</p>
+
+    <div class="kiezer">
+      <span>Achtergrond van de ontdeksite:</span>
+      <button data-kleur="wit">Wit</button>
+      <button data-kleur="grijs">Crème</button>
+      <button data-kleur="donker">Donker</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap inhoud">
+
+  <h2>Uw flessen</h2>
+  <p class="uitleg">Wissel van achtergrond en kijk wat er gebeurt. Omdat de beelden
+  doorzichtig zijn, past elke fles zich aan de pagina aan — dat is precies waarom we het zo
+  doen.</p>
+  <div class="paren">
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163905785-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163905785-na.png" alt=""></div>
+      </div>
+      <div class="naam">George Dickel Classic Recipe Whisky 1,00 ltr 40%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/160138259-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/160138259-na.png" alt=""></div>
+      </div>
+      <div class="naam">Cley Dutch Single Malt Whisky Secret Isle Of Mull 0,50 l…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/152443589-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/152443589-na.png" alt=""></div>
+      </div>
+      <div class="naam">Macnair&#x27;s 21 Years Old Blended Peated Malt Scotch Whisky…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163567486-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/163567486-na.png" alt=""></div>
+      </div>
+      <div class="naam">Clynelish 8 Years Old Duncan Taylor Specially For WHISKY…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/123310964-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/123310964-na.png" alt=""></div>
+      </div>
+      <div class="naam">Handgranaat Gevuld Met Whisky 0,20 ltr 40%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/160332115-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/160332115-na.png" alt=""></div>
+      </div>
+      <div class="naam">Horstman Friendship Edition Single Cask 3Whiskyteers 0,5…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/142501321-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/142501321-na.png" alt=""></div>
+      </div>
+      <div class="naam">The Lakes Single Malt Whiskymaker&#x27;s Edition Resfeber 0,7…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/162709542-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/162709542-na.png" alt=""></div>
+      </div>
+      <div class="naam">Whisky of VooDoo Serpent&#x27;s Ember Blair Athol 11 Years Ol…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/140048132-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/140048132-na.png" alt=""></div>
+      </div>
+      <div class="naam">Villa De Varda Grappa Riserva Peated Whisky Cask 0,70 lt…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/154680705-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/154680705-na.png" alt=""></div>
+      </div>
+      <div class="naam">Naud Alcee Single Malt Whisky 0,70 ltr 45%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163953923-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/163953923-na.png" alt=""></div>
+      </div>
+      <div class="naam">Bache Gabrielsen Whisky Tourbe Peated 0,70 ltr 46%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/157837063-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/157837063-na.png" alt=""></div>
+      </div>
+      <div class="naam">The Daisen Blended Whisky Mizunara Cask 0,70 ltr 40%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/159546824-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/159546824-na.png" alt=""></div>
+      </div>
+      <div class="naam">Wagging Finger Single Malt Whisky 6 Years Old 0,70 ltr 5…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/157522826-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/157522826-na.png" alt=""></div>
+      </div>
+      <div class="naam">Strathenry 6 Years Old 2018 Elevenses Whisky 0,70 ltr 50%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/159391977-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/159391977-na.png" alt=""></div>
+      </div>
+      <div class="naam">Mars Tsunuki Edition 2023 Single Malt Japanse Whisky 0,7…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/135368271-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/135368271-na.png" alt=""></div>
+      </div>
+      <div class="naam">A Secret Islay Distillery 31 Years Old 1990 The Whisky A…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/131479311-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/131479311-na.png" alt=""></div>
+      </div>
+      <div class="naam">Aikan Whisky Blend Collection Batch No. 3 0,50 ltr 43%</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/161751051-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/161751051-na.png" alt=""></div>
+      </div>
+      <div class="naam">Invergordon 50 Years Old 1974 Uncharted Whisky Company 0…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/131479322-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/131479322-na.png" alt=""></div>
+      </div>
+      <div class="naam">BenRiach Cask Edition 10YO 2010/2021 Cask No. 2739 PX Sh…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/150934707-voor.png" alt=""></div>
+        <div class="vak"><img src="beelden/150934707-na.png" alt=""></div>
+      </div>
+      <div class="naam">Cutty Sark Whisky 1,00 ltr 40%</div>
+    </div>
+  </div>
+
+  <h2>Proefflesjes krijgen hun eigen fles</h2>
+  <p class="uitleg">In de winkel staan ongeveer 1496 proefflesjes met
+  hetzelfde vervangplaatje. Die krijgen voortaan het beeld van de fles waar ze uit komen,
+  met de inhoud erbij vermeld.</p>
+  <div class="paren">
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163264396-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163264396-na.webp" alt=""></div>
+      </div>
+      <div class="naam">Ben Nevis 22 Years Old 2003 Whiskynerds 52,4% 6 CL Sample</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163612897-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163612897-na.png" alt=""></div>
+      </div>
+      <div class="naam">Glendronach Sevillian Room 43% 6 CL Sample</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163566080-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163566080-na.png" alt=""></div>
+      </div>
+      <div class="naam">Port Askaig 100 Proof 57,1% 6 CL Sample</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163527117-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163527117-na.png" alt=""></div>
+      </div>
+      <div class="naam">The Dalmore 17 Years Old 42% 6 CL Sample</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163755722-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163755722-na.png" alt=""></div>
+      </div>
+      <div class="naam">Glenallachie 10 Years Old Cask Strength Batch #13 59,8%…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/164099124-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/164099124-na.png" alt=""></div>
+      </div>
+      <div class="naam">Bunnahabhain 13 Years Old Bargh Garbh 50% 6 CL Sample</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163314092-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163314092-na.png" alt=""></div>
+      </div>
+      <div class="naam">Bunnahabhain Staoisha 8 Years Old King Cask 63,5% 6 CL S…</div>
+    </div>
+    <div class="paar">
+      <div class="kop"><div>nu in de winkel</div><div>op de ontdeksite</div></div>
+      <div class="beelden">
+        <div class="vak voor"><img src="beelden/163293477-voor.webp" alt=""></div>
+        <div class="vak"><img src="beelden/163293477-na.png" alt=""></div>
+      </div>
+      <div class="naam">Weller Special Reserve 45% 6 CL Sample</div>
+    </div>
+  </div>
+
+  <div class="slot">
+    <h3>Wat niet vanzelf gaat</h3>
+    <p>Bij flessen van helder glas met een licht etiket lukt het vrijmaken niet altijd
+    netjes. Die beelden laten we ongemoeid — liever een foto met een witte rand dan een
+    fles waar een stuk uit is geknipt.</p>
+    <p>Hetzelfde geldt voor foto's waarop de verpakking staat, of een set van meerdere
+    flessen. Daar valt niet uit af te leiden wat het product is, dus die blijven zoals
+    ze zijn.</p>
+    <p>Deze pagina toont een steekproef uit uw catalogus, geen volledige doorloop.</p>
+  </div>
+
+  <footer>Geen 18, geen alcohol. © 2026 Whiskysite.nl — demo-concept, geen officiële website.
+  <br>Beeldbewerking: Jons Tankesmed. <a href="index.html" style="color:var(--amber)">Terug naar de demo</a></footer>
+</div>
+<script>
+const knoppen=document.querySelectorAll('.kiezer button');
+function zet(k){
+  document.documentElement.style.setProperty('--tegel','var(--'+k+')');
+  knoppen.forEach(b=>b.setAttribute('aria-pressed', b.dataset.kleur===k));
+}
+knoppen.forEach(b=>b.addEventListener('click',()=>zet(b.dataset.kleur)));
+zet('grijs');
+</script>
+</body>
+</html>

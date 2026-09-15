@@ -755,14 +755,45 @@ var REV={
  "teeling-wow4":{s:"Dramface",u:"dramface.com",v:"",q:""},
  "peats-beast-2010":{s:"The Whisky Philes",u:"thewhiskyphiles.com",v:"",q:""},
  "bruichladdich-21":{s:"WhiskyNotes",u:"whiskynotes.be",v:"",q:""},
- "bowmore-50":{s:"Whiskyfun",u:"whiskyfun.com",v:"",q:""},
+ /* Echt citaat, letterlijk overgenomen uit de review van 29-12-2023. Let op: Serge besprak
+    een ándere 1969-botteling dan deze 50-jarige — daarom staat de beproefde fles er
+    uitdrukkelijk bij. Kort citaat met bronvermelding en link; volledige overname pas na
+    toestemming. */
+ "bowmore-50":{s:"Whiskyfun",u:"whiskyfun.com",auteur:"Serge Valentin",
+   q:"The signature is extremely Bowmore-like, very saline.",
+   bot:"Bowmore 1969 (43%, OB, sherry casks, ±1990)",
+   score:"93/100 · SGP 753",datum:"29 december 2023",
+   url:"https://www.whiskyfun.com/2023/Bowmore-1999-vs-1969.html",v:""},
  "teaninich-12-gm":{s:"Whisky Saga",u:"whiskysaga.com",v:"",q:""},
  "dailuaine-8-dl":{s:"Dramface",u:"dramface.com",v:"",q:""},
  "cb-orchard":{s:"WhiskyNotes",u:"whiskynotes.be",v:"",q:""}
 };
 /* Zolang er geen toestemming is, verwijzen we naar de site van de schrijver zelf
    en niet naar een zoekopdracht die een specifieke review suggereert. */
-function revLink(p){return p.rev?"https://"+p.rev.u:"#";}
+function revLink(p){return p.rev?(p.rev.url||("https://"+p.rev.u)):"#";}
+
+/* Het reviewblok op de productpagina kent twee toestanden.
+   1. Zonder afspraak: lege opmaak met het label "voorbeeld · nog geen toestemming".
+   2. Met een echt, kort citaat (veld `q`): de woorden van de schrijver tussen
+      aanhalingstekens, zijn naam, de botteling die hij besprak, zijn score en een
+      directe link naar het oorspronkelijke artikel. Zo staat er nooit tekst onder
+      iemands naam die hij niet geschreven heeft, en is altijd zichtbaar welke fles
+      hij precies heeft geproefd. */
+function revBlok(p){
+ var r=p.rev;
+ if(!r.q){
+  return '<div class="revbox"><span style="color:var(--muted)">Hier komt de proefnotitie van de schrijver — zijn eigen woorden, een fragment of de hele tekst.</span>'
+   +'<div class="revsrc">— <b>'+r.s+'</b> · <a href="'+revLink(p)+'" target="_blank" rel="noopener">'+r.u+' →</a>'
+   +'<span class="demoflag">voorbeeld · nog geen toestemming</span></div></div>';
+ }
+ return '<div class="revbox">“'+r.q+'”'
+  +'<div class="revsrc">— <b>'+(r.auteur||r.s)+'</b>, '+r.s
+  +(r.bot?' · over <i style="font-style:normal">'+r.bot+'</i>':'')
+  +(r.score?' · <b>'+r.score+'</b>':'')
+  +(r.datum?' · '+r.datum:'')
+  +'<br><a href="'+revLink(p)+'" target="_blank" rel="noopener">lees de volledige review op '+r.u+' →</a>'
+  +'<span class="demoflag">'+(r.label||'citaat met bronvermelding · volledige overname na toestemming')+'</span></div></div>';
+}
 P.forEach(function(p){p.rev=REV[p.id]||null;});
 /* ================= STATE ================= */
 /* F wordt gezet in de data-laag verderop (nieuwF) */
@@ -1624,7 +1655,22 @@ function beeldOpen(){
 }
 function vAdminBeeld(){
  var streken=Object.keys(BEELDVOORSTEL);
- return '<h3 style="font-size:20px;margin-bottom:6px">Beeldvoorstellen</h3>'
+ return '<h3 style="font-size:20px;margin-bottom:6px">Productfoto\'s — eerste resultaten</h3>'
+ +'<p style="font-size:12.5px;color:var(--muted);max-width:78ch;margin-bottom:14px">'
+ +'De beeldbewerking draait. Hieronder staan de eerste uitkomsten: <b>twintig flessen voor en na</b>, '
+ +'plus <b>acht proefflesjes</b> die de foto van hun grote broer hebben gekregen met een inhoudslabel erop. '
+ +'Handmatig gedraaid op een steekproef, niet op de hele catalogus — bedoeld om te laten zien wat de tool doet '
+ +'en waar hij nog de fout in gaat.</p>'
+ +'<div class="sync-box" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
+ +'<div style="flex:1 1 320px"><b>● Achtergrond weghalen zonder model</b>'
+ +'<p>Egale achtergronden worden herkend en weggesneden; wit binnen een etiket blijft staan. '
+ +'Foto\'s die al goed zijn worden niet aangeraakt. Het origineel blijft bewaard als terugval.</p></div>'
+ +'<a class="btn btn-a btn-s" href="productbeelden.html" target="_blank" rel="noopener" style="text-decoration:none">Bekijk voor en na →</a>'
+ +'</div>'
+ +'<p style="font-size:11.5px;color:var(--muted);margin:10px 0 30px">'
+ +'Op die pagina kun je de achtergrondkleur wisselen, zodat je ziet dat één foto op elke ondergrond werkt. '
+ +'Dat is de reden om ze doorzichtig te bewaren.</p>'
+ +'<h3 style="font-size:20px;margin-bottom:6px">Beeldvoorstellen</h3>'
  +'<p style="font-size:12.5px;color:var(--muted);max-width:78ch;margin-bottom:18px">'
  +'De tool zoekt zelf een passende foto bij elke streek of distilleerderij en zet die hier klaar — met maker, '
  +'licentie en bronpagina erbij. Niets komt online voordat het hier is goedgekeurd. Past er niets bij, dan plak '
@@ -2054,9 +2100,7 @@ function vProduct(rt){
  +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
  +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
  +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
- +(p.rev?'<div class="revbox"><span style="color:var(--muted)">Hier komt de proefnotitie van de schrijver — zijn eigen woorden, een fragment of de hele tekst.</span>'
-  +'<div class="revsrc">— <b>'+p.rev.s+'</b> · <a href="'+revLink(p)+'" target="_blank" rel="noopener">'+p.rev.u+' →</a>'
-  +'<span class="demoflag">voorbeeld · nog geen toestemming</span></div></div>':"")
+ +(p.rev?revBlok(p):"")
  +'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
