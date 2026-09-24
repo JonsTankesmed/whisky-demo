@@ -684,7 +684,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
-var DIMS=["Rook","Fruit","Kruid","Zoet","Zee","Sherry"];
+var DIMS=["Rook","Zoet","Fruit","Kruid"];
 /* lijn-iconen (lucide-stijl) */
 var IC={
  flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
@@ -709,33 +709,33 @@ var IC={
 };
 function I(n,s,sw){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.7)+'" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+'</svg>';}
 function HEART(f){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="'+(f?"#8a1c26":"none")+'" stroke="#8a1c26" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+IC.heart+'</svg>';}
-var FLAVORS=[{k:0,n:"Rokerig",ic:"flame"},{k:1,n:"Fruitig",ic:"apple"},{k:2,n:"Kruidig",ic:"zap"},{k:3,n:"Zoet",ic:"droplet"},{k:4,n:"Maritiem",ic:"waves"},{k:5,n:"Sherry",ic:"grape"}];
-var HINTS=["Van zacht naar intens turfrook","Van mout naar tropisch fruit","Van rond naar peperig","Van droog naar vol-zoet","Van binnenland naar zilte zeebries","Invloed van sherryvat-rijping"];
-var SLIDER_ORDER=[0,1,2,3,4,5];
+var FLAVORS=[{k:0,n:"Rokerig",ic:"flame"},{k:1,n:"Zoet",ic:"droplet"},{k:2,n:"Fruitig",ic:"apple"},{k:3,n:"Kruidig",ic:"zap"}];
+var HINTS=["Van zacht naar intens turfrook","Van droog naar vol-zoet","Van mout naar tropisch fruit","Van rond naar peperig"];
+var SLIDER_ORDER=[0,1,2,3];
 var CDN="https://cdn.webshopapp.com/shops/39103/files/";
 var IMG={lag:CDN+"494230561/325x375x2/lagavulin-lagavulin-16-years-old-070-ltr-43.jpg",oban:CDN+"31784880/325x375x2/oban-oban-14-years-old-070-ltr-43.jpg",mac:CDN+"484799063/325x375x2/macallan-12-years-old-double-cask-2025-release-070.jpg",red:CDN+"446074002/325x375x2/redbreast-redbreast-12-years-old-cask-strength-070.jpg",bow:CDN+"445784032/325x375x2/bowmore-bowmore-50-years-old-1969-070-ltr-469.jpg",glm:CDN+"498306047/375x375x2/image.jpg"};
 var BOTTLE='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="185" viewBox="0 0 120 185"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%23d99a3d"/><stop offset="1" stop-color="%236b4416"/></linearGradient></defs><rect x="52" y="6" width="16" height="26" rx="3" fill="%233a3226"/><path d="M45 32 h30 c0 14 14 16 14 34 v104 a10 10 0 0 1 -10 10 h-38 a10 10 0 0 1 -10 -10 v-104 c0-18 14-20 14-34z" fill="url(%23g)" opacity="0.9"/><rect x="38" y="92" width="44" height="52" rx="4" fill="%23f0e8dc" opacity="0.85"/></svg>');
 var P=[
- {id:"lagavulin-16",name:"Lagavulin 16 Years Old",dist:"Lagavulin",region:"Islay",country:"Schotland",age:"16 jr",abv:"43%",cask:"Ex-Bourbon & Sherry",img:IMG.lag,price:59.99,was:74.99,sample:7.49,t:[9,3,5,4,8,3],tags:["turf","zeewier","droge rook"],sum:"De iconische Islay-klassieker: intense turfrook, zilte zeebries, lapsang en een lange, warme afdronk.",pair:["Donkere chocolade","Blauwe kaas","Gerookte zalm"]},
- {id:"oban-14",name:"Oban 14 Years Old",dist:"Oban",region:"Highland",country:"Schotland",age:"14 jr",abv:"43%",cask:"Ex-Bourbon",img:IMG.oban,price:49.99,was:64.99,sample:6.49,t:[4,6,4,5,6,2],tags:["citrus","zout","honing"],sum:"West-Highland kustklassieker: honing en sinaasappel met een subtiele zilte rook.",pair:["Wildgerechten","Schaaldieren"]},
- {id:"macallan-12-dc",name:"Macallan 12 Double Cask (2025)",dist:"Macallan",region:"Speyside",country:"Schotland",age:"12 jr",abv:"40%",cask:"Sherry & Bourbon",img:IMG.mac,price:59.99,was:74.99,sample:6.95,t:[1,7,4,8,1,8],tags:["sherry","gedroogd fruit","vanille"],sum:"Rond en toegankelijk: sherryzoet, sinaasappelschil, vanille en warme eik.",pair:["Pure chocolade","Noten"]},
- {id:"redbreast-12-cs",name:"Redbreast 12 Cask Strength",dist:"Midleton",region:"Ierland",country:"Ierland",age:"12 jr",abv:"57,2%",cask:"Bourbon & Sherry",img:IMG.red,price:97.99,was:null,sample:8.95,t:[1,8,7,7,1,6],tags:["pot still","specerijen","rood fruit"],sum:"Iers single pot still op vatsterkte: romig, kruidig en vol rood fruit.",pair:["Karamel","Appeltaart"]},
- {id:"glenmorangie-21",name:"Glenmorangie 21 The Aureum",dist:"Glenmorangie",region:"Highland",country:"Schotland",age:"21 jr",abv:"43%",cask:"Bourbon, getoast",img:IMG.glm,price:149.99,was:179.99,sample:12.95,t:[1,8,3,7,2,4],tags:["abrikoos","eik","floraal"],sum:"Elegant en gelaagd: abrikoos, honing, floraal met verfijnde eik. Cadeau-waardig.",pair:["Crème brûlée","Zachte kazen"]},
- {id:"kilchoman-rockside",name:"Kilchoman Rockside 11 Years Old",dist:"Kilchoman",region:"Islay",country:"Schotland",age:"11 jr",abv:"46%",cask:"Ex-Bourbon",img:BOTTLE,price:59.99,was:null,sample:6.49,isNew:true,t:[8,5,4,4,7,2],tags:["farm distillery","citrusrook"],sum:"Van Islay's boerderijdistilleerderij: heldere citrus onder een laag frisse turfrook.",pair:["Oesters","Gerookte vis"]},
- {id:"bruichladdich-oldskool",name:"Bruichladdich Old Skool 10",dist:"Bruichladdich",region:"Islay",country:"Schotland",age:"10 jr",abv:"50%",cask:"Ex-Bourbon & wijn",img:BOTTLE,price:69.99,was:null,sample:7.49,isNew:true,t:[2,7,4,6,5,3],tags:["ongeturfd","gerst","zeebries"],sum:"Ongeturfde Islay: pure gerst, boomgaardfruit en een vleugje zeebries.",pair:["Witvis","Milde kaas"]},
- {id:"nikka-coffey",name:"Nikka Coffey Grain",dist:"Nikka",region:"Japan",country:"Japan",age:"NAS",abv:"45%",cask:"New American Oak",img:BOTTLE,price:36.99,was:46.99,sample:5.95,t:[1,6,3,8,1,2],tags:["vanille","kokos","zacht"],sum:"Zachte Japanse grain: vanille, kokos en tropisch zoet. Ideale instapper.",pair:["Sushi","Desserts"]},
- {id:"ledaig-rioja",name:"Ledaig Rioja Cask Finish",dist:"Tobermory",region:"Island",country:"Schotland",age:"NAS",abv:"46,3%",cask:"Rioja finish",img:BOTTLE,price:34.99,was:44.99,sample:5.95,t:[8,5,5,4,6,5],tags:["rook","rode wijn","peper"],sum:"Van Mull: stevige rook verweven met rode wijn en peper. Veel karakter voor weinig.",pair:["BBQ","Gerookt vlees"]},
- {id:"glenglassaugh-12",name:"Glenglassaugh 12 Years Old",dist:"Glenglassaugh",region:"Highland",country:"Schotland",age:"12 jr",abv:"45%",cask:"Bourbon, sherry & wijn",img:BOTTLE,price:36.99,was:46.99,sample:5.95,t:[2,7,4,7,3,5],tags:["kust","tropisch fruit","karamel"],sum:"Kust-Highland: tropisch fruit en karamel met een zachte zilte ondertoon.",pair:["Fruitdesserts"]},
- {id:"glenglassaugh-portsoy",name:"Glenglassaugh Portsoy",dist:"Glenglassaugh",region:"Highland",country:"Schotland",age:"NAS",abv:"49,1%",cask:"Sherry, bourbon & port",img:BOTTLE,price:36.99,was:46.99,sample:5.95,t:[5,6,4,6,6,5],tags:["kustrook","donker fruit"],sum:"Genoemd naar de havenplaats: zachte kustrook, donker fruit en zeezout.",pair:["Gerookte makreel"]},
- {id:"teeling-wow4",name:"Teeling Wonders of Wood #4",dist:"Teeling",region:"Ierland",country:"Ierland",age:"NAS",abv:"50%",cask:"Chinkapin eik",img:BOTTLE,price:64.99,was:79.99,sample:7.95,t:[1,7,6,7,1,2],tags:["pot still","hout","kruidnagel"],sum:"Experimentele pot still gerijpt op zeldzame Chinkapin-eik: hout, specerij en boomgaard.",pair:["Steak","Harde kazen"]},
- {id:"peats-beast-2010",name:"Peat's Beast Single Cask 2010",dist:"Undisclosed",region:"Islay",country:"Schotland",age:"2010",abv:"57%",cask:"Single cask",img:BOTTLE,price:39.99,was:52.99,sample:6.95,ib:true,bott:"pb",fest:true,t:[9,4,5,3,7,2],tags:["cask strength","beest","turf"],sum:"Voor de liefhebber: ongetemde turfrook op vatsterkte uit één enkel vat.",pair:["Blauwe kaas"]},
- {id:"bruichladdich-21",name:"Bruichladdich 21 Years Old",dist:"Bruichladdich",region:"Islay",country:"Schotland",age:"21 jr",abv:"50%",cask:"Re-charred oak",img:BOTTLE,price:149.99,was:194.99,sample:14.95,t:[2,8,4,7,5,4],tags:["ongeturfd","elegant","kust"],sum:"Rijpe, elegante Islay zonder turf: honing, stoofpeer en zachte kust-mineraliteit.",pair:["Wild","Oude kaas"]},
- {id:"teaninich-12-gm",name:"Teaninich 12 Years Old 2009 — Gordon & MacPhail",dist:"Teaninich",region:"Highland",country:"Schotland",age:"12 jr",abv:"57,9%",cask:"Refill hogshead",img:CDN+"386304468/325x375x2/teaninich-teaninich-12-years-old-2009-gordon-macph.jpg",price:79.99,was:null,sample:7.99,ib:true,bott:"gm",fest:true,t:[2,7,5,6,2,4],tags:["connoisseurs choice","cask strength"],sum:"Zeldzaam gebottelde Highland-distilleerderij uit de Connoisseurs Choice-reeks: grasachtig, fruitig en vol op vatsterkte.",pair:["Harde kazen","Appelgebak"]},
- {id:"strathmill-14-gm",name:"Strathmill 14 Years Old 2009 — Gordon & MacPhail",dist:"Strathmill",region:"Speyside",country:"Schotland",age:"14 jr",abv:"55,3%",cask:"Single cask",img:CDN+"448768592/325x375x2/strathmill-strathmill-14-years-old-2009-gordon-mac.jpg",price:119.99,was:null,sample:null,ib:true,bott:"gm",t:[1,8,4,7,1,3],tags:["single cask","zeldzaam"],sum:"Strathmill zie je vrijwel nooit als single malt — G&M bottelde dit ene vat: honing, mout en boomgaardfruit.",pair:["Zachte kazen","Noten"]},
- {id:"dailuaine-8-dl",name:"Dailuaine 8 Years Old Provenance — Douglas Laing",dist:"Dailuaine",region:"Speyside",country:"Schotland",age:"8 jr",abv:"46%",cask:"Refill bourbon",img:CDN+"490979939/325x375x2/dailuaine-dailuaine-8-years-old-provenance-070-ltr.jpg",price:44.99,was:null,sample:5.95,ib:true,bott:"dl",t:[1,6,4,6,1,2],tags:["provenance","jong & fris"],sum:"Jonge, frisse Speysider uit de Provenance-reeks: mout, peer en vanille — ongekleurd en ongefilterd.",pair:["Lichte desserts"]},
- {id:"cb-orchard",name:"Compass Box Orchard House",dist:"Compass Box",region:"Blend",country:"Schotland",age:"NAS",abv:"46%",cask:"Diverse (blend)",img:CDN+"496799774/325x375x2/compass-box-compass-box-orchard-house-070-ltr-46.jpg",price:42.99,was:null,sample:6.49,ib:true,bott:"cb",t:[1,9,3,6,1,1],tags:["blended malt","boomgaard"],sum:"Een ode aan de boomgaard: sappige appel en peer in een heldere, moderne blended malt.",pair:["Appeltaart","Frisse kazen"]},
- {id:"cb-artists",name:"Compass Box Great King Street Artist's Blend",dist:"Compass Box",region:"Blend",country:"Schotland",age:"NAS",abv:"43%",cask:"Diverse (blend)",img:CDN+"435338616/325x375x2/compass-box-compass-box-great-king-street-artists.jpg",price:39.99,was:null,sample:5.95,ib:true,bott:"cb",t:[1,6,3,7,1,2],tags:["blended scotch","creamy"],sum:"Bewijst dat blended scotch spannend kan zijn: romige vanille, peer en een vleugje eik.",pair:["Aperitief","Milde kazen"]},
- {id:"bowmore-50",name:"Bowmore 50 Years Old 1969",dist:"Bowmore",region:"Islay",country:"Schotland",age:"50 jr",abv:"46,9%",cask:"Hogshead 1969",img:IMG.bow,price:39999.99,was:null,sample:null,rare:true,t:[6,8,4,6,7,7],tags:["rare & old","tropisch","legendarisch"],sum:"Een halve eeuw gerijpt op Islay: tropisch fruit, oude rook en oneindige diepte. Museumstuk.",pair:["Een goede sigaar","Stilte"]}
+ {id:"lagavulin-16",name:"Lagavulin 16 Years Old",dist:"Lagavulin",region:"Islay",country:"Schotland",age:"16 jr",abv:"43%",cask:"Ex-Bourbon & Sherry",img:IMG.lag,price:59.99,was:74.99,sample:7.49,t:[4,2,2,2],tags:["turf","zeewier","droge rook"],sum:"De iconische Islay-klassieker: intense turfrook, zilte zeebries, lapsang en een lange, warme afdronk.",pair:["Donkere chocolade","Blauwe kaas","Gerookte zalm"]},
+ {id:"oban-14",name:"Oban 14 Years Old",dist:"Oban",region:"Highland",country:"Schotland",age:"14 jr",abv:"43%",cask:"Ex-Bourbon",img:IMG.oban,price:49.99,was:64.99,sample:6.49,t:[2,2,3,2],tags:["citrus","zout","honing"],sum:"West-Highland kustklassieker: honing en sinaasappel met een subtiele zilte rook.",pair:["Wildgerechten","Schaaldieren"]},
+ {id:"macallan-12-dc",name:"Macallan 12 Double Cask (2025)",dist:"Macallan",region:"Speyside",country:"Schotland",age:"12 jr",abv:"40%",cask:"Sherry & Bourbon",img:IMG.mac,price:59.99,was:74.99,sample:6.95,t:[0,4,4,2],tags:["sherry","gedroogd fruit","vanille"],sum:"Rond en toegankelijk: sherryzoet, sinaasappelschil, vanille en warme eik.",pair:["Pure chocolade","Noten"]},
+ {id:"redbreast-12-cs",name:"Redbreast 12 Cask Strength",dist:"Midleton",region:"Ierland",country:"Ierland",age:"12 jr",abv:"57,2%",cask:"Bourbon & Sherry",img:IMG.red,price:97.99,was:null,sample:8.95,t:[0,4,4,4],tags:["pot still","specerijen","rood fruit"],sum:"Iers single pot still op vatsterkte: romig, kruidig en vol rood fruit.",pair:["Karamel","Appeltaart"]},
+ {id:"glenmorangie-21",name:"Glenmorangie 21 The Aureum",dist:"Glenmorangie",region:"Highland",country:"Schotland",age:"21 jr",abv:"43%",cask:"Bourbon, getoast",img:IMG.glm,price:149.99,was:179.99,sample:12.95,t:[0,4,4,2],tags:["abrikoos","eik","floraal"],sum:"Elegant en gelaagd: abrikoos, honing, floraal met verfijnde eik. Cadeau-waardig.",pair:["Crème brûlée","Zachte kazen"]},
+ {id:"kilchoman-rockside",name:"Kilchoman Rockside 11 Years Old",dist:"Kilchoman",region:"Islay",country:"Schotland",age:"11 jr",abv:"46%",cask:"Ex-Bourbon",img:BOTTLE,price:59.99,was:null,sample:6.49,isNew:true,t:[4,2,2,2],tags:["farm distillery","citrusrook"],sum:"Van Islay's boerderijdistilleerderij: heldere citrus onder een laag frisse turfrook.",pair:["Oesters","Gerookte vis"]},
+ {id:"bruichladdich-oldskool",name:"Bruichladdich Old Skool 10",dist:"Bruichladdich",region:"Islay",country:"Schotland",age:"10 jr",abv:"50%",cask:"Ex-Bourbon & wijn",img:BOTTLE,price:69.99,was:null,sample:7.49,isNew:true,t:[1,3,4,2],tags:["ongeturfd","gerst","zeebries"],sum:"Ongeturfde Islay: pure gerst, boomgaardfruit en een vleugje zeebries.",pair:["Witvis","Milde kaas"]},
+ {id:"nikka-coffey",name:"Nikka Coffey Grain",dist:"Nikka",region:"Japan",country:"Japan",age:"NAS",abv:"45%",cask:"New American Oak",img:BOTTLE,price:36.99,was:46.99,sample:5.95,t:[0,4,3,2],tags:["vanille","kokos","zacht"],sum:"Zachte Japanse grain: vanille, kokos en tropisch zoet. Ideale instapper.",pair:["Sushi","Desserts"]},
+ {id:"ledaig-rioja",name:"Ledaig Rioja Cask Finish",dist:"Tobermory",region:"Island",country:"Schotland",age:"NAS",abv:"46,3%",cask:"Rioja finish",img:BOTTLE,price:34.99,was:44.99,sample:5.95,t:[4,2,2,2],tags:["rook","rode wijn","peper"],sum:"Van Mull: stevige rook verweven met rode wijn en peper. Veel karakter voor weinig.",pair:["BBQ","Gerookt vlees"]},
+ {id:"glenglassaugh-12",name:"Glenglassaugh 12 Years Old",dist:"Glenglassaugh",region:"Highland",country:"Schotland",age:"12 jr",abv:"45%",cask:"Bourbon, sherry & wijn",img:BOTTLE,price:36.99,was:46.99,sample:5.95,t:[1,4,4,2],tags:["kust","tropisch fruit","karamel"],sum:"Kust-Highland: tropisch fruit en karamel met een zachte zilte ondertoon.",pair:["Fruitdesserts"]},
+ {id:"glenglassaugh-portsoy",name:"Glenglassaugh Portsoy",dist:"Glenglassaugh",region:"Highland",country:"Schotland",age:"NAS",abv:"49,1%",cask:"Sherry, bourbon & port",img:BOTTLE,price:36.99,was:46.99,sample:5.95,t:[2,3,3,2],tags:["kustrook","donker fruit"],sum:"Genoemd naar de havenplaats: zachte kustrook, donker fruit en zeezout.",pair:["Gerookte makreel"]},
+ {id:"teeling-wow4",name:"Teeling Wonders of Wood #4",dist:"Teeling",region:"Ierland",country:"Ierland",age:"NAS",abv:"50%",cask:"Chinkapin eik",img:BOTTLE,price:64.99,was:79.99,sample:7.95,t:[0,4,4,3],tags:["pot still","hout","kruidnagel"],sum:"Experimentele pot still gerijpt op zeldzame Chinkapin-eik: hout, specerij en boomgaard.",pair:["Steak","Harde kazen"]},
+ {id:"peats-beast-2010",name:"Peat's Beast Single Cask 2010",dist:"Undisclosed",region:"Islay",country:"Schotland",age:"2010",abv:"57%",cask:"Single cask",img:BOTTLE,price:39.99,was:52.99,sample:6.95,ib:true,bott:"pb",fest:true,t:[4,2,2,2],tags:["cask strength","beest","turf"],sum:"Voor de liefhebber: ongetemde turfrook op vatsterkte uit één enkel vat.",pair:["Blauwe kaas"]},
+ {id:"bruichladdich-21",name:"Bruichladdich 21 Years Old",dist:"Bruichladdich",region:"Islay",country:"Schotland",age:"21 jr",abv:"50%",cask:"Re-charred oak",img:BOTTLE,price:149.99,was:194.99,sample:14.95,t:[1,4,4,2],tags:["ongeturfd","elegant","kust"],sum:"Rijpe, elegante Islay zonder turf: honing, stoofpeer en zachte kust-mineraliteit.",pair:["Wild","Oude kaas"]},
+ {id:"teaninich-12-gm",name:"Teaninich 12 Years Old 2009 — Gordon & MacPhail",dist:"Teaninich",region:"Highland",country:"Schotland",age:"12 jr",abv:"57,9%",cask:"Refill hogshead",img:CDN+"386304468/325x375x2/teaninich-teaninich-12-years-old-2009-gordon-macph.jpg",price:79.99,was:null,sample:7.99,ib:true,bott:"gm",fest:true,t:[1,3,4,2],tags:["connoisseurs choice","cask strength"],sum:"Zeldzaam gebottelde Highland-distilleerderij uit de Connoisseurs Choice-reeks: grasachtig, fruitig en vol op vatsterkte.",pair:["Harde kazen","Appelgebak"]},
+ {id:"strathmill-14-gm",name:"Strathmill 14 Years Old 2009 — Gordon & MacPhail",dist:"Strathmill",region:"Speyside",country:"Schotland",age:"14 jr",abv:"55,3%",cask:"Single cask",img:CDN+"448768592/325x375x2/strathmill-strathmill-14-years-old-2009-gordon-mac.jpg",price:119.99,was:null,sample:null,ib:true,bott:"gm",t:[0,4,4,2],tags:["single cask","zeldzaam"],sum:"Strathmill zie je vrijwel nooit als single malt — G&M bottelde dit ene vat: honing, mout en boomgaardfruit.",pair:["Zachte kazen","Noten"]},
+ {id:"dailuaine-8-dl",name:"Dailuaine 8 Years Old Provenance — Douglas Laing",dist:"Dailuaine",region:"Speyside",country:"Schotland",age:"8 jr",abv:"46%",cask:"Refill bourbon",img:CDN+"490979939/325x375x2/dailuaine-dailuaine-8-years-old-provenance-070-ltr.jpg",price:44.99,was:null,sample:5.95,ib:true,bott:"dl",t:[0,3,3,2],tags:["provenance","jong & fris"],sum:"Jonge, frisse Speysider uit de Provenance-reeks: mout, peer en vanille — ongekleurd en ongefilterd.",pair:["Lichte desserts"]},
+ {id:"cb-orchard",name:"Compass Box Orchard House",dist:"Compass Box",region:"Blend",country:"Schotland",age:"NAS",abv:"46%",cask:"Diverse (blend)",img:CDN+"496799774/325x375x2/compass-box-compass-box-orchard-house-070-ltr-46.jpg",price:42.99,was:null,sample:6.49,ib:true,bott:"cb",t:[0,3,4,2],tags:["blended malt","boomgaard"],sum:"Een ode aan de boomgaard: sappige appel en peer in een heldere, moderne blended malt.",pair:["Appeltaart","Frisse kazen"]},
+ {id:"cb-artists",name:"Compass Box Great King Street Artist's Blend",dist:"Compass Box",region:"Blend",country:"Schotland",age:"NAS",abv:"43%",cask:"Diverse (blend)",img:CDN+"435338616/325x375x2/compass-box-compass-box-great-king-street-artists.jpg",price:39.99,was:null,sample:5.95,ib:true,bott:"cb",t:[0,4,3,2],tags:["blended scotch","creamy"],sum:"Bewijst dat blended scotch spannend kan zijn: romige vanille, peer en een vleugje eik.",pair:["Aperitief","Milde kazen"]},
+ {id:"bowmore-50",name:"Bowmore 50 Years Old 1969",dist:"Bowmore",region:"Islay",country:"Schotland",age:"50 jr",abv:"46,9%",cask:"Hogshead 1969",img:IMG.bow,price:39999.99,was:null,sample:null,rare:true,t:[3,3,4,2],tags:["rare & old","tropisch","legendarisch"],sum:"Een halve eeuw gerijpt op Islay: tropisch fruit, oude rook en oneindige diepte. Museumstuk.",pair:["Een goede sigaar","Stilte"]}
 ];
 var REGIONS=[...new Set(P.map(p=>p.region))];
 /* Reviews van gerenommeerde whiskysites — scores en citaten ILLUSTRATIEF (demo-concept);
@@ -837,7 +837,7 @@ var SUBLABEL={scotch:"Kies een regio",world:"Kies een land",ib:"Kies een bottela
 function subMatch(p,cat,sub){if(cat==="scotch")return p.region===sub;if(cat==="world")return p.country===sub;if(cat==="ib")return p.bott===sub;return true;}
 function mono(item,i,size){var ini=item.ini||item.n.slice(0,2);return '<div class="mono" style="width:'+(size||46)+'px;height:'+(size||46)+'px;background:'+MONOCOLORS[i%MONOCOLORS.length]+'">'+ini+'</div>';}
 var PROFILE=null;
-var SL={0:5,1:5,2:5,3:5,4:5,5:5};
+var SL={0:3,1:3,2:3,3:3};
 var compareSet=new Set(),wish=new Set(),cart=0;
 var eur=n=>"€"+n.toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
 var el=id=>document.getElementById(id);
@@ -846,16 +846,46 @@ function toast(m){var t=el("toast");t.textContent=m;t.classList.add("show");clea
 function esc(s){return s.replace(/'/g,"\\'");}
 /* ================= HELPERS ================= */
 /* Een fles zonder gelezen smaakprofiel krijgt geen matchpercentage. Zonder deze
-   regel rekent de match tegen de neutrale [5,5,5,5,5,5] die normEcht invult, en
-   dan staat er een percentage op een kaart waar niets onder ligt. */
-function matchPct(p,prof){if(p.geenprofiel)return null;var d=0;for(var i=0;i<6;i++)d+=Math.pow(p.t[i]-prof[i],2);return Math.max(0,Math.round(100-Math.sqrt(d)*7));}
+   regel rekent de match tegen de neutrale waarden die normEcht invult, en dan
+   staat er een percentage op een kaart waar niets onder ligt.
+   Vier assen op schaal 0-5: de grootste afstand is sqrt(4 x 25) = 10, dus een
+   factor 10 laat de slechtste match op 0% uitkomen. */
+function matchPct(p,prof){if(p.geenprofiel||!p.t)return null;var n=Math.min(p.t.length,prof.length),d=0;
+ for(var i=0;i<n;i++)d+=Math.pow((p.t[i]||0)-(prof[i]||0),2);
+ return Math.max(0,Math.round(100-Math.sqrt(d)*10));}
+/* Intern fijner rekenen dan we tonen (besluit 7, 24-09). Op vier assen van 0-5
+   zijn er maar zes verschillende matchpercentages mogelijk in een top-20; de
+   volgorde binnen een gelijke stand was daardoor willekeurig. De weergave
+   verandert niet — de rangschikking wel.
+   Zilt telt mee waar het van beide flessen bekend is (gemeten samenhang met
+   rook is maar r=0,33, dus het draagt eigen informatie). De microtermen
+   daarna wegen bewust licht: zij ordenen alleen wat verder gelijk is. */
+function _jaar(p){var m=/(\d+)/.exec(p.age||"");return m?+m[1]:null;}
+function _abv(p){var m=/([\d.,]+)/.exec(p.abv||"");return m?parseFloat(m[1].replace(",",".")):null;}
+function profAfstand(p,prof){
+ if(!p.t)return 99;
+ var d=0,i,n=Math.min(p.t.length,prof.length);
+ for(i=0;i<n;i++)d+=Math.pow((p.t[i]||0)-(prof[i]||0),2);
+ d=Math.sqrt(d);
+ var x=_abv(p);if(x!=null)d+=0.004*Math.min(Math.abs(x-46),20);
+ return d;}
+function fijnAfstand(p,q){
+ var som=0,i;
+ for(i=0;i<4;i++)som+=Math.pow((p.t[i]||0)-(q.t[i]||0),2);
+ if(p._z!=null&&q._z!=null)som+=0.35*Math.pow(p._z-q._z,2);
+ var d=Math.sqrt(som);
+ var a=_jaar(p),b=_jaar(q);       if(a!=null&&b!=null)d+=0.010*Math.min(Math.abs(a-b),20);
+ var x=_abv(p),y=_abv(q);         if(x!=null&&y!=null)d+=0.012*Math.min(Math.abs(x-y),20);
+ if(!!p.sherry!==!!q.sherry)d+=0.08;
+ if(p.dist&&p.dist===q.dist)d-=0.12;
+ return d;}
 /* Vergelijkbaar op smaak kan alleen tussen flessen die allebei een gelezen
    profiel hebben. Zocht eerst alleen in de 20 handgemaakte producten; nu in de
    hele catalogus, maar zonder de flessen waarvan het profiel nog ontbreekt. */
 function similar(p,n){
- if(p.geenprofiel)return[];
- return CAT.filter(x=>x.id!==p.id&&!x.rare&&!x.geenprofiel)
-  .map(x=>({x,d:x.t.reduce((s,v,i)=>s+Math.abs(v-p.t[i]),0)}))
+ if(p.geenprofiel||!p.t)return[];
+ return CAT.filter(x=>x.id!==p.id&&!x.rare&&!x.geenprofiel&&x.t)
+  .map(x=>({x,d:fijnAfstand(x,p)}))
   .sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
 /* Zonder smaakprofiel is 'vergelijkbaar' een loze belofte. Dan tonen we wat we
    wél zeker weten: andere flessen van dezelfde distilleerderij. */
@@ -863,13 +893,13 @@ function zelfdeStokerij(p,n){
  return CAT.filter(x=>x.id!==p.id&&x.dist===p.dist&&p.dist!=="Onbekend").slice(0,n);}
 function bars(t,geen){
  if(geen)return '<div class="geenprofiel">Nog geen smaakprofiel — deze fles wacht op beoordeling.</div>';
- return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*10)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
+ return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*20)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
 function card(p,prof,opt){
  var m=prof?matchPct(p,prof):null;
  /* compact: rustige kaart voor de homepage — smaaktags en smaakbalkjes staan op de productpagina */
  var compact=!!(opt&&opt.compact);
  return '<div class="pcard'+(compact?" compact":"")+'">'
- +'<div class="pimg" onclick="go(\'#/product/'+p.id+'\')"><img loading="lazy" src="'+p.img+'" alt="">'
+ +'<div class="pimg" onclick="go(\'#/product/'+p.id+'\')"><img loading="lazy" src="'+p.img+'" alt="">'+samplLabel(p)
  +'<div class="badges">'+(p.fest?'<span class="badge" style="background:var(--gold);color:#241a0c">FESTIVAL</span>':"")+(p.was?'<span class="badge sale">SALE</span>':"")+(p.rare?'<span class="badge rare">RARE & OLD</span>':"")+(p.isNew?'<span class="badge new">NIEUW</span>':"")+'<span class="badge">'+p.region+'</span></div>'
  +(m!==null?'<div class="match-ring">'+m+'%<small>match</small></div>':"")
  +'<button class="wish" onclick="event.stopPropagation();wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+'</button></div>'
@@ -936,7 +966,7 @@ function genereer(n){
          (vat[1].indexOf("sherry")>=0?6:3)+Math.round(rnd()*3),
          (reg.r==="Islay"||reg.r==="Island"||reg.r==="Campbeltown")?5+Math.round(rnd()*4):1+Math.round(rnd()*3),
          vat[1].indexOf("sherry")>=0?7+Math.round(rnd()*2):1+Math.round(rnd()*3)];
-  t=t.map(function(v){return Math.max(1,Math.min(10,v));});
+  t=[t[0],t[3],t[1],t[2]].map(function(v){return Math.max(0,Math.min(5,Math.round(v/2)));});
   var dagen=Math.floor(rnd()*540);
   var naam=merk+" "+(leeftijd?leeftijd+" Years Old":"NAS")+(rnd()<.35?" "+(2026-(leeftijd||8)-Math.floor(rnd()*3)):"")+" "+vat[0]+(bot[0]?" — "+bot[0]:"")+(sample?" (sample 5cl)":"");
   uit.push({id:"vb-"+i,name:naam,dist:dist,merk:merk,region:reg.r,country:reg.c,
@@ -967,12 +997,13 @@ function normEcht(p){
     zetten zou 'ongeturfd' beweren over 4.992 flessen die we niet gelezen hebben;
     null geeft ze een eigen filterwaarde 'Nog niet bepaald'. */
  p.geenprofiel=!p.t;
- if(!p.t)p.t=[5,5,5,5,5,5];
- p._turf=p.geenprofiel?null:(p.t[0]>=7?2:(p.t[0]>=4?1:0));
+ if(!p.t)p.t=[3,3,3,3];
+ p._turf=p.geenprofiel?null:(p.t[0]>=4?2:(p.t[0]>=2?1:0));
  if(p._vol==null)p._vol=70;
  if(p._sample==null)p._sample=/sample|5cl|3cl/i.test(p.name||"");
  p._dagen=p.isNew?12:200;
  if(p._voorraad==null)p._voorraad=!p.rare;
+ if(p._ouderbeeld){p.img=p._ouderbeeld;p._toonSample=true;}
  if(!p.img)p.img=BOTTLE;
  p.merk=p.merk||p.dist;
  return p;
@@ -989,6 +1020,10 @@ var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
 function bktLeeftijd(p){if(p._leeftijd===null)return "Geen leeftijd (NAS)";var a=p._leeftijd;
  return a<10?"Tot 10 jaar":a<15?"10 tot 15 jaar":a<21?"15 tot 21 jaar":"21 jaar en ouder";}
 function bktSterkte(p){return p._abv>=50?"Vatsterkte (50%+)":p._abv>=46?"46 tot 50%":"Tot 46%";}
+/* Zilt is geen schuif meer (T5), maar wel een kenmerk. Van de flessen met
+   zilt >= 4 staat 45% buiten Islay, Island en Campbeltown, dus het streekfilter
+   dekt dit niet af. De drempel van 4 ligt bij Jack ter bevestiging. */
+function lblZee(p){return p._z==null?"Nog niet bepaald":p._z>=4?"Maritiem":"Niet maritiem";}
 function lblTurf(p){return p._turf==null?"Nog niet bepaald":p._turf===2?"Uitgesproken turf":p._turf===1?"Licht turfig":"Ongeturfd";}
 /* de facetlijst is redactioneel beheerd, niet afgeleid uit de producten:
    anders komen streek en land door elkaar te staan ("Blend" naast "Islay") */
@@ -1001,6 +1036,7 @@ var FACETS=[
  {id:"leeftijd",n:"Leeftijd",v:bktLeeftijd,vast:["Tot 10 jaar","10 tot 15 jaar","15 tot 21 jaar","21 jaar en ouder","Geen leeftijd (NAS)"]},
  {id:"sterkte",n:"Alcohol",v:bktSterkte,vast:["Tot 46%","46 tot 50%","Vatsterkte (50%+)"]},
  {id:"turf",n:"Turf",v:lblTurf,vast:["Ongeturfd","Licht turfig","Uitgesproken turf","Nog niet bepaald"]},
+ {id:"zee",n:"Maritiem",v:lblZee,vast:["Maritiem","Niet maritiem","Nog niet bepaald"]},
  {id:"bottelaar",n:"Bottelaar",v:function(p){return p.ib?"Independent bottler":"Eigen botteling";}},
  {id:"inhoud",n:"Inhoud",v:function(p){
    /* De echte catalogus kent meer maten dan 5cl en 70cl: 3cl-samples,
@@ -1070,7 +1106,10 @@ function sorteer(l){
  if(s==="match"&&PROFILE)return l.slice().sort(function(a,b){
   var x=matchPct(a,PROFILE),y=matchPct(b,PROFILE);
   if(x===null&&y===null)return 0; if(x===null)return 1; if(y===null)return -1;
-  return y-x;});
+  if(y!==x)return y-x;
+  /* Gelijke percentages: dan ordent de onafgeronde afstand, niet de toevallige
+     volgorde in de catalogus (besluit 7). */
+  return profAfstand(a,PROFILE)-profAfstand(b,PROFILE);});
  if(s==="priceAsc")return l.slice().sort(function(a,b){return a.price-b.price;});
  if(s==="priceDesc")return l.slice().sort(function(a,b){return b.price-a.price;});
  if(s==="ageDesc")return l.slice().sort(function(a,b){return (b._leeftijd||0)-(a._leeftijd||0);});
@@ -2031,21 +2070,29 @@ function vOntdek(){
  +'<p style="color:var(--muted)">Verschuif de regelaars naar jouw voorkeur. We berekenen live welke flessen het dichtst bij jouw smaak liggen — elk met een match-percentage.</p></div>'
  +'<div class="disc"><div class="sliders">'
  +SLIDER_ORDER.map(k=>'<div class="sl"><div class="sl-h"><div><b style="display:flex;align-items:center;gap:9px;color:var(--text)"><span style="color:var(--amber);display:inline-flex">'+I(FLAVORS[k].ic,18)+'</span>'+FLAVORS[k].n+'</b><small>'+HINTS[k]+'</small></div><span class="val" id="v'+k+'">'+SL[k]+'</span></div>'
- +'<input type="range" min="0" max="10" step="1" value="'+SL[k]+'" oninput="SL['+k+']=+this.value;el(\'v'+k+'\').textContent=this.value;updMatches()"></div>').join("")
- +'<button class="btn btn-a" style="width:100%;justify-content:center;margin-top:6px" onclick="PROFILE=[SL[0],SL[1],SL[2],SL[3],SL[4],SL[5]];snel({sort:\'match\'})">Toon alle resultaten met match-score →</button>'
+ +'<input type="range" min="0" max="5" step="1" value="'+SL[k]+'" oninput="SL['+k+']=+this.value;el(\'v'+k+'\').textContent=this.value;updMatches()"></div>').join("")
+ +'<button class="btn btn-a" style="width:100%;justify-content:center;margin-top:6px" onclick="PROFILE=[SL[0],SL[1],SL[2],SL[3]];snel({sort:\'match\'})">Toon alle resultaten met match-score →</button>'
  +'</div><div class="matches"><div class="kicker">Live match</div><h3 style="font-size:22px;margin:8px 0 16px">Top 3 op basis van jouw smaak</h3><div id="mlist"></div>'
  +'<p style="font-size:12px;color:var(--muted);margin-top:12px">Tip: bestel van je top 3 eerst de samples — samen vaak minder dan €25.</p></div></div></div></section>';
 }
 function updMatches(){
  var box=el("mlist");if(!box)return;
- var prof=[SL[0],SL[1],SL[2],SL[3],SL[4],SL[5]];
+ var prof=[SL[0],SL[1],SL[2],SL[3]];
  /* De smaakprofiel-wizard zocht in de 20 handgemaakte producten. Dat is de
     kernbelofte van de site, dus die zoekt nu in alle flessen met een gelezen
     profiel — 1.379 in plaats van 20. */
- var top=CAT.filter(p=>!p.rare&&!p.geenprofiel).map(p=>({p,m:matchPct(p,prof)})).sort((a,b)=>b.m-a.m).slice(0,3);
+ /* Tonen doen we het afgeronde percentage; ordenen doen we op de onafgeronde
+    afstand plus dezelfde microtermen als bij "lijkt op deze fles". Anders
+    beslist de volgorde in de catalogus wie er bij de eerste drie staat. */
+ var top=CAT.filter(p=>!p.rare&&!p.geenprofiel&&p.t).map(function(p){
+   var d=0,i;for(i=0;i<4;i++)d+=Math.pow((p.t[i]||0)-(prof[i]||0),2);
+   d=Math.sqrt(d);
+   var x=_abv(p);if(x!=null)d+=0.004*Math.min(Math.abs(x-46),20);
+   return {p:p,m:matchPct(p,prof),d:d};
+  }).sort(function(a,b){return a.d-b.d;}).slice(0,3);
  box.innerHTML=top.map(o=>'<div class="mcard" onclick="go(\'#/product/'+o.p.id+'\')">'
  +'<div class="mring">'+o.m+'%</div><div><div class="rg">'+o.p.region+'</div><div class="nm">'+o.p.name+'</div>'
- +'<div style="font-size:11.5px;color:var(--muted)">'+o.p.tags.slice(0,2).join(" · ")+(o.p.sample?' · sample '+eur(o.p.sample):'')+'</div></div>'
+ +'<div style="font-size:11.5px;color:var(--muted)">'+(o.p.tags||[]).slice(0,2).join(" · ")+(o.p.sample?' · sample '+eur(o.p.sample):'')+'</div></div>'
  +'<div class="pr">'+eur(o.p.price)+'</div></div>').join("");
 }
 /* Streek en land zijn bij Japan, Taiwan en Nederland hetzelfde woord; die twee
@@ -2053,6 +2100,15 @@ function updMatches(){
 function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+')';}
 /* De inhoud stond hard op 0,70 ltr. Deze catalogus heeft 3cl-samples,
    halve flessen en literflessen; dan is een vaste tekst gewoon onjuist. */
+/* Een sample leent de foto van de ouderfles (F-g). Het inhoudslabel is dan geen versiering
+   maar een noodzaak: zonder dat label toont de site een 0,70 fles bij een 6 cl monster. */
+function samplLabel(p){
+ if(!p._toonSample)return "";
+ var v=p._vol?((p._vol%1?p._vol.toFixed(1):p._vol)+" CL"):"SAMPLE";
+ return '<span class="samplabel" style="position:absolute;left:8px;bottom:8px;z-index:2;'
+  +'background:rgba(20,16,14,.86);color:#f4efe7;font-size:11px;font-weight:700;letter-spacing:.04em;'
+  +'padding:3px 7px;border-radius:4px;pointer-events:none">'+v+'</span>';
+}
 function volTekst(p){var v=p._vol||70;return (v/100).toFixed(2).replace(".",",")+" ltr";}
 /* Het beoordeelpaneel op de productpagina zelf. Dezelfde besluiten als in de
    lijst, maar naast de pagina die de klant straks ziet. */
@@ -2096,7 +2152,7 @@ function vProduct(rt){
  return '<section><div class="wrap">'
  +'<a class="back" href="#/collectie">← Terug naar collectie</a>'
  +bPaneel(p)
- +'<div class="pd" style="margin-top:22px"><div class="pd-img"><img src="'+p.img+'" alt=""></div><div>'
+ +'<div class="pd" style="margin-top:22px"><div class="pd-img" style="position:relative"><img src="'+p.img+'" alt="">'+samplLabel(p)+'</div><div>'
  +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
  +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
  +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
@@ -2135,7 +2191,7 @@ function vVergelijk(){
  +row("Sample",p=>'<td>'+(p.sample?eur(p.sample):"—")+'</td>')
  +row("Vatsoort",p=>'<td>'+p.cask+'</td>')
  +row("Review",p=>'<td>'+(p.rev?'<span style="color:var(--muted);font-size:12px">proefnotitie voorzien</span><br><a href="'+revLink(p)+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px">'+p.rev.s+' ('+p.rev.u+') →</a>':"—")+'</td>')
- +DIMS.map((d,i)=>row(d,p=>p.geenprofiel?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*9)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
+ +DIMS.map((d,i)=>row(d,p=>p.geenprofiel?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*18)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
  +row("Karakter",p=>'<td>'+((p.tags||[]).join(", ")||"—")+'</td>')
  +row("",p=>'<td><button class="btn btn-a btn-s" onclick="add(\''+esc(p.name)+'\')">In winkelwagen</button></td>')
  +'</table></div></div></section>';
@@ -2551,7 +2607,7 @@ function bVolgende(){
  if(open.length){location.hash="#/product/"+open[0].pid;window.scrollTo(0,0);return;}
  toast("Alles beoordeeld.");
 }
-var BASSEN=["rook","zoet","fruit","kruidig","lichaam","zilt"];
+var BASSEN=["rook","zoet","fruit","kruidig"];
 var BHERK={eigen:"uit de eigen proefnotitie",zuster:"geschat uit andere flessen van dit merk",review:"uit een externe proefnotitie","":"niet gelezen"};
 /* Een as bijstellen is geen ja/nee. Jack proeft deze whisky's; als hij zegt dat
    rook een 3 is en geen 5, dan is dat de waarde — niet 'afgekeurd'. Het besluit
@@ -2715,7 +2771,7 @@ function vAdmin(rt){
   +ORDERS.map(o=>'<tr><td><b>'+o.nr+'</b></td><td>'+o.kl+'</td><td>'+o.it+'</td><td>'+eur(o.tot)+'</td><td><span class="st '+o.st+'">'+o.lbl+'</span></td></tr>').join("")+'</table>'
   +'<p style="font-size:12px;color:var(--muted);margin-top:14px">Orders en betalingen blijven volledig in Lightspeed — dit is een leesweergave via de sync-laag.</p>';
  }else if(sub==="smaak"){
-  body='<h3 style="font-size:20px;margin-bottom:6px">Smaakprofielen</h3><p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">AI stelt profielen voor op basis van productteksten; een mens keurt per batch. Zes assen: '+DIMS.join(" · ")+'.</p>'
+  body='<h3 style="font-size:20px;margin-bottom:6px">Smaakprofielen</h3><p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">AI stelt profielen voor op basis van productteksten; een mens keurt per batch. Vier assen: '+DIMS.join(" · ")+'.</p>'
   +'<table class="atable"><tr><th>Product</th><th>Profiel</th><th>Bron</th><th>Review</th></tr>'
   +P.slice(0,8).map((p,i)=>'<tr><td>'+p.name+'</td><td><span class="mini">'+p.t.map(v=>'<i style="width:'+(v*3)+'px"></i>').join("")+'</span></td><td>'+(i%3===0?"Handmatig":"AI-voorstel")+'</td><td><span class="st '+(i%3===2?"warn":"ok")+'">'+(i%3===2?"Wacht op review":"Goedgekeurd")+'</span></td></tr>').join("")+'</table>';
  }else if(sub==="sync"){
@@ -2807,19 +2863,19 @@ function ask(preset){
  var ref=P.find(p=>lq.includes(p.name.split(" ")[0].toLowerCase()));
  if(lq.includes("alternatief")&&ref){
   var recs=best(p=>-p.t.reduce((s,v,i)=>s+Math.abs(v-ref.t[i]),0),[ref.id],budget);
-  html='Op zoek naar iets dat lijkt op <b>'+ref.name+'</b>'+(budget?' onder '+eur(budget):'')+'? Op basis van het smaakprofiel raad ik aan:'+recHtml(recs,p=>'Vergelijkbaar: rook '+p.t[0]+'/10, maritiem '+p.t[4]+'/10 — '+p.tags[0]+'.');
+  html='Op zoek naar iets dat lijkt op <b>'+ref.name+'</b>'+(budget?' onder '+eur(budget):'')+'? Op basis van het smaakprofiel raad ik aan:'+recHtml(recs,p=>'Vergelijkbaar: rook '+p.t[0]+'/5, zoet '+p.t[1]+'/5 — '+(p.tags||[])[0]+'.');
  }else if(lq.includes("rokerig")||lq.includes("rook")||lq.includes("turf")){
-  html="Voor rokerige whisky's kijk je op Islay. Mijn tips:"+recHtml(best(p=>p.t[0]*2+p.t[4],[],budget),p=>'Rook '+p.t[0]+'/10 — '+p.tags.join(", ")+'.');
+  html="Voor rokerige whisky's kijk je op Islay. Mijn tips:"+recHtml(best(p=>p.t[0]*2,[],budget),p=>'Rook '+p.t[0]+'/5 — '+(p.tags||[]).join(", ")+'.');
  }else if(lq.includes("sherry")||lq.includes("zoet")){
-  html="Zoet en sherry-gerijpt — dan zit je goed bij:"+recHtml(best(p=>p.t[5]*2+p.t[3],[],budget),p=>'Sherry '+p.t[5]+'/10, zoet '+p.t[3]+'/10 — '+p.tags[0]+'.');
+  html="Zoet en sherry-gerijpt — dan zit je goed bij:"+recHtml(best(p=>(p.sherry?4:0)+p.t[1]*2,[],budget),p=>'Zoet '+p.t[1]+'/5'+(p.sherry?', sherryvat':'')+' — '+(p.tags||[])[0]+'.');
  }else if(lq.includes("fruit")){
-  html="Fruitige aanraders uit de collectie:"+recHtml(best(p=>p.t[1]*2+p.t[3],[],budget),p=>'Fruit '+p.t[1]+'/10 — '+p.tags.join(", ")+'.');
+  html="Fruitige aanraders uit de collectie:"+recHtml(best(p=>p.t[2]*2+p.t[1],[],budget),p=>'Fruit '+p.t[2]+'/5 — '+(p.tags||[]).join(", ")+'.');
  }else if(lq.includes("cadeau")||lq.includes("kado")){
   html="Voor een cadeau werkt een bekende naam met verhaal het best:"+recHtml(best(p=>(p.was?3:0)+p.t[1],[],budget||80),p=>'Klassieker — cadeauverpakking beschikbaar.');
  }else if(lq.includes("beginner")||lq.includes("instap")||lq.includes("start")){
-  html="Voor een eerste kennismaking: zacht, niet te veel rook, vriendelijk geprijsd:"+recHtml(best(p=>p.t[3]+p.t[1]-p.t[0]*2-(p.price>60?3:0),[],budget||60),p=>'Zacht ('+p.t[3]+'/10 zoet) en toegankelijk — begin met de sample.');
+  html="Voor een eerste kennismaking: zacht, niet te veel rook, vriendelijk geprijsd:"+recHtml(best(p=>p.t[1]+p.t[2]-p.t[0]*2-(p.price>60?3:0),[],budget||60),p=>'Zacht ('+p.t[1]+'/5 zoet) en toegankelijk — begin met de sample.');
  }else if(budget){
-  html='Binnen '+eur(budget)+' zijn dit de beste keuzes:'+recHtml(best(p=>10-Math.abs(p.price-budget*0.8)/10,[],budget),p=>p.tags.join(", ")+'.');
+  html='Binnen '+eur(budget)+' zijn dit de beste keuzes:'+recHtml(best(p=>10-Math.abs(p.price-budget*0.8)/10,[],budget),p=>(p.tags||[]).join(", ")+'.');
  }else{
   html="In de volledige versie doorzoek ik alle 10.000+ artikelen. Probeer in deze demo: een smaak (rokerig, zoet, sherry, fruitig), 'beginner', een budget ('onder €60') of 'alternatief voor Lagavulin'.";
  }
