@@ -168,10 +168,14 @@ h2{font-size:29px}
 .bpaneel .pas{grid-template-columns:110px 92px 1fr}
 
 @media(max-width:720px){.brij{grid-template-columns:44px 1fr}.bkeuze{grid-column:1/-1;justify-content:flex-start;max-width:none}}
-.tbars{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;align-items:end;height:24px}
+.tbars{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;align-items:end;height:24px}
 .tbar{position:relative;background:var(--line);border-radius:2px;overflow:hidden;height:100%}
 .tbar b{position:absolute;bottom:0;left:0;right:0;background:var(--gold);display:block}
-.tlabels{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:8px;color:var(--muted);text-align:center}
+.tbar.leeg{background:transparent;border:1px dashed var(--line)}
+.tbar.leeg s{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:9px;color:var(--muted)}
+.tleeg{font-size:9px;color:var(--muted);margin-top:3px}
+.pnaam em.nnb{color:var(--amber);font-style:normal}
+.tlabels{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:8px;color:var(--muted);text-align:center}
 .price{display:flex;align-items:baseline;gap:9px;margin-top:auto}
 .price b{font-size:18px;font-family:var(--serif)}
 .price s{color:var(--muted);font-size:12.5px}
@@ -850,9 +854,18 @@ function esc(s){return s.replace(/'/g,"\\'");}
    staat er een percentage op een kaart waar niets onder ligt.
    Vier assen op schaal 0-5: de grootste afstand is sqrt(4 x 25) = 10, dus een
    factor 10 laat de slechtste match op 0% uitkomen. */
-function matchPct(p,prof){if(p.geenprofiel||!p.t)return null;var n=Math.min(p.t.length,prof.length),d=0;
- for(var i=0;i<n;i++)d+=Math.pow((p.t[i]||0)-(prof[i]||0),2);
- return Math.max(0,Math.round(100-Math.sqrt(d)*10));}
+/* Een lege as is "nog niet bepaald", geen nul. 489 flessen hebben er minstens één
+   (bij rook alleen al 437). Die as tellen we niet mee, en de afstand schalen we
+   terug naar vier assen. Onder MIN_ASSEN bekende assen vergelijken we niet: op
+   één of twee assen is "lijkt op" een gok. */
+var MIN_ASSEN=3;
+function asAfstand(a,b){
+ if(!a||!b)return null;var s=0,k=0;
+ for(var i=0;i<4;i++){if(a[i]==null||b[i]==null)continue;s+=Math.pow(a[i]-b[i],2);k++;}
+ return k<MIN_ASSEN?null:Math.sqrt(s*4/k);}
+function profielVolledig(p){return !p.geenprofiel&&!!p.t&&p.t.every(function(v){return v!=null;});}
+function matchPct(p,prof){if(p.geenprofiel||!p.t)return null;var d=asAfstand(p.t,prof);
+ return d===null?null:Math.max(0,Math.round(100-d*10));}
 /* Intern fijner rekenen dan we tonen (besluit 7, 24-09). Op vier assen van 0-5
    zijn er maar zes verschillende matchpercentages mogelijk in een top-20; de
    volgorde binnen een gelijke stand was daardoor willekeurig. De weergave
@@ -863,15 +876,13 @@ function matchPct(p,prof){if(p.geenprofiel||!p.t)return null;var n=Math.min(p.t.
 function _jaar(p){var m=/(\d+)/.exec(p.age||"");return m?+m[1]:null;}
 function _abv(p){var m=/([\d.,]+)/.exec(p.abv||"");return m?parseFloat(m[1].replace(",",".")):null;}
 function profAfstand(p,prof){
- if(!p.t)return 99;
- var d=0,i,n=Math.min(p.t.length,prof.length);
- for(i=0;i<n;i++)d+=Math.pow((p.t[i]||0)-(prof[i]||0),2);
- d=Math.sqrt(d);
+ if(p.geenprofiel||!p.t)return 99;
+ var d=asAfstand(p.t,prof);if(d===null)return 99;
  var x=_abv(p);if(x!=null)d+=0.004*Math.min(Math.abs(x-46),20);
  return d;}
 function fijnAfstand(p,q){
- var som=0,i;
- for(i=0;i<4;i++)som+=Math.pow((p.t[i]||0)-(q.t[i]||0),2);
+ var basis=asAfstand(p.t,q.t);if(basis===null)return Infinity;
+ var som=basis*basis;
  if(p._z!=null&&q._z!=null)som+=0.35*Math.pow(p._z-q._z,2);
  var d=Math.sqrt(som);
  var a=_jaar(p),b=_jaar(q);       if(a!=null&&b!=null)d+=0.010*Math.min(Math.abs(a-b),20);
@@ -885,7 +896,7 @@ function fijnAfstand(p,q){
 function similar(p,n){
  if(p.geenprofiel||!p.t)return[];
  return CAT.filter(x=>x.id!==p.id&&!x.rare&&!x.geenprofiel&&x.t)
-  .map(x=>({x,d:fijnAfstand(x,p)}))
+  .map(x=>({x,d:fijnAfstand(x,p)})).filter(o=>isFinite(o.d))
   .sort((a,b)=>a.d-b.d).slice(0,n).map(o=>o.x);}
 /* Zonder smaakprofiel is 'vergelijkbaar' een loze belofte. Dan tonen we wat we
    wél zeker weten: andere flessen van dezelfde distilleerderij. */
@@ -893,7 +904,8 @@ function zelfdeStokerij(p,n){
  return CAT.filter(x=>x.id!==p.id&&x.dist===p.dist&&p.dist!=="Onbekend").slice(0,n);}
 function bars(t,geen){
  if(geen)return '<div class="geenprofiel">Nog geen smaakprofiel — deze fles wacht op beoordeling.</div>';
- return '<div class="tbars">'+t.map(v=>'<div class="tbar"><b style="height:'+(v*20)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>';}
+ var leeg=t.some(v=>v==null);
+ return '<div class="tbars">'+t.map(v=>v==null?'<div class="tbar leeg" title="Nog niet bepaald"><s>?</s></div>':'<div class="tbar"><b style="height:'+(v*20)+'%"></b></div>').join("")+'</div><div class="tlabels">'+DIMS.map(d=>'<span>'+d+'</span>').join("")+'</div>'+(leeg?'<div class="tleeg">? = nog niet bepaald</div>':'');}
 function card(p,prof,opt){
  var m=prof?matchPct(p,prof):null;
  /* compact: rustige kaart voor de homepage — smaaktags en smaakbalkjes staan op de productpagina */
@@ -998,7 +1010,7 @@ function normEcht(p){
     null geeft ze een eigen filterwaarde 'Nog niet bepaald'. */
  p.geenprofiel=!p.t;
  if(!p.t)p.t=[3,3,3,3];
- p._turf=p.geenprofiel?null:(p.t[0]>=4?2:(p.t[0]>=2?1:0));
+ p._turf=(p.geenprofiel||p.t[0]==null)?null:(p.t[0]>=4?2:(p.t[0]>=2?1:0));
  if(p._vol==null)p._vol=70;
  if(p._sample==null)p._sample=/sample|5cl|3cl/i.test(p.name||"");
  p._dagen=p.isNew?12:200;
@@ -1079,7 +1091,9 @@ function selectie(sla){
    var f=FACETS[i];if(f.id===sla)continue;
    if(!facetTreffer(p,f,F[f.id]))return false;
   }
-  if(F.flavors&&F.flavors.size)for(const k of F.flavors)if(p.t[k]<6)return false;
+  /* Drempel stond nog op 6 (schaal 0-10): op 0-5 gaf elk smaakfilter nul flessen.
+     3 is dezelfde grens op de nieuwe schaal. Een lege as telt niet als treffer. */
+  if(F.flavors&&F.flavors.size)for(const k of F.flavors)if(p.geenprofiel||p.t[k]==null||p.t[k]<3)return false;
   return true;});
 }
 function tellingen(f){
@@ -1149,7 +1163,7 @@ function urlNaarF(qs){
   else if(k==="cat")over.cat=v;
   else if(k==="aanbieding")over.aanbieding=true;
   else if(k==="nieuw")over.nieuw=true;
-  else if(k==="smaak")over.flavors=new Set(v.split("|").map(Number));
+  else if(k==="smaak")over.flavors=new Set(v.split("|").map(Number).filter(function(x){return x>=0&&x<4;}));
  });
  F=nieuwF(over);
 }
@@ -2049,10 +2063,10 @@ function vHome(){
  +'<section><div class="wrap"><div class="kicker">Snel vinden</div><h2>Waar ben je naar op zoek?</h2>'
  +'<div class="qf">'
  +'<a href="#/ontdek"><i>'+I("wine",24)+'</i><b>Op smaak</b><span>Vind via smaakprofiel</span></a>'
- +'<a href="#/collectie" onclick="F=nieuwF({max:50,sort:\'priceAsc\'})"><i>'+I("star",24)+'</i><b>Onder €50</b><span>Toegankelijk genieten</span></a>'
- +'<a href="#/collectie" onclick="F=nieuwF({flavors:new Set([3])})"><i>'+I("sprout",24)+'</i><b>Beginners</b><span>Zachte introducties</span></a>'
- +'<a href="#/collectie" onclick="F=nieuwF({sort:\'priceDesc\',max:150})"><i>'+I("gift",24)+'</i><b>Cadeau</b><span>Memorabel verpakt</span></a>'
- +'<a href="#/collectie" onclick="F=nieuwF({cat:\'rare\',sort:\'priceDesc\'})"><i>'+I("crown",24)+'</i><b>Rare &amp; Old</b><span>Voor de kenner</span></a>'
+ +'<a href="#/collectie" onclick="return snel({max:50,sort:\'priceAsc\'})"><i>'+I("star",24)+'</i><b>Onder €50</b><span>Toegankelijk genieten</span></a>'
+ +'<a href="#/collectie" onclick="return snel({flavors:new Set([1])})"><i>'+I("sprout",24)+'</i><b>Beginners</b><span>Zachte introducties</span></a>'
+ +'<a href="#/collectie" onclick="return snel({sort:\'priceDesc\',max:150})"><i>'+I("gift",24)+'</i><b>Cadeau</b><span>Memorabel verpakt</span></a>'
+ +'<a href="#/collectie" onclick="return snel({cat:\'rare\',sort:\'priceDesc\'})"><i>'+I("crown",24)+'</i><b>Rare &amp; Old</b><span>Voor de kenner</span></a>'
  +'</div></div></section>'
  +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>Zomerse aanbiedingen</h2><a class="link-a" href="#/collectie">Bekijk alles →</a></div>'
  +'<div class="grid">'+featured.map(p=>card(p,null,{compact:true})).join("")+'</div></div></section>'
@@ -2085,11 +2099,8 @@ function updMatches(){
     afstand plus dezelfde microtermen als bij "lijkt op deze fles". Anders
     beslist de volgorde in de catalogus wie er bij de eerste drie staat. */
  var top=CAT.filter(p=>!p.rare&&!p.geenprofiel&&p.t).map(function(p){
-   var d=0,i;for(i=0;i<4;i++)d+=Math.pow((p.t[i]||0)-(prof[i]||0),2);
-   d=Math.sqrt(d);
-   var x=_abv(p);if(x!=null)d+=0.004*Math.min(Math.abs(x-46),20);
-   return {p:p,m:matchPct(p,prof),d:d};
-  }).sort(function(a,b){return a.d-b.d;}).slice(0,3);
+   return {p:p,m:matchPct(p,prof),d:profAfstand(p,prof)};
+  }).filter(function(o){return o.m!==null;}).sort(function(a,b){return a.d-b.d;}).slice(0,3);
  box.innerHTML=top.map(o=>'<div class="mcard" onclick="go(\'#/product/'+o.p.id+'\')">'
  +'<div class="mring">'+o.m+'%</div><div><div class="rg">'+o.p.region+'</div><div class="nm">'+o.p.name+'</div>'
  +'<div style="font-size:11.5px;color:var(--muted)">'+(o.p.tags||[]).slice(0,2).join(" · ")+(o.p.sample?' · sample '+eur(o.p.sample):'')+'</div></div>'
@@ -2125,7 +2136,8 @@ function bPaneel(p){
  var assen=x.assen?BASSEN.map(function(naam,i){
    var bw=(x.bew[i]||[]).join(", ");
    return '<div class="pas"><span class="pnaam" title="'+(BHERK[x.herk[i]]||"")+'">'+naam
-    +(x.herk[i]==="zuster"?' <em>geschat</em>':'')+'</span>'
+    +(BGESCHAT[x.herk[i]]?' <em>geschat</em>':'')
+    +((!w||w[i]==null)?' <em class="nnb">nog niet bepaald</em>':'')+'</span>'
     +'<span class="pbol">'+[0,1,2,3,4,5].map(function(n){
        return '<b class="'+(w&&w[i]===n?"aan":"")+'" onclick="bAs(\''+x.id+'\','+i+','+n+')"></b>';}).join("")+'</span>'
     +'<span class="pbew">'+(bw||"geen woorden op deze fles gelezen")+'</span></div>';}).join("")
@@ -2191,7 +2203,7 @@ function vVergelijk(){
  +row("Sample",p=>'<td>'+(p.sample?eur(p.sample):"—")+'</td>')
  +row("Vatsoort",p=>'<td>'+p.cask+'</td>')
  +row("Review",p=>'<td>'+(p.rev?'<span style="color:var(--muted);font-size:12px">proefnotitie voorzien</span><br><a href="'+revLink(p)+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px">'+p.rev.s+' ('+p.rev.u+') →</a>':"—")+'</td>')
- +DIMS.map((d,i)=>row(d,p=>p.geenprofiel?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*18)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
+ +DIMS.map((d,i)=>row(d,p=>(p.geenprofiel||p.t[i]==null)?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*18)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
  +row("Karakter",p=>'<td>'+((p.tags||[]).join(", ")||"—")+'</td>')
  +row("",p=>'<td><button class="btn btn-a btn-s" onclick="add(\''+esc(p.name)+'\')">In winkelwagen</button></td>')
  +'</table></div></div></section>';
@@ -2608,7 +2620,11 @@ function bVolgende(){
  toast("Alles beoordeeld.");
 }
 var BASSEN=["rook","zoet","fruit","kruidig"];
-var BHERK={eigen:"uit de eigen proefnotitie",zuster:"geschat uit andere flessen van dit merk",review:"uit een externe proefnotitie","":"niet gelezen"};
+var BHERK={eigen:"uit de eigen proefnotitie",zuster:"geschat uit andere flessen van dit merk",review:"uit een externe proefnotitie",
+ afwezig:"afgeleid: niet genoemd in een volledige proefnotitie",streek:"geschat uit andere flessen uit deze streek — zwakke bron",
+ catalogus:"geschat uit het catalogusgemiddelde — zwakste bron","":"niet gelezen"};
+/* Welke herkomsten een schatting zijn en dus het label 'geschat' krijgen (38_vul_assen.py). */
+var BGESCHAT={zuster:1,afwezig:1,streek:1,catalogus:1};
 /* Een as bijstellen is geen ja/nee. Jack proeft deze whisky's; als hij zegt dat
    rook een 3 is en geen 5, dan is dat de waarde — niet 'afgekeurd'. Het besluit
    bewaart daarom de hele reeks, met de oorspronkelijke waarden ernaast zodat
@@ -2848,7 +2864,7 @@ function best(scoreFn,exclude,budget){
  exclude=exclude||[];
  /* Ook de AI-sommelier adviseerde uit 20 flessen. Alleen flessen met een gelezen
     profiel, want zijn hele redenering gaat over smaak. */
- return CAT.filter(p=>!p.rare&&!p.geenprofiel&&exclude.indexOf(p.id)<0&&(budget==null||p.price<=budget))
+ return CAT.filter(p=>!p.rare&&profielVolledig(p)&&exclude.indexOf(p.id)<0&&(budget==null||p.price<=budget))
   .map(p=>({p,s:scoreFn(p)})).sort((a,b)=>b.s-a.s).slice(0,2).map(o=>o.p);
 }
 function recHtml(list,why){
@@ -2862,7 +2878,7 @@ function ask(preset){
  var html;
  var ref=P.find(p=>lq.includes(p.name.split(" ")[0].toLowerCase()));
  if(lq.includes("alternatief")&&ref){
-  var recs=best(p=>-p.t.reduce((s,v,i)=>s+Math.abs(v-ref.t[i]),0),[ref.id],budget);
+  var recs=best(p=>-fijnAfstand(p,ref),[ref.id],budget);
   html='Op zoek naar iets dat lijkt op <b>'+ref.name+'</b>'+(budget?' onder '+eur(budget):'')+'? Op basis van het smaakprofiel raad ik aan:'+recHtml(recs,p=>'Vergelijkbaar: rook '+p.t[0]+'/5, zoet '+p.t[1]+'/5 — '+(p.tags||[])[0]+'.');
  }else if(lq.includes("rokerig")||lq.includes("rook")||lq.includes("turf")){
   html="Voor rokerige whisky's kijk je op Islay. Mijn tips:"+recHtml(best(p=>p.t[0]*2,[],budget),p=>'Rook '+p.t[0]+'/5 — '+(p.tags||[]).join(", ")+'.');
