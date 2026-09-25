@@ -685,6 +685,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 
 <script src="catalogus-lokaal.js" onerror="void 0"></script>
 <script src="beoordeling.js" onerror="void 0"></script>
+<script src="wijzigingen.js" onerror="void 0"></script>
+<script src="beeldtool.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
@@ -2046,6 +2048,7 @@ function render(){
  if(fk){var t=document.querySelector('[data-fk="'+fk.replace(/"/g,'')+'"]');if(t)t.focus();}
  updateBadges();
  if(rt.r==="admin"&&rt.sub==="voortgang"&&typeof arRender==="function")arRender();
+ if(rt.r==="admin"&&rt.sub==="beeldtool"&&typeof btInit==="function")btInit();
 }
 /* ================= VIEWS ================= */
 function vHome(){
@@ -2347,10 +2350,14 @@ var VRAAGLOG=[
   {d:"29 aug",o:"Wie benader jij zelf, en waar wil je dat ik meekijk?",a:"Jack benadert iedereen zelf (2 sep). WhiskyNotes (Ruben Luyten) en Words of Whisky (Thijs Klaverstijn) zijn akkoord; de overige schrijvers volgen. Whiskyfun op verzoek van Jack toegevoegd aan de bijdragers.",st:"ok",lbl:"Beantwoord"},
  {d:"2 sep",o:"Wat is er precies afgesproken met Ruben en Thijs?",a:"De volledige review mag worden overgenomen, met bronvermelding (naam van de schrijver, naam van de site, directe link naar het oorspronkelijke artikel). Bevestigd door Jack op 2 september.",st:"ok",lbl:"Beantwoord"},
 ];
+function wzLijst(){return (typeof WIJZIGINGEN!=="undefined"&&WIJZIGINGEN)||[];}
+function wzDatum(iso){var m=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"],d=(iso||"").split("-");return d.length<3?iso:(+d[2])+" "+m[+d[1]-1];}
 function arLijst(){
  var a=[];
  VRAAGLOG.forEach(function(q){a.push({t:"Vraag",d:q.d,o:q.o,x:q.a,st:q.st,lbl:q.lbl});});
  VOORTGANG.forEach(function(v){a.push({t:"Stap",d:"",o:v.s,x:v.d,st:v.st,lbl:v.lbl});});
+ /* Wijzigingslogboek, nieuwste eerst. 'v' is de versiecode, zodat terug te vinden is wat wanneer veranderde. */
+ wzLijst().slice().reverse().forEach(function(w){a.push({t:"Wijziging",d:wzDatum(w.d),o:w.o,x:w.x+' <span style="opacity:.7">· versie '+w.v+'</span>',st:"ok",lbl:"Doorgevoerd"});});
  return a;
 }
 var arAlles=false;
@@ -2769,12 +2776,14 @@ function vAdminBeoordeel(){
 }
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
+ var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
  var body;
  if(sub==="beoordeel"){
   body=vAdminBeoordeel();
  }else if(sub==="beeld"){
   body=vAdminBeeld();
+ }else if(sub==="beeldtool"){
+  body=typeof vBeeldtool==="function"?vBeeldtool():'<p>De beeldtool kon niet worden geladen (beeldtool.js ontbreekt).</p>';
  }else if(sub==="producten"){
   body='<h3 style="font-size:20px;margin-bottom:16px">Producten <span style="font-size:12px;color:var(--muted);font-weight:400">(demo: '+P.length+' · live: 10.482)</span></h3>'
   +'<table class="atable"><tr><th>Product</th><th>Regio</th><th>Prijs</th><th>Sample</th><th>Smaakprofiel</th><th>Status</th></tr>'
@@ -2800,7 +2809,7 @@ function vAdmin(rt){
  }else if(sub==="voortgang"){
   body='<h3 style="font-size:20px;margin-bottom:6px">Voortgang project</h3>'
   +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:18px">Deze pagina houdt bij waar we staan en wat er nog nodig is. Geen echte klantdata — alleen de stand van het project.</p>'
-  +'<div class="sync-box"><b>● Stap 1 — testversie in voorbereiding</b><p>Laatst bijgewerkt: 24 augustus 2026 · Eerst een werkende testversie met de eigen catalogus, daarna pas het besluit over livegang.</p></div>'
+  +'<div class="sync-box"><b>● Stap 1 — testversie in voorbereiding</b><p>Laatst bijgewerkt: '+(wzLijst().length?wzDatum(wzLijst()[wzLijst().length-1].d)+" 2026":"24 aug 2026")+' · Eerst een werkende testversie met de eigen catalogus, daarna pas het besluit over livegang.</p></div>'
   +'<div class="kpis"><div class="kpi"><span>Fase</span><b>1 van 2</b><small>testversie</small></div>'
   +'<div class="kpi"><span>Stappen afgerond</span><b>'+VOORTGANG.filter(v=>v.lbl==="Afgerond").length+' van '+VOORTGANG.length+'</b><small>'+VOORTGANG.filter(v=>v.lbl==="Loopt").length+' lopen nu</small></div>'
   +'<div class="kpi"><span>Eerste streekpagina</span><b>Campbeltown</b><small>voorstel Jack</small></div>'
@@ -2820,12 +2829,12 @@ function vAdmin(rt){
   +vgFormulier()
   +'<div style="border-top:1px solid var(--line);margin:34px 0 0;padding-top:24px">'
   +'<h3 style="font-size:16px;margin:0 0 6px">Archief — vragen en voortgang</h3>'
-  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we hebben afgestemd en elke projectstap, doorzoekbaar. Standaard zie je alleen wat nog openstaat — typ een woord om iets terug te vinden, bijvoorbeeld <i>foto</i>, <i>Campbeltown</i> of <i>Google</i>.</p>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we hebben afgestemd en elke projectstap, doorzoekbaar. Standaard zie je alleen wat nog openstaat — typ een woord om iets terug te vinden, bijvoorbeeld <i>foto</i>, <i>Campbeltown</i> of <i>Google</i>. Typ <i>wijziging</i> voor het logboek van alle versies.</p>'
   +'<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
   +'<input id="arZoek" oninput="arRender()" placeholder="Zoek in vragen en voortgang…" style="flex:1 1 220px;font:inherit;font-size:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)">'
   +'<button id="arBtn" onclick="arToggle()" style="font:inherit;font-size:12.5px;font-weight:600;padding:9px 14px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--amber)">Toon alles</button>'
   +'</div><div id="arRes"></div>'
-  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen</p></div>';
+  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen · '+wzLijst().length+' wijzigingen in het logboek</p></div>';
  }else{
   body='<h3 style="font-size:20px;margin-bottom:16px">Dashboard</h3>'
   +'<div class="kpis"><div class="kpi"><span>Omzet vandaag</span><b>€2.847</b><small>+18% vs vorige week</small></div>'
