@@ -171,6 +171,18 @@ function zoek(q){
   :'<p class="bt-leeg">Geen product met foto gevonden.</p>';
 }
 
+/* ---------- aandachtslijst: wat de automatische opmaak niet aankon ---------- */
+function aandachtLijst(){return (typeof BEELD_AANDACHT!=="undefined"&&BEELD_AANDACHT)||[];}
+function aandachtHtml(){
+ var l=aandachtLijst();
+ if(typeof BEELDEN==="undefined")return '<p class="bt-leeg" style="margin-top:14px">De automatische opmaak van de catalogus heeft nog niet gedraaid. Zodra dat is gebeurd, staan hier de foto\'s die aandacht nodig hebben.</p>';
+ if(!l.length)return '<p class="bt-leeg" style="margin-top:14px">Geen foto\'s op de aandachtslijst: alles wat automatisch is opgemaakt, is gelukt.</p>';
+ return '<div class="bt-aandacht"><div class="bt-akop">Aandacht nodig <span>'+l.length+'</span></div>'
+  +'<p class="bt-leeg">Deze foto\'s kon de automatische opmaak niet goed uitknippen. Op de site staat daarom de winkelfoto. Kies er een, maak hem op en download hem; de naam van het bestand bevat het product-ID.</p>'
+  +'<div id="btAandacht">'+l.slice(0,60).map(function(x){return '<button type="button" class="bt-hit" data-id="'+esc(x.id)+'"><span>'+esc(x.t)+'<br><small style="color:var(--muted)">'+esc(x.r)+'</small></span></button>';}).join("")
+  +(l.length>60?'<p class="bt-leeg">…en nog '+(l.length-60)+'. Zoek hierboven op naam.</p>':'')+'</div></div>';
+}
+
 /* ---------- scherm ---------- */
 var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:22px}@media(max-width:820px){.bt-grid{grid-template-columns:1fr}}'
 +'.bt-drop{display:block;border:2px dashed var(--line);border-radius:12px;padding:26px 16px;text-align:center;cursor:pointer;background:var(--card)}.bt-drop.over{border-color:var(--amber)}'
@@ -182,7 +194,8 @@ var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:2
 +'.bt-paar{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bt-paar figure{margin:0}.bt-paar figcaption{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}'
 +'.bt-paar canvas{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block}'
 +'.bt-diag{font-size:12.5px;margin:12px 0;padding:10px 12px;border-radius:9px;background:var(--card);border:1px solid var(--line)}.bt-waarschuwing{border-color:#c9963f}.bt-fout{border-color:#8a1c26;color:#8a1c26}'
-+'.bt-knoppen{display:flex;gap:8px;flex-wrap:wrap}.bt-leeg{font-size:12px;color:var(--muted);padding:6px}';
++'.bt-knoppen{display:flex;gap:8px;flex-wrap:wrap}.bt-leeg{font-size:12px;color:var(--muted);padding:6px}'
++'.bt-aandacht{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:8px;max-height:360px;overflow:auto}.bt-akop{font-size:13px;font-weight:700;padding:4px 6px}.bt-akop span{background:var(--amber);color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px}';
 
 window.vBeeldtool=function(){
  return '<style>'+CSS+'</style>'
@@ -191,6 +204,7 @@ window.vBeeldtool=function(){
  +'<div class="bt-grid"><div>'
  +'<label class="bt-drop" id="btDrop"><input type="file" id="btFile" accept="image/png,image/jpeg,image/webp"><b>Sleep een foto hierheen</b><span>of klik om te kiezen · png, jpg of webp, tot '+BT.MAXMB+' MB</span></label>'
  +'<div class="bt-zoek"><input id="btZoek" placeholder="…of zoek een product uit de catalogus" autocomplete="off"><div id="btHits"></div></div>'
+ +aandachtHtml()
  +'<div class="bt-inst"><label>Tolerantie achtergrond: <b id="btTolW">'+st.tol+'</b><input type="range" id="btTol" min="4" max="40" value="'+st.tol+'"></label>'
  +'<label><input type="checkbox" id="btLaat"'+(st.laatStaan?" checked":"")+'> Achtergrond laten staan (alleen kaderen)</label></div>'
  +'</div><div>'
@@ -207,10 +221,15 @@ window.btInit=function(){
  ["dragleave","drop"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove("over");});});
  drop.addEventListener("drop",function(e){bestand(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]);});
  $("btZoek").addEventListener("input",function(e){zoek(e.target.value);});
- $("btHits").addEventListener("click",function(e){
+ function kies(e){
   var b=e.target.closest(".bt-hit");if(!b)return;
   var p=CAT.filter(function(x){return String(x.id)===b.getAttribute("data-id");})[0];if(!p)return;
-  $("btHits").innerHTML="";$("btZoek").value=p.name;laad(p.img,String(p.id),true);});
+  $("btHits").innerHTML="";$("btZoek").value=p.name;
+  /* altijd de winkelfoto als bron, nooit een eerder opgemaakt beeld */
+  var bron=(typeof BEELD_TERUG!=="undefined"&&p._opgemaakt&&BEELD_TERUG[String(p.img).replace(/^.*\/|\.webp$/g,"")])||p.img;
+  laad(bron,String(p.id),true);}
+ $("btHits").addEventListener("click",kies);
+ var al=$("btAandacht");if(al)al.addEventListener("click",kies);
  $("btTol").addEventListener("input",function(e){st.tol=+e.target.value;$("btTolW").textContent=st.tol;verwerk();});
  $("btLaat").addEventListener("change",function(e){st.laatStaan=e.target.checked;verwerk();});
  document.querySelectorAll(".bt-tegels button").forEach(function(b){b.addEventListener("click",function(){

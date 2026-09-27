@@ -100,7 +100,14 @@ h2{font-size:29px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
 .pcard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:.15s;position:relative}
 .pcard:hover{border-color:var(--amber2);transform:translateY(-3px)}
-.pimg{position:relative;background:linear-gradient(180deg,#f7f3ec,#e9e2d4);height:200px;display:grid;place-items:center;cursor:pointer}
+.sampband{position:absolute;left:50%;top:50%;width:62%;transform:translate(-50%,-50%) rotate(-24deg);z-index:2;pointer-events:none;
+ background:rgba(38,40,45,.8);border-top:2px solid rgba(255,255,255,.92);border-bottom:2px solid rgba(255,255,255,.92);text-align:center;line-height:1}
+.sampband b{display:block;color:#fff;font-weight:800;letter-spacing:.16em;font-size:clamp(11px,4.2cqw,22px);padding:.42em 0}
+.samplabel{position:absolute;left:8px;bottom:8px;z-index:3;pointer-events:none;background:#26282d;color:#fff;border:2px solid #fff;
+ font-size:11px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.pd-img .sampband{width:44%}.pd-img .sampband b{font-size:26px}.pd-img .samplabel{left:18px;bottom:18px;font-size:14px;padding:4px 10px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pimg{container-type:inline-size;position:relative;background:linear-gradient(180deg,#f7f3ec,#e9e2d4);height:200px;display:grid;place-items:center;cursor:pointer}
 .pimg img{max-height:178px;max-width:80%;object-fit:contain}
 .badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:5px}
 .badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:10px;background:var(--amber);color:#fff;width:max-content}
@@ -167,6 +174,19 @@ h2{font-size:29px}
 .bpkop span{font-size:11.5px;color:var(--muted);flex:1}
 .bpaneel .pas{grid-template-columns:110px 92px 1fr}
 
+.wslogin{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:14px 16px;margin:0 0 16px}
+.wslogin p{font-size:12.5px;color:var(--muted);margin:4px 0 10px}.wsfout{color:#9b2c2c!important;font-size:12.5px}
+.wsvelden{display:flex;gap:8px;flex-wrap:wrap}.wsvelden input{font:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;min-width:200px;background:var(--bg,#fff);color:var(--text)}
+.wsstatus{font-size:12.5px;color:var(--muted);margin:0 0 14px}.wsstatus a{color:var(--amber)}
+.bnu{font-size:12px;color:var(--amber);margin-top:3px}
+.hrij{padding:14px 4px;border-bottom:1px solid var(--line)}.hrij.af{opacity:.75}
+.hkop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.hsoort{font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--text)}
+.hvraag{font-size:14px;margin:6px 0 8px;max-width:90ch}.hkeuze{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hvelden{display:grid;grid-template-columns:1fr 260px auto auto;gap:8px;align-items:start}
+.hvelden textarea,.hvelden input,.hsel,.hzoek{font:inherit;font-size:12.5px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)}
+.hsel,.hzoek{margin-left:6px}
+@media(max-width:720px){.hvelden{grid-template-columns:1fr}}
 @media(max-width:720px){.brij{grid-template-columns:44px 1fr}.bkeuze{grid-column:1/-1;justify-content:flex-start;max-width:none}}
 .tbars{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;align-items:end;height:24px}
 .tbar{position:relative;background:var(--line);border-radius:2px;overflow:hidden;height:100%}
@@ -686,7 +706,12 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 <script src="catalogus-lokaal.js" onerror="void 0"></script>
 <script src="beoordeling.js" onerror="void 0"></script>
 <script src="wijzigingen.js" onerror="void 0"></script>
+<script src="afstemming.js" onerror="void 0"></script>
+<script src="beelden-manifest.js" onerror="void 0"></script>
 <script src="beeldtool.js" onerror="void 0"></script>
+<script src="vendor/supabase.js" onerror="void 0"></script>
+<script src="hiaten.js" onerror="void 0"></script>
+<script src="vragenlijst.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
@@ -1018,6 +1043,12 @@ function normEcht(p){
  p._dagen=p.isNew?12:200;
  if(p._voorraad==null)p._voorraad=!p.rare;
  if(p._ouderbeeld){p.img=p._ouderbeeld;p._toonSample=true;}
+ /* Opgemaakt beeld uit de eigen laag (39_beelden_catalogus.py, F-b): eerst het bewerkte beeld,
+    anders de winkelfoto. Een sample met hoofdfles krijgt het opgemaakte beeld van die hoofdfles. */
+ if(typeof BEELDEN!=="undefined"&&BEELDEN){
+  var bid=BEELDEN[p.id]?p.id:(p._toonSample&&p._ouder&&BEELDEN[p._ouder]?p._ouder:null);
+  if(bid){var BT_=window.BEELD_TERUG||(window.BEELD_TERUG={});if(!BT_[bid])BT_[bid]=p.img;p.img="beelden/p/"+bid+".webp";p._opgemaakt=true;}
+ }
  if(!p.img)p.img=BOTTLE;
  p.merk=p.merk||p.dist;
  return p;
@@ -2116,12 +2147,25 @@ function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+
    halve flessen en literflessen; dan is een vaste tekst gewoon onjuist. */
 /* Een sample leent de foto van de ouderfles (F-g). Het inhoudslabel is dan geen versiering
    maar een noodzaak: zonder dat label toont de site een 0,70 fles bij een 6 cl monster. */
+/* Zelfde ontwerp als op de voor-en-na-pagina die Jack heeft gezien (test 28/29, F-g):
+   een schuine SAMPLE-band óver de fles — naast de fles wordt hij over het hoofd gezien —
+   en linksonder een pil met de inhoudsmaat. Band half-doorzichtig zodat het etiket leesbaar
+   blijft, met een lichte lijn boven en onder; pil dekkend met een lichte rand. Zo blijven
+   beide leesbaar op elke tegelkleur en op elke flesskleur. */
+/* Terugval (F-b): laadt een opgemaakt beeld niet, dan alsnog de winkelfoto. Nooit een leeg vak. */
+/* wordt al bij het inlezen van de catalogus gevuld (hierboven); hier alleen niet overschrijven */
+var BEELD_TERUG=window.BEELD_TERUG||{};
+document.addEventListener("error",function(e){
+ var t=e.target;if(!t||t.tagName!=="IMG")return;
+ var m=/beelden\/p\/([A-Za-z0-9_-]+)\.webp/.exec(t.getAttribute("src")||"");
+ if(m&&BEELD_TERUG[m[1]]){t.src=BEELD_TERUG[m[1]];}
+},true);
 function samplLabel(p){
  if(!p._toonSample)return "";
- var v=p._vol?((p._vol%1?p._vol.toFixed(1):p._vol)+" CL"):"SAMPLE";
- return '<span class="samplabel" style="position:absolute;left:8px;bottom:8px;z-index:2;'
-  +'background:rgba(20,16,14,.86);color:#f4efe7;font-size:11px;font-weight:700;letter-spacing:.04em;'
-  +'padding:3px 7px;border-radius:4px;pointer-events:none">'+v+'</span>';
+ var v=p._vol?((p._vol%1?String(p._vol.toFixed(1)).replace(".",","):p._vol)+" CL"):"";
+ return '<span class="sampband" aria-hidden="true"><b>SAMPLE</b></span>'
+  +(v?'<span class="samplabel">'+v+'</span>':'')
+  +'<span class="sr-only">Sample'+(v?' van '+v:'')+'; foto van de hoofdfles</span>';
 }
 function volTekst(p){var v=p._vol||70;return (v/100).toFixed(2).replace(".",",")+" ltr";}
 /* Het beoordeelpaneel op de productpagina zelf. Dezelfde besluiten als in de
@@ -2303,12 +2347,12 @@ var SYNCLOG=[
  {t:"03:20",e:"Prijssync",d:"1.204 prijzen bijgewerkt",st:"ok"}
 ];
 var VOORTGANG=[
- {s:"Voorstel besproken en akkoord",d:"Gesprek met Jack, Tino en zoon verwerkt; offerte verstuurd conform voorstel.",st:"ok",lbl:"Afgerond"},
- {s:"Demo-concept opgeleverd",d:"Deze demo, met echte productdata en prijzen (juli 2026) in de huisstijl van de site.",st:"ok",lbl:"Afgerond"},
- {s:"Read-only API-toegang ontvangen",d:"Inhoud en producten op lezen — genoeg om de bron te inventariseren zonder risico op wijzigingen.",st:"ok",lbl:"Afgerond"},
+ {dt:"2026-08-21",s:"Voorstel besproken en akkoord",d:"Gesprek met Jack, Tino en zoon verwerkt; offerte verstuurd conform voorstel.",st:"ok",lbl:"Afgerond"},
+ {dt:"2026-07-23",s:"Demo-concept opgeleverd",d:"Deze demo, met echte productdata en prijzen (juli 2026) in de huisstijl van de site.",st:"ok",lbl:"Afgerond"},
+ {dt:"2026-08-27",s:"Read-only API-toegang ontvangen",d:"Inhoud en producten op lezen — genoeg om de bron te inventariseren zonder risico op wijzigingen.",st:"ok",lbl:"Afgerond"},
  {s:"Inventarisatie van de catalogus",d:"Eerst de 5.000 whisky's en 1.400 samples: welke velden zijn gevuld, waar ontbreken smaakkenmerken, welke foto's voldoen niet aan even groot / scherp / witte achtergrond. Wijn en overige dranken volgen in een latere fase.",st:"warn",lbl:"Loopt"},
- {s:"Filteren en sorteren — werkende preview",d:"De collectie filtert nu op streek, distilleerderij, vatsoort, leeftijd, alcohol, turf, bottelaar en inhoud, met bij elk filter het aantal flessen dat overblijft. Sorteren kan op relevantie, prijs, leeftijd, nieuw binnen en hoogste korting. Elke filterstand heeft een eigen webadres, dus een selectie is te delen. Op de telefoon schuift het filterpaneel van onderen open. Om te kunnen beoordelen hoe dat voelt bij duizenden flessen staan er naast de 20 echte flessen 2.000 voorbeeldproducten in; die zijn als voorbeeld gemarkeerd. Deze pagina heeft geen koppeling met de winkel en bevat geen sleutel.",st:"ok",lbl:"Te bekijken"},
- {s:"Streekpagina Campbeltown",d:"Voorstel van Jack overgenomen: kleinste Schotse regio eerst volledig af als sjabloon, daarna Islay, Speyside en de rest.",st:"warn",lbl:"Loopt"},
+ {dt:"2026-08-25",s:"Filteren en sorteren — werkende preview",d:"De collectie filtert nu op streek, distilleerderij, vatsoort, leeftijd, alcohol, turf, bottelaar en inhoud, met bij elk filter het aantal flessen dat overblijft. Sorteren kan op relevantie, prijs, leeftijd, nieuw binnen en hoogste korting. Elke filterstand heeft een eigen webadres, dus een selectie is te delen. Op de telefoon schuift het filterpaneel van onderen open. Om te kunnen beoordelen hoe dat voelt bij duizenden flessen staan er naast de 20 echte flessen 2.000 voorbeeldproducten in; die zijn als voorbeeld gemarkeerd. Deze pagina heeft geen koppeling met de winkel en bevat geen sleutel.",st:"ok",lbl:"Te bekijken"},
+ {dt:"2026-08-25",s:"Streekpagina Campbeltown",d:"Voorstel van Jack overgenomen: kleinste Schotse regio eerst volledig af als sjabloon, daarna Islay, Speyside en de rest.",st:"warn",lbl:"Loopt"},
  {s:"Lijst met signaleringen uit de data",d:"Overzicht van producten waar iets aan mankeert — foto, omschrijving of ontbrekende kenmerken. Gaat naar Jack zodra de inventarisatie rond is.",st:"warn",lbl:"Gepland"},
  {s:"Afstemming met technische partners",d:"Kort overleg met Dennis (it2help) en Dennis (2ndchapter) over hosting, domein en de bestaande site.",st:"warn",lbl:"Gepland"},
  {s:"Testversie met eigen catalogus",d:"Stap 1 uit het voorstel: eerst draaiend zien met jullie eigen producten.",st:"warn",lbl:"Gepland"},
@@ -2352,13 +2396,29 @@ var VRAAGLOG=[
 ];
 function wzLijst(){return (typeof WIJZIGINGEN!=="undefined"&&WIJZIGINGEN)||[];}
 function wzDatum(iso){var m=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"],d=(iso||"").split("-");return d.length<3?iso:(+d[2])+" "+m[+d[1]-1];}
+function arIso(d){ /* "21 aug" -> "2026-08-21"; het project loopt binnen 2026 */
+ var m=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"],p=String(d||"").trim().toLowerCase().split(/\s+/);
+ var mi=m.indexOf((p[1]||"").slice(0,3));if(mi<0||!+p[0])return "";
+ return "2026-"+("0"+(mi+1)).slice(-2)+"-"+("0"+(+p[0])).slice(-2);}
 function arLijst(){
  var a=[];
- VRAAGLOG.forEach(function(q){a.push({t:"Vraag",d:q.d,o:q.o,x:q.a,st:q.st,lbl:q.lbl});});
- VOORTGANG.forEach(function(v){a.push({t:"Stap",d:"",o:v.s,x:v.d,st:v.st,lbl:v.lbl});});
+ /* Eén tijdlijn, nieuwste boven — niet gegroepeerd op soort (wens John 25-09).
+    Elke regel krijgt een sorteersleutel 'k' (JJJJ-MM-DD). Projectstappen zonder datum zijn
+    lopend of gepland en staan daarom bovenaan, in hun eigen volgorde. */
+ VRAAGLOG.forEach(function(q){a.push({t:"Vraag",k:arIso(q.d),d:q.d,o:q.o,x:q.a,st:q.st,lbl:q.lbl});});
+ VOORTGANG.forEach(function(v){a.push({t:"Stap",k:v.dt||"",d:v.dt?wzDatum(v.dt):"",o:v.s,x:v.d,st:v.st,lbl:v.lbl});});
  /* Wijzigingslogboek, nieuwste eerst. 'v' is de versiecode, zodat terug te vinden is wat wanneer veranderde. */
- wzLijst().slice().reverse().forEach(function(w){a.push({t:"Wijziging",d:wzDatum(w.d),o:w.o,x:w.x+' <span style="opacity:.7">· versie '+w.v+'</span>',st:"ok",lbl:"Doorgevoerd"});});
- return a;
+ /* Afstemming uit overleg en mail (afstemming.js) */
+ ((typeof AFSTEMMING!=="undefined"&&AFSTEMMING)||[]).forEach(function(m){
+  a.push({t:m.via==="mail"?"Mail":(m.via==="overleg"?"Overleg":"Afstemming"),k:m.d,d:wzDatum(m.d),o:m.o,x:m.x,st:"ok",lbl:"Afgesproken"});});
+ wzLijst().forEach(function(w,i){a.push({t:"Wijziging",k:w.d,n:i,d:wzDatum(w.d),o:w.o,x:w.x+' <span style="opacity:.7">· versie '+w.v+'</span>',st:"ok",lbl:"Doorgevoerd"});});
+ a.forEach(function(r,i){r.i=i;});
+ return a.sort(function(p,q){
+  if(!p.k&&!q.k)return p.i-q.i;       /* lopend/gepland: eigen volgorde */
+  if(!p.k)return -1; if(!q.k)return 1; /* zonder datum bovenaan */
+  if(p.k!==q.k)return p.k<q.k?1:-1;    /* nieuwste eerst */
+  return q.i-p.i;                      /* zelfde dag: later toegevoegd eerst */
+ });
 }
 var arAlles=false;
 function arToggle(){arAlles=!arAlles;arRender();}
@@ -2368,9 +2428,9 @@ function arRender(){
  var alles=arLijst();
  var hit=q?alles.filter(function(r){return (r.t+" "+r.o+" "+r.x+" "+r.lbl).toLowerCase().indexOf(q)>-1;}):null;
  var rows=hit?hit:(arAlles?alles:alles.filter(function(r){return r.st!=="ok";}));
- var kop='<table class="atable"><tr><th style="width:66px">Soort</th><th>Onderwerp</th><th>Stand van zaken</th><th style="width:96px">Status</th></tr>';
+ var kop='<table class="atable"><tr><th style="width:92px">Datum · soort</th><th>Onderwerp</th><th>Stand van zaken</th><th style="width:96px">Status</th></tr>';
  var body=rows.map(function(r){
-  return '<tr><td style="color:var(--muted);white-space:nowrap">'+r.t+(r.d?' · '+r.d:'')+'</td><td><b>'+r.o+'</b></td><td style="color:var(--muted)">'+r.x+'</td><td><span class="st '+r.st+'">'+r.lbl+'</span></td></tr>';
+  return '<tr><td style="color:var(--muted);white-space:nowrap">'+(r.d?'<b style="color:var(--text);font-weight:600">'+r.d+'</b> · ':'<b style="color:var(--text);font-weight:600">'+(r.lbl==="Gepland"?"gepland":"nu")+'</b> · ')+r.t+'</td><td><b>'+r.o+'</b></td><td style="color:var(--muted)">'+r.x+'</td><td><span class="st '+r.st+'">'+r.lbl+'</span></td></tr>';
  }).join("");
  var leeg='<p style="font-size:12.5px;color:var(--muted);padding:10px 0">Niets gevonden voor die zoekterm.</p>';
  var uitleg=q?('<p style="font-size:12px;color:var(--muted);margin:8px 0 0">'+rows.length+' resultaten voor "'+q.replace(/[<>&]/g,"")+'"</p>')
@@ -2584,7 +2644,8 @@ function vAdminBronnen(){
    in één keer terug. */
 var BSLT=(function(){try{return JSON.parse(localStorage.getItem("wsbeoordeling")||"{}");}catch(e){return{};}})();
 var BFILTER="open";
-function bBewaar(){try{localStorage.setItem("wsbeoordeling",JSON.stringify(BSLT));}catch(e){}}
+function bBewaar(){try{localStorage.setItem("wsbeoordeling",JSON.stringify(BSLT));}catch(e){}
+ if(typeof wsSyncBeoordeling==="function")wsSyncBeoordeling();}
 function bZet(id,waarde){
  if(waarde===null)delete BSLT[id]; else BSLT[id]={w:waarde,op:new Date().toISOString().slice(0,16)};
  bBewaar();render();
@@ -2660,7 +2721,7 @@ function bOmsTekst(id){
  if(v!==null&&v.trim())bOms(id,v.trim());
 }
 function bFilter(f){BFILTER=f;render();}
-function bWis(){if(confirm("Alle eigen besluiten wissen? Dit kan niet ongedaan worden gemaakt.")){BSLT={};bBewaar();render();}}
+function bWis(){if(typeof WS!=="undefined"&&WS.gebruiker){toast("Ingelogd: besluiten staan in de opslag en worden niet gewist. Pas ze per regel aan.");return;}if(confirm("Alle eigen besluiten wissen? Dit kan niet ongedaan worden gemaakt.")){BSLT={};bBewaar();render();}}
 function bUitvoer(){
  var uit={gemaakt:new Date().toISOString().slice(0,16),bron:BEOORDELING.gemaakt,
   besluiten:Object.keys(BSLT).map(function(k){var x=BEOORDELING.items.filter(function(i){return i.id===k;})[0]||{};
@@ -2675,6 +2736,18 @@ function bUitvoer(){
 }
 function bKopieer(){var ta=document.querySelector("#buitvoer textarea");ta.select();
  try{document.execCommand("copy");toast("Gekopieerd — plak het in een bericht aan John.");}catch(e){toast("Selecteer de tekst en kopieer met Ctrl+C.");}}
+/* Wat staat er nu in de demo? De wachtrij is van 2 september; de catalogus is daarna
+   bijgewerkt. Zo ziet Jack of een vraag inmiddels anders ligt. */
+function bNuInDemo(x){
+ if(typeof CAT==="undefined"||!CAT.length)return "";
+ if(x.k==="herkomst"){
+  var t={};CAT.forEach(function(p){if(p.dist===x.titel)t[p.country||"Onbekend"]=(t[p.country||"Onbekend"]||0)+1;});
+  var d=Object.keys(t).map(function(k){return k+" "+t[k];}).join(" · ");
+  return '<div class="bnu">Nu in de demo: '+(d||"geen flessen meer onder deze naam")+'</div>';
+ }
+ if(x.k==="vat"||x.k==="turf")return '<div class="bnu">Staat al zo in de demo — jouw oordeel bepaalt of het blijft.</div>';
+ return "";
+}
 function vAdminBeoordeel(){
  if(typeof BEOORDELING==="undefined")return '<h3 style="font-size:20px">Beoordelen</h3><p style="color:var(--muted)">De beoordeelrij is niet geladen.</p>';
  var alle=BEOORDELING.items, gedaan=Object.keys(BSLT).length;
@@ -2745,13 +2818,13 @@ function vAdminBeoordeel(){
   return '<div class="brij'+(b?" af":"")+'">'
    +(x.foto?'<img loading="lazy" src="'+x.foto+'" alt="">':'<div class="bgeen">'+(x.flessen||"")+(x.k==="herkomst"?'<small>flessen</small>':'')+'</div>')
    +'<div class="bmid"><div class="btitel">'+x.titel+'</div>'
-   +'<div class="buit">'+x.uitleg+'</div>'
+   +'<div class="buit">'+x.uitleg+'</div>'+bNuInDemo(x)
    +(x.voorstel?'<div class="bvoor"><span>'+(x.huidig||"leeg")+'</span> → <b>'+x.voorstel+'</b></div>':"")
    +'</div><div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.groep?"groepsbesluit · ":"")+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
  }).join("");
 
- return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'
- +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Wat je hier beslist, wordt in deze browser bewaard — je kunt tussendoor stoppen. Aan het eind geef je alles in één keer terug; er gaat niets automatisch naar de winkel. De lijsten hieronder zijn voor bulk — hele stapels tegelijk. Wil je per product oordelen, gebruik dan <b>Beoordelen op de site zelf</b>: dan loop je door de winkel en zie je elke fles zoals de klant hem straks ziet, met de beoordeling ernaast.</p>'
+ return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'+(typeof WS!=='undefined'?(WS.gebruiker?wsStatusRegel():wsLoginBlok('je besluiten op te slaan')):'')
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Ben je ingelogd, dan wordt elk besluit direct opgeslagen — je kunt tussendoor stoppen en op elk apparaat verder. Er gaat niets automatisch naar de winkel. De lijsten hieronder zijn voor bulk — hele stapels tegelijk. Wil je per product oordelen, gebruik dan <b>Beoordelen op de site zelf</b>: dan loop je door de winkel en zie je elke fles zoals de klant hem straks ziet, met de beoordeling ernaast.</p>'
  +'<div class="bvoortgang"><div style="width:'+Math.round(gedaan/alle.length*100)+'%"></div></div>'
  +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' beoordeeld · '+open.length+' nog te doen</p>'
  +'<div class="bfilters">'
@@ -2776,10 +2849,12 @@ function vAdminBeoordeel(){
 }
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"]];
+ var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"],["hiaten","Hiatenlijst"]];
  var body;
  if(sub==="beoordeel"){
   body=vAdminBeoordeel();
+ }else if(sub==="hiaten"){
+  body=typeof vAdminHiaten==="function"?vAdminHiaten():'<p>De hiatenlijst kon niet worden geladen.</p>';
  }else if(sub==="beeld"){
   body=vAdminBeeld();
  }else if(sub==="beeldtool"){
@@ -2829,12 +2904,12 @@ function vAdmin(rt){
   +vgFormulier()
   +'<div style="border-top:1px solid var(--line);margin:34px 0 0;padding-top:24px">'
   +'<h3 style="font-size:16px;margin:0 0 6px">Archief — vragen en voortgang</h3>'
-  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we hebben afgestemd en elke projectstap, doorzoekbaar. Standaard zie je alleen wat nog openstaat — typ een woord om iets terug te vinden, bijvoorbeeld <i>foto</i>, <i>Campbeltown</i> of <i>Google</i>. Typ <i>wijziging</i> voor het logboek van alle versies.</p>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alles wat we hebben afgestemd en elke projectstap, doorzoekbaar. Standaard zie je alleen wat nog openstaat — typ een woord om iets terug te vinden, bijvoorbeeld <i>foto</i>, <i>Campbeltown</i> of <i>Google</i>. Typ <i>wijziging</i> voor het logboek van alle versies, of <i>afgesproken</i> voor de afspraken uit overleg en mail.</p>'
   +'<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
   +'<input id="arZoek" oninput="arRender()" placeholder="Zoek in vragen en voortgang…" style="flex:1 1 220px;font:inherit;font-size:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)">'
   +'<button id="arBtn" onclick="arToggle()" style="font:inherit;font-size:12.5px;font-weight:600;padding:9px 14px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--amber)">Toon alles</button>'
   +'</div><div id="arRes"></div>'
-  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen · '+wzLijst().length+' wijzigingen in het logboek</p></div>';
+  +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen · '+((typeof AFSTEMMING!=="undefined"&&AFSTEMMING)||[]).length+' afspraken · '+wzLijst().length+' wijzigingen in het logboek</p></div>';
  }else{
   body='<h3 style="font-size:20px;margin-bottom:16px">Dashboard</h3>'
   +'<div class="kpis"><div class="kpi"><span>Omzet vandaag</span><b>€2.847</b><small>+18% vs vorige week</small></div>'
