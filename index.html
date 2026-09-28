@@ -182,7 +182,7 @@ h2{font-size:29px}
 .hrij{padding:14px 4px;border-bottom:1px solid var(--line)}.hrij.af{opacity:.75}
 .hkop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .hsoort{font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--text)}
-.hvraag{font-size:15px;font-weight:500;margin:6px 0 8px;max-width:90ch}.hthema{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 0 8px}.hnr{display:inline-block;min-width:22px;margin-right:6px;color:var(--muted);font-size:12px}.hweet{margin:0 0 10px 0;padding-left:18px;font-size:12.5px;color:var(--muted);max-width:90ch}.hweet li{margin:2px 0}.hweet .hwkop{list-style:none;margin-left:-18px;font-weight:600}.hkeuze{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hvraag{font-size:15px;font-weight:500;margin:6px 0 8px;max-width:90ch}.wsv{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;margin-top:6px;border:1px solid var(--line)}.wsv.nieuw{color:var(--muted)}.wsv.gezien{background:#FFF2CC}.wsv.verwerkt{background:#E2EFDA}.wsv.terug{background:#FCE4D6}.hthema{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 0 8px}.hnr{display:inline-block;min-width:22px;margin-right:6px;color:var(--muted);font-size:12px}.hweet{margin:0 0 10px 0;padding-left:18px;font-size:12.5px;color:var(--muted);max-width:90ch}.hweet li{margin:2px 0}.hweet .hwkop{list-style:none;margin-left:-18px;font-weight:600}.hkeuze{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .hvelden{display:grid;grid-template-columns:1fr 260px auto auto;gap:8px;align-items:start}
 .hvelden textarea,.hvelden input,.hsel,.hzoek{font:inherit;font-size:12.5px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)}
 .hsel,.hzoek{margin-left:6px}
@@ -2813,17 +2813,17 @@ function vAdminBeoordeel(){
      +'<div class="passen">'+assen+'</div></div>'
     +(bronnen?'<div class="pblok"><div class="pkop">Waar dit vandaan komt</div><div class="pbron">'+bronnen+'</div></div>':"")
     +'</div>'
-    +'<div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.w&&b.w.a?"bijgesteld · ":"")+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
+    +'<div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.w&&b.w.a?"bijgesteld · ":"")+b.op.replace("T"," ")+'</div>':"")+(typeof wsVerwLabel==='function'&&b?wsVerwLabel(wsVerwStatus('beoordelen',x.id)):'')+'</div></div>';
   }
   return '<div class="brij'+(b?" af":"")+'">'
    +(x.foto?'<img loading="lazy" src="'+x.foto+'" alt="">':'<div class="bgeen">'+(x.flessen||"")+(x.k==="herkomst"?'<small>flessen</small>':'')+'</div>')
    +'<div class="bmid"><div class="btitel">'+x.titel+'</div>'
    +'<div class="buit">'+x.uitleg+'</div>'+bNuInDemo(x)
    +(x.voorstel?'<div class="bvoor"><span>'+(x.huidig||"leeg")+'</span> → <b>'+x.voorstel+'</b></div>':"")
-   +'</div><div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.groep?"groepsbesluit · ":"")+b.op.replace("T"," ")+'</div>':"")+'</div></div>';
+   +'</div><div class="bkeuze">'+keuzes+(b?'<div class="bstatus">'+(b.groep?"groepsbesluit · ":"")+b.op.replace("T"," ")+'</div>':"")+(typeof wsVerwLabel==='function'&&b?wsVerwLabel(wsVerwStatus('beoordelen',x.id)):'')+'</div></div>';
  }).join("");
 
- return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'+(typeof WS!=='undefined'?(WS.gebruiker?wsStatusRegel():wsLoginBlok('je besluiten op te slaan')):'')
+ return '<h3 style="font-size:20px;margin-bottom:6px">Beoordelen</h3>'+(typeof WS!=='undefined'?(WS.gebruiker?wsStatusRegel('beoordelen'):wsLoginBlok('je besluiten op te slaan')):'')
  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch">De tool vult wat hij zeker weet en legt de rest hier neer. Ben je ingelogd, dan wordt elk besluit direct opgeslagen — je kunt tussendoor stoppen en op elk apparaat verder. Er gaat niets automatisch naar de winkel. De lijsten hieronder zijn voor bulk — hele stapels tegelijk. Wil je per product oordelen, gebruik dan <b>Beoordelen op de site zelf</b>: dan loop je door de winkel en zie je elke fles zoals de klant hem straks ziet, met de beoordeling ernaast.</p>'
  +'<div class="bvoortgang"><div style="width:'+Math.round(gedaan/alle.length*100)+'%"></div></div>'
  +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' beoordeeld · '+open.length+' nog te doen</p>'
