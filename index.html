@@ -2155,10 +2155,15 @@ function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+
 /* Terugval (F-b): laadt een opgemaakt beeld niet, dan alsnog de winkelfoto. Nooit een leeg vak. */
 /* wordt al bij het inlezen van de catalogus gevuld (hierboven); hier alleen niet overschrijven */
 var BEELD_TERUG=window.BEELD_TERUG||{};
+var GEEN_FOTO="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Cpath d='M88 18h24v58c0 10 26 22 26 52v146c0 9-7 14-16 14H78c-9 0-16-5-16-14V128c0-30 26-42 26-52z' fill='#d9d2c7'/%3E%3Crect x='86' y='10' width='28' height='12' rx='3' fill='#c4bbad'/%3E%3Crect x='68' y='160' width='64' height='70' rx='4' fill='#efeae2'/%3E%3Ctext x='100' y='200' font-family='sans-serif' font-size='13' text-anchor='middle' fill='#8a8174'%3Efoto volgt%3C/text%3E%3C/svg%3E";
 document.addEventListener("error",function(e){
  var t=e.target;if(!t||t.tagName!=="IMG")return;
  var m=/beelden\/p\/([A-Za-z0-9_-]+)\.webp/.exec(t.getAttribute("src")||"");
- if(m&&BEELD_TERUG[m[1]]){t.src=BEELD_TERUG[m[1]];}
+ if(m&&BEELD_TERUG[m[1]]){t.src=BEELD_TERUG[m[1]];return;}
+ /* Ook de winkelfoto ontbreekt (404 bij Lightspeed): neutrale fles, eenmalig, zodat er nooit een kapot plaatje staat. */
+ if(t.dataset.geenFoto)return;
+ t.dataset.geenFoto="1";t.classList.add("geen-foto");t.alt=(t.alt?t.alt+" — ":"")+"foto volgt";
+ t.src=GEEN_FOTO;
 },true);
 function samplLabel(p){
  if(!p._toonSample)return "";
