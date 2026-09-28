@@ -114,73 +114,73 @@ function wsSyncBeoordeling(){
  },600);
 }
 
-/* ---------- Hiatenlijst ---------- */
-var HF={prio:"Ja",status:"open",cat:"",zoek:"",toon:40,net:{}}; /* net: in deze sessie beantwoord; blijft zichtbaar tot een ander filter */
-function hFilter(k,v){HF[k]=v;HF.net={};if(k!=="toon")HF.toon=40;render();}
+/* ---------- Vragen voor Jack (voorheen: Hiatenlijst) ----------
+   HIATEN komt uit hiaten.js en wordt gemaakt uit 'Vragen voor Jack.json' in de kennisbank.
+   Per vraag: id, c (thema), t (titel), v (de vraag), k (wat we weten), opties (keuzes of null = open vraag).
+   Een gekozen optie staat in waarde.keuze; 'Weet ik niet' en 'Overslaan' in oordeel. */
+var HF={status:"open",cat:"",net:{}}; /* net: in deze sessie beantwoord; blijft zichtbaar tot een ander filter */
+function hFilter(k,v){HF[k]=v;HF.net={};render();}
 function hAnt(id){return WS.ant["hiaten|"+id]||null;}
-function hBewaar(id,oordeel){
+function hKeuze(a){return a&&a.waarde&&a.waarde.keuze?a.waarde.keuze:null;}
+function hBewaar(id,oordeel,keuzeNr){
  if(!wsKanOpslaan()){toast("Log eerst in om op te slaan.");return;}
  var it=HIATEN.items.filter(function(x){return x.id===id;})[0];if(!it)return;
  var ta=document.getElementById("ha-"+id),bi=document.getElementById("hb-"+id);
- var huidig=hAnt(id)||{};
- var rij={vraag_id:id,lijst:"hiaten",
-  oordeel:oordeel===undefined?(huidig.oordeel||null):(huidig.oordeel===oordeel?null:oordeel),
+ var huidig=hAnt(id)||{},keuze=hKeuze(huidig),o=huidig.oordeel||null;
+ if(keuzeNr!==undefined){var nk=(it.opties||[])[keuzeNr];keuze=(keuze===nk)?null:nk;if(keuze)o=null;}
+ else if(oordeel!==undefined){o=(o===oordeel)?null:oordeel;if(o)keuze=null;}
+ var rij={vraag_id:id,lijst:"hiaten",oordeel:o,
   antwoord:ta?ta.value.trim().slice(0,4000):(huidig.antwoord||null),
   bron:bi?bi.value.trim().slice(0,1000):(huidig.bron||null),
-  vraag_tekst:(it.o+" — "+it.v).slice(0,4000),
-  waarde:{categorie:it.c,soort:it.s}};
+  vraag_tekst:(it.t+" — "+it.v).slice(0,4000),
+  waarde:{thema:it.c,keuze:keuze}};
  WS.sb.from("ws_antwoorden").upsert(rij,{onConflict:"vraag_id"}).select().then(function(r){
   if(r.error){toast("Opslaan mislukt. Probeer het opnieuw.");console.warn(r.error);return;}
   WS.ant["hiaten|"+id]=r.data&&r.data[0]?r.data[0]:rij;HF.net[id]=1;toast("Opgeslagen");render();
  });
 }
-function hIsBeantwoord(a){return !!(a&&(a.oordeel||(a.antwoord&&a.antwoord.length)));}
+function hIsBeantwoord(a){return !!(a&&(a.oordeel||hKeuze(a)||(a.antwoord&&a.antwoord.length)));}
 function vAdminHiaten(){
- if(typeof HIATEN==="undefined")return '<h3 style="font-size:20px">Hiatenlijst</h3><p style="color:var(--muted)">De hiatenlijst is niet geladen.</p>';
+ if(typeof HIATEN==="undefined")return '<h3 style="font-size:20px">Vragen voor Jack</h3><p style="color:var(--muted)">De vragen zijn niet geladen.</p>';
  var alle=HIATEN.items;
  var gedaan=alle.filter(function(x){return hIsBeantwoord(hAnt(x.id));}).length;
  var cats=[];alle.forEach(function(x){if(cats.indexOf(x.c)<0)cats.push(x.c);});
- var z=HF.zoek.toLowerCase();
  var lijst=alle.filter(function(x){
-  if(HF.prio&&x.p!==HF.prio)return false;
   if(HF.cat&&x.c!==HF.cat)return false;
   var b=hIsBeantwoord(hAnt(x.id));
   if(HF.status==="open"&&b&&!HF.net[x.id])return false;
   if(HF.status==="gedaan"&&!b)return false;
-  if(z&&(x.o+" "+x.v).toLowerCase().indexOf(z)<0)return false;
   return true;
  });
- var tel=function(p){return alle.filter(function(x){return x.p===p;}).length;};
- var kleur={"Bronconflict":"#FCE4D6","Claim/legende":"#FFF2CC","Onzeker":"#E2EFDA","Ontbreekt":"transparent"};
- var kan=wsKanOpslaan();
- var rijen=lijst.slice(0,HF.toon).map(function(x){
-  var a=hAnt(x.id)||{};
-  var k=function(o,l,kl){return '<button class="bbtn'+(a.oordeel===o?" aan "+(kl||""):"")+'"'+(kan?'':' disabled')+' onclick="hBewaar(\''+x.id+'\',\''+o+'\')">'+l+'</button>';};
-  return '<div class="hrij'+(hIsBeantwoord(a)?" af":"")+'">'
-   +'<div class="hkop"><span class="hsoort" style="background:'+kleur[x.s]+'">'+wsH(x.s)+'</span>'
-   +'<span class="hcat">'+wsH(x.c)+' · <b>'+wsH(x.o)+'</b></span></div>'
+ var kan=wsKanOpslaan(),dis=kan?'':' disabled',vorige="",nr=0;
+ var rijen=lijst.map(function(x){
+  var a=hAnt(x.id)||{},kz=hKeuze(a);nr=alle.indexOf(x)+1;
+  var kop=(x.c!==vorige)?'<h4 class="hthema">'+wsH(x.c)+'</h4>':"";vorige=x.c;
+  var knop=function(aan,l,js,kl){return '<button class="bbtn'+(aan?" aan "+(kl||"ja"):"")+'"'+dis+' onclick="'+js+'">'+wsH(l)+'</button>';};
+  var opties=(x.opties||[]).filter(function(o){return o!=="Weet ik niet";});
+  var knoppen=opties.map(function(o,i){return knop(kz===o,o,"hBewaar('"+x.id+"',undefined,"+(x.opties.indexOf(o))+")");}).join("")
+   +knop(a.oordeel==="weet niet","Weet ik niet","hBewaar('"+x.id+"','weet niet')","")
+   +knop(a.oordeel==="overslaan","Sla over","hBewaar('"+x.id+"','overslaan')","");
+  return kop+'<div class="hrij'+(hIsBeantwoord(a)?" af":"")+'">'
+   +'<div class="hkop"><span class="hnr">'+nr+'</span><b>'+wsH(x.t)+'</b></div>'
    +'<div class="hvraag">'+wsH(x.v)+'</div>'
-   +'<div class="hkeuze">'+k("klopt","Klopt","ja")+k("klopt niet","Klopt niet","nee")+k("weet niet","Weet ik niet")+k("overslaan","Overslaan")+'</div>'
-   +'<div class="hvelden"><textarea id="ha-'+x.id+'" rows="2" maxlength="4000" placeholder="Wat weet jij hierover? (juiste waarde, correctie, aanvulling)"'+(kan?'':' disabled')+'>'+wsH(a.antwoord||"")+'</textarea>'
-   +'<input id="hb-'+x.id+'" maxlength="1000" placeholder="Bron of toelichting (optioneel)" value="'+wsH(a.bron||"")+'"'+(kan?'':' disabled')+'>'
-   +'<button class="btn btn-g btn-s"'+(kan?'':' disabled')+' onclick="hBewaar(\''+x.id+'\')">Bewaar tekst</button>'
+   +(x.k&&x.k.length?'<ul class="hweet"><li class="hwkop">Wat we nu weten:</li>'+x.k.map(function(s){return '<li>'+wsH(s)+'</li>';}).join("")+'</ul>':'')
+   +'<div class="hkeuze">'+knoppen+'</div>'
+   +'<div class="hvelden"><textarea id="ha-'+x.id+'" rows="2" maxlength="4000" placeholder="'+(x.opties?'Toelichting (optioneel)':'Jouw antwoord')+'"'+dis+'>'+wsH(a.antwoord||"")+'</textarea>'
+   +'<input id="hb-'+x.id+'" maxlength="1000" placeholder="Bron of link (optioneel)" value="'+wsH(a.bron||"")+'"'+dis+'>'
+   +'<button class="btn btn-g btn-s"'+dis+' onclick="hBewaar(\''+x.id+'\')">Bewaar tekst</button>'
    +(a.bijgewerkt_op?'<span class="bstatus">'+wsH(String(a.bijgewerkt_op).slice(0,16).replace("T"," "))+'</span>':'')+'</div></div>';
  }).join("");
- return '<h3 style="font-size:20px;margin-bottom:6px">Hiatenlijst</h3>'
- +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:72ch">Open punten uit de whiskykennisbank achter de site: wat nog ontbreekt, waar bronnen elkaar tegenspreken en wat alleen de producent beweert. Vul in waar je iets weet — in je eigen tempo; alles wordt bewaard en je kunt altijd verder waar je gebleven was. Een punt zonder antwoord is geen probleem. Stand van de lijst: '+wsH(HIATEN.gemaakt)+'.</p>'
- +(WS.gebruiker?wsStatusRegel():wsLoginBlok("de hiatenlijst in te vullen"))
+ return '<h3 style="font-size:20px;margin-bottom:6px">Vragen voor Jack</h3>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:72ch">'+wsH(HIATEN.toelichting||"")+' Kies een antwoord of typ het in; alles wordt direct bewaard en je kunt later verder. Stand: '+wsH(HIATEN.gemaakt)+'.</p>'
+ +(WS.gebruiker?wsStatusRegel():wsLoginBlok("de vragen in te vullen"))
  +(WS.gebruiker&&WS.fout?'<p class="wsfout">'+wsH(WS.fout)+'</p>':'')
  +'<div class="bvoortgang"><div style="width:'+Math.round(gedaan/alle.length*100)+'%"></div></div>'
- +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' punten beantwoord</p>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin:8px 0 16px"><b>'+gedaan+'</b> van '+alle.length+' vragen beantwoord</p>'
  +'<div class="bfilters">'
- +[["Ja","Belangrijkst ("+tel("Ja")+")"],["Misschien","Misschien ("+tel("Misschien")+")"],["Nee","Eigen onderzoek ("+tel("Nee")+")"],["","Alles ("+alle.length+")"]]
-   .map(function(f){return '<button class="bfil'+(HF.prio===f[0]?" aan":"")+'" onclick="hFilter(\'prio\',\''+f[0]+'\')">'+f[1]+'</button>';}).join("")
- +'</div><div class="bfilters">'
  +[["open","Nog open"],["gedaan","Beantwoord"],["alle","Alle"]].map(function(f){return '<button class="bfil'+(HF.status===f[0]?" aan":"")+'" onclick="hFilter(\'status\',\''+f[0]+'\')">'+f[1]+'</button>';}).join("")
- +'<select class="hsel" onchange="hFilter(\'cat\',this.value)"><option value="">Alle onderwerpen</option>'+cats.map(function(c){return '<option'+(HF.cat===c?' selected':'')+' value="'+wsH(c)+'">'+wsH(c)+'</option>';}).join("")+'</select>'
- +'<input class="hzoek" data-fk="hzoek" placeholder="Zoek…" value="'+wsH(HF.zoek)+'" oninput="HF.zoek=this.value;clearTimeout(window._hz);window._hz=setTimeout(function(){HF.toon=40;render();},300)">'
+ +'<select class="hsel" onchange="hFilter(\'cat\',this.value)"><option value="">Alle thema\'s</option>'+cats.map(function(c){return '<option'+(HF.cat===c?' selected':'')+' value="'+wsH(c)+'">'+wsH(c)+'</option>';}).join("")+'</select>'
  +'</div>'
- +(rijen||'<p style="color:var(--muted);padding:20px 0">Niets in deze selectie.</p>')
- +(lijst.length>HF.toon?'<p style="padding:14px 0"><button class="btn btn-g btn-s" onclick="hFilter(\'toon\','+(HF.toon+40)+')">Toon meer ('+(lijst.length-HF.toon)+' over)</button></p>':'');
+ +(rijen||'<p style="color:var(--muted);padding:20px 0">'+(HF.status==="open"&&gedaan===alle.length?'Alle vragen zijn beantwoord. Dank je!':'Niets in deze selectie.')+'</p>');
 }
 document.addEventListener("DOMContentLoaded",function(){try{wsStart();}catch(e){console.warn(e);}});

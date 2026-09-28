@@ -182,7 +182,7 @@ h2{font-size:29px}
 .hrij{padding:14px 4px;border-bottom:1px solid var(--line)}.hrij.af{opacity:.75}
 .hkop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .hsoort{font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--text)}
-.hvraag{font-size:14px;margin:6px 0 8px;max-width:90ch}.hkeuze{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.hvraag{font-size:15px;font-weight:500;margin:6px 0 8px;max-width:90ch}.hthema{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 0 8px}.hnr{display:inline-block;min-width:22px;margin-right:6px;color:var(--muted);font-size:12px}.hweet{margin:0 0 10px 0;padding-left:18px;font-size:12.5px;color:var(--muted);max-width:90ch}.hweet li{margin:2px 0}.hweet .hwkop{list-style:none;margin-left:-18px;font-weight:600}.hkeuze{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 .hvelden{display:grid;grid-template-columns:1fr 260px auto auto;gap:8px;align-items:start}
 .hvelden textarea,.hvelden input,.hsel,.hzoek{font:inherit;font-size:12.5px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)}
 .hsel,.hzoek{margin-left:6px}
@@ -2849,7 +2849,7 @@ function vAdminBeoordeel(){
 }
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"],["hiaten","Hiatenlijst"]];
+ var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"],["hiaten","Vragen voor Jack"]];
  var body;
  if(sub==="beoordeel"){
   body=vAdminBeoordeel();
