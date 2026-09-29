@@ -298,6 +298,41 @@ h2{font-size:29px}
 .sync-box{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:18px}
 .sync-box b{font-family:var(--serif);font-size:17px}
 .sync-box p{font-size:12.5px;color:var(--muted);margin-top:4px}
+/* Beheer: drie soorten schermen — werkt al (groen), voortgang (goud), voorbeeld (gestippeld) */
+.adm-side .agrp{padding:20px 22px 6px;margin-top:6px;border-top:1px solid var(--line);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text);font-weight:700;display:flex;align-items:center;gap:7px}
+.adm-side .agrt{padding:0 22px 4px 38px;font-size:11px;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot.echt{background:var(--green)}.dot.bouw{background:var(--gold)}.dot.mock{border:1.5px dashed #a99f93}
+.adm-side a.mock{color:#a39a8f}
+.adm-side a.mock.act{color:var(--amber)}
+.mockband{border:1.5px dashed #b9afa3;background:repeating-linear-gradient(135deg,#fbf8f4 0 12px,#f5f0ea 12px 24px);border-radius:12px;padding:12px 16px;margin-bottom:22px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.mockband b,.echtband b,.bouwband b{color:var(--text)}
+.echtband,.bouwband{border-left:3px solid var(--green);background:rgba(63,143,79,.07);border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:20px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.bouwband{border-left-color:var(--gold);background:rgba(201,150,63,.09)}
+.ov-route{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:6px 0 10px;position:relative}
+.ov-stap{padding:12px 14px 12px 0;position:relative}
+.ov-stap:before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:var(--line)}
+.ov-stap i{position:relative;display:block;width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--line);margin-bottom:8px}
+.ov-stap.nu i{border-color:var(--amber);background:var(--amber);box-shadow:0 0 0 4px rgba(138,28,38,.12)}
+.ov-stap b{display:block;font-size:13.5px}.ov-stap span{display:block;font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:2px;max-width:24ch}
+.ov-stap.nu b{color:var(--amber)}
+.ov-leg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--muted);margin:14px 0 22px}
+.ov-leg span{display:inline-flex;align-items:center;gap:7px}
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;align-items:start}
+.ov-card{border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;background:var(--bg2)}
+.ov-card.echt{border-top:3px solid var(--green)}.ov-card.bouw{border-top:3px solid var(--gold)}
+.ov-card.mock{border:1.5px dashed #b9afa3;background:repeating-linear-gradient(135deg,#fbf8f4 0 12px,#f5f0ea 12px 24px)}
+.ov-card h4{font-family:var(--serif);font-size:18px;margin:0 0 4px}
+.ov-card .ov-wat{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.ov-taak{padding:10px 0;border-top:1px solid var(--line)}
+.ov-taak a{font-weight:600;font-size:13.5px;color:var(--text)}
+.ov-taak a:hover{color:var(--amber)}
+.ov-taak p{font-size:12px;color:var(--muted);margin:2px 0 0;line-height:1.5}
+.ov-bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin:7px 0 3px}
+.ov-bar i{display:block;height:100%;background:var(--green);border-radius:4px}
+.ov-sub{font-size:11.5px;color:var(--muted)}
+.ov-lnk{display:inline-block;margin-top:10px;font-size:12.5px;font-weight:600;color:var(--amber)}
+@media(max-width:640px){.ov-route{grid-template-columns:1fr}.ov-stap:before{display:none}}
 .vgf label{display:block;font-size:13px;font-weight:600;margin:18px 0 3px}
 .vgf .h{font-size:12px;color:var(--muted);margin-bottom:7px}
 .vgf input,.vgf textarea,.vgf select{width:100%;font:inherit;font-size:13px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
@@ -378,6 +413,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
   .adm-side{display:flex;overflow-x:auto;padding:0}
   .adm-side a{white-space:nowrap}
   .adm-side a.act{border-right:none;border-bottom:2px solid var(--amber)}
+  .adm-side .agrp{margin:0;padding:0 6px 0 16px;border-top:none;border-left:1px solid var(--line);white-space:nowrap;font-size:9.5px}
+  .adm-side .agrt{display:none}
   .matches{position:static}
 }
 @media(max-width:640px){
@@ -2087,7 +2124,7 @@ function route(){
  if(h.startsWith("#/inspiratie/streek/"))return{r:"streekgids",id:h.slice(20)};
  if(h.startsWith("#/streek/"))return{r:"streek",id:h.slice(9)};
  if(h.startsWith("#/product/"))return{r:"product",id:h.slice(10)};
- if(h.startsWith("#/admin"))return{r:"admin",sub:h.split("/")[2]||"dashboard"};
+ if(h.startsWith("#/admin"))return{r:"admin",sub:h.split("/")[2]||"start"};
  var m={"#/":"home","#/ontdek":"ontdek","#/collectie":"collectie","#/kaart":"kaart","#/vergelijk":"vergelijk","#/inspiratie":"inspiratie","#/festival":"festival"};
  return{r:m[h]||"home"};
 }
@@ -2898,11 +2935,66 @@ function vAdminBeoordeel(){
  +'<div style="display:flex;gap:10px;margin-top:8px"><button class="btn btn-g btn-s" onclick="bKopieer()">Kopieer</button>'
  +'<a class="btn btn-g btn-s dl" href="#">Bewaar als bestand</a></div></div>';
 }
+/* ---------- Beheer: indeling en overzicht ---------- */
+var ADMGROEP=[
+ {k:"",items:[["start","Overzicht"]]},
+ {k:"Werkt al",c:"echt",t:"echte gegevens",items:[["hiaten","Vragen voor Jack"],["beoordeel","Beoordelen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"]]},
+ {k:"Voortgang",c:"bouw",t:"stand van de bouw",items:[["voortgang","Voortgang project"],["bronnen","Bronnen & partners"]]},
+ {k:"Voorbeeld",c:"mock",t:"toekomstige backend",items:[["dashboard","Winkeldashboard"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"]]}
+];
+var ADMBAND={
+ hiaten:["echt","<b>Werkt al.</b> Echte vragen over jullie catalogus en teksten. Je antwoorden worden na inloggen direct opgeslagen."],
+ beoordeel:["echt","<b>Werkt al.</b> Echte flessen uit jullie catalogus. Je oordeel wordt na inloggen opgeslagen en verwerkt."],
+ beeld:["echt","<b>Werkt al.</b> Echte beeldvoorstellen voor de streekpagina's, met maker en licentie per foto."],
+ beeldtool:["echt","<b>Werkt al.</b> Opgemaakte productfoto's komen via de opslag direct bij de fles op de site."],
+ voortgang:["bouw","<b>Stand van de bouw.</b> Wat klaar is, wat nu loopt en wat nog van jullie nodig is."],
+ bronnen:["bouw","<b>Stand van de bouw.</b> Welke bronnen we mogen gebruiken, en waarvoor nog toestemming nodig is."],
+ dashboard:["mock","<b>Voorbeeld van de toekomstige backend.</b> Zo kan het dagelijkse beheer eruitzien als de site live is. De cijfers zijn verzonnen en er is nog niets gekoppeld."],
+ producten:["mock","<b>Voorbeeld van het productbeheer.</b> De flessen komen uit de demo; voorraadstatus en aantallen zijn verzonnen."],
+ orders:["mock","<b>Voorbeeld.</b> Orders en betalingen blijven in Lightspeed. Deze orders zijn verzonnen."],
+ smaak:["mock","<b>Voorbeeld.</b> Zo kan de goedkeuring van smaakprofielen straks werken. Bron en reviewstatus zijn verzonnen; het echte beoordelen gebeurt onder <a href=\"#/admin/beoordeel\" style=\"color:var(--amber)\">Beoordelen</a>."],
+ sync:["mock","<b>Voorbeeld.</b> De koppeling met Lightspeed bestaat nog niet. Zo kan het logboek eruitzien als hij er is."]
+};
+function admGroep(sub){for(var i=0;i<ADMGROEP.length;i++)for(var j=0;j<ADMGROEP[i].items.length;j++)if(ADMGROEP[i].items[j][0]===sub)return ADMGROEP[i];return ADMGROEP[0];}
+function vAdminStart(){
+ var hz=typeof HIATEN!=="undefined"?HIATEN.items:[];
+ var ingelogd=typeof WS!=="undefined"&&!!WS.gebruiker;
+ var hg=ingelogd&&typeof hIsBeantwoord==="function"?hz.filter(function(x){return hIsBeantwoord(hAnt(x.id));}).length:null;
+ var bz=typeof BEOORDELING!=="undefined"?BEOORDELING.items:[];
+ var bg=bz.filter(function(x){return BSLT[x.id];}).length;
+ var af=VOORTGANG.filter(function(v){return v.lbl==="Afgerond";}).length;
+ var loopt=VOORTGANG.filter(function(v){return v.lbl==="Loopt";});
+ var wz=wzLijst().slice(-3).reverse();
+ function nl(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");}
+ function balk(n,t){var p=t?Math.round(n/t*100):0;return '<div class="ov-bar"><i style="width:'+Math.max(p,n?2:0)+'%"></i></div><div class="ov-sub">'+nl(n)+' van '+nl(t)+' gedaan'+(t>500?' · in je eigen tempo, per soort te filteren':'')+'</div>';}
+ return '<h3 style="font-size:20px;margin-bottom:6px">Overzicht</h3>'
+ +'<p style="font-size:13px;color:var(--muted);margin-bottom:18px;max-width:70ch">Wat er op je wacht, hoe ver de bouw is en hoe het beheer er na livegang uit kan zien.</p>'
+ +'<div class="ov-route">'
+ +'<div class="ov-stap nu"><i></i><b>1 · Demo en onderdelen</b><span>Nu. Losse onderdelen bouwen en met jou testen.</span></div>'
+ +'<div class="ov-stap"><i></i><b>2 · Testversie</b><span>De complete site met jullie eigen catalogus, afgeschermd.</span></div>'
+ +'<div class="ov-stap"><i></i><b>3 · Livegang</b><span>Streefdatum 1 januari, alleen als alles werkt.</span></div></div>'
+ +'<div class="ov-leg"><span><i class="dot echt"></i>Werkt al, met echte gegevens</span><span><i class="dot bouw"></i>Stand van de bouw</span><span><i class="dot mock"></i>Voorbeeld, verzonnen cijfers</span></div>'
+ +'<div class="ov-grid">'
+ +'<div class="ov-card echt"><h4>Wacht op jou</h4><div class="ov-wat">Werkt al. Wat je hier doet, gebruiken we direct in de bouw.</div>'
+ +'<div class="ov-taak"><a href="#/admin/hiaten">Vragen voor Jack →</a>'+(hg===null?'<p>'+hz.length+' vragen. Log in om je stand te zien en antwoorden op te slaan.</p>':balk(hg,hz.length))+'</div>'
+ +'<div class="ov-taak"><a href="#/admin/beoordeel">Beoordelen →</a><p>Per fles: klopt de omschrijving, het smaakprofiel, de herkomst?</p>'+balk(bg,bz.length)+'</div>'
+ +'<div class="ov-taak"><a href="#/admin/beeld">Beeldvoorstellen →</a><p>Foto\'s voor de streekpagina\'s goedkeuren of afwijzen.</p></div>'
+ +'<div class="ov-taak"><a href="#/admin/beeldtool">Beeldtool →</a><p>Productfoto\'s vrijmaken en op vaste hoogte zetten.</p></div></div>'
+ +'<div class="ov-card bouw"><h4>Hoe ver de bouw is</h4><div class="ov-wat">Fase 1 van 2 · '+af+' van '+VOORTGANG.length+' stappen afgerond.</div>'
+ +(loopt.length?'<div class="ov-taak"><b style="font-size:12px;color:var(--muted);font-weight:600">Loopt nu</b>'+loopt.map(function(v){return '<p style="color:var(--text)">'+v.s+'</p>';}).join("")+'</div>':'')
+ +'<div class="ov-taak"><b style="font-size:12px;color:var(--muted);font-weight:600">Laatst gewijzigd op de demo</b>'
+ +wz.map(function(w){return '<p><span style="color:var(--text)">'+wzDatum(w.d)+'</span> · '+w.o+'</p>';}).join("")+'</div>'
+ +'<a class="ov-lnk" href="#/admin/voortgang">Volledige voortgang en logboek →</a><br><a class="ov-lnk" style="margin-top:4px" href="#/admin/bronnen">Bronnen &amp; partners →</a></div>'
+ +'<div class="ov-card mock"><h4>Zo kan de backend eruitzien</h4><div class="ov-wat">Voorbeeldschermen met verzonnen cijfers. Na livegang staan hier omzet, orders, voorraad en de koppeling met Lightspeed. Er is nog niets gekoppeld, dus je kunt niets kapotmaken.</div>'
+ +ADMGROEP[3].items.map(function(it){return '<div class="ov-taak"><a href="#/admin/'+it[0]+'">'+it[1]+' →</a></div>';}).join("")+'</div>'
+ +'</div>';
+}
 function vAdmin(rt){
  var sub=rt.sub;
- var side=[["dashboard","Dashboard"],["beoordeel","Beoordelen"],["producten","Producten"],["orders","Orders"],["smaak","Smaakprofielen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"],["sync","Lightspeed-sync"],["bronnen","Bronnen & partners"],["voortgang","Voortgang project"],["hiaten","Vragen voor Jack"]];
  var body;
- if(sub==="beoordeel"){
+ if(sub==="start"){
+  body=vAdminStart();
+ }else if(sub==="beoordeel"){
   body=vAdminBeoordeel();
  }else if(sub==="hiaten"){
   body=typeof vAdminHiaten==="function"?vAdminHiaten():'<p>De hiatenlijst kon niet worden geladen.</p>';
@@ -2962,7 +3054,8 @@ function vAdmin(rt){
   +'</div><div id="arRes"></div>'
   +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen · '+((typeof AFSTEMMING!=="undefined"&&AFSTEMMING)||[]).length+' afspraken · '+wzLijst().length+' wijzigingen in het logboek</p></div>';
  }else{
-  body='<h3 style="font-size:20px;margin-bottom:16px">Dashboard</h3>'
+  sub="dashboard";
+  body='<h3 style="font-size:20px;margin-bottom:16px">Winkeldashboard</h3>'
   +'<div class="kpis"><div class="kpi"><span>Omzet vandaag</span><b>€2.847</b><small>+18% vs vorige week</small></div>'
   +'<div class="kpi"><span>Orders</span><b>31</b><small>+6</small></div>'
   +'<div class="kpi"><span>Sample-attach rate</span><b>34%</b><small>+9pt sinds discovery</small></div>'
@@ -2972,10 +3065,14 @@ function vAdmin(rt){
   +'<table class="atable"><tr><th>Order</th><th>Klant</th><th>Totaal</th><th>Status</th></tr>'
   +ORDERS.slice(0,3).map(o=>'<tr><td>'+o.nr+'</td><td>'+o.kl+'</td><td>'+eur(o.tot)+'</td><td><span class="st '+o.st+'">'+o.lbl+'</span></td></tr>').join("")+'</table>';
  }
- return '<section><div class="wrap"><div class="kicker">Demo — beheeromgeving</div><h2>Beheer <span style="font-size:13px;color:var(--muted);font-family:var(--sans);font-weight:400">mock, alleen ter illustratie · geen echte data of login</span></h2>'
- +'<div class="adm"><div class="adm-side">'+side.map(s=>'<a href="#/admin/'+s[0]+'" class="'+(sub===s[0]?"act":"")+'">'+s[1]+'</a>').join("")+'</div>'
- +'<div class="adm-main">'+body+'</div></div>'
- +'<p style="font-size:12.5px;color:var(--muted)">In de echte implementatie: login met rollen, echte Lightspeed-data via de beveiligde sync-laag, en reviewflow voor AI-verrijking.</p></div></section>';
+ var band=ADMBAND[sub]?'<div class="'+ADMBAND[sub][0]+'band">'+ADMBAND[sub][1]+'</div>':'';
+ var zij=ADMGROEP.map(function(g){
+  return (g.k?'<div class="agrp"><i class="dot '+g.c+'"></i>'+g.k+'</div><div class="agrt">'+g.t+'</div>':'')
+  +g.items.map(function(s){return '<a href="#/admin/'+s[0]+'" class="'+(sub===s[0]?"act ":"")+(g.c==="mock"?"mock":"")+'">'+s[1]+'</a>';}).join("");
+ }).join("");
+ return '<section><div class="wrap"><div class="kicker">Demo — beheeromgeving</div><h2>Beheer <span style="font-size:13px;color:var(--muted);font-family:var(--sans);font-weight:400">groen werkt al met echte gegevens · gestippeld is een voorbeeld van de toekomstige backend</span></h2>'
+ +'<div class="adm"><div class="adm-side">'+zij+'</div>'
+ +'<div class="adm-main">'+band+body+'</div></div></div></section>';
 }
 /* ================= ACTIONS ================= */
 function add(name){cart++;el("cartN").textContent=cart;toast(name+" toegevoegd aan winkelwagen");}
