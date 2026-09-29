@@ -8,12 +8,15 @@
    4. kaderen: 800 x 800, fles op 92% van de hoogte (hooguit 94% breed), gecentreerd;
    5. bewaren met doorzichtige achtergrond (WebP, anders PNG).
    Geen generatieve AI en geen model (besluit F-c). Er wordt niets geüpload: de foto
-   verlaat de browser niet. */
+   verlaat de browser niet.
+   Gekozen uit de catalogus of de aandachtslijst? Dan heet de download <product-ID>.webp,
+   staat het beeld meteen op de site (alleen in deze sessie) en gaat het van de lijst af.
+   40_beelden_inladen.py zet de downloads in beelden/p en werkt het manifest bij. */
 (function(){
 "use strict";
 var BT={KADER:800,DOELHOOGTE:0.92,MAXBREEDTE:0.94,TOL:14,UNIFORM:0.97,WIT:244,RAND:3,MAXBRON:2400,MAXMB:20};
 var TEGELS=[["grijs","Grijs","#ece8e3"],["wit","Wit","#ffffff"],["creme","Crème","#f7f3ee"],["donker","Donker","#241b16"],["ruit","Ruit",""]];
-var st={img:null,naam:"foto",tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
+var st={img:null,naam:"foto",pid:null,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function $(id){return document.getElementById(id);}
@@ -139,11 +142,11 @@ function teken(){
  if(st.uit){na.width=400;na.height=400;var nx=na.getContext("2d");nx.clearRect(0,0,400,400);nx.imageSmoothingQuality="high";nx.drawImage(st.uit,0,0,400,400);}
 }
 function meld(niveau,tekst){var e=$("btDiag");if(!e)return;e.className="bt-diag bt-"+niveau;e.textContent=tekst;}
-function laad(src,naam,crossOrigin){
+function laad(src,naam,crossOrigin,pid){
  st.uit=null;["btWebp","btPng"].forEach(function(id){var b=$(id);if(b)b.disabled=true;});
  meld("ok","Foto laden…");
  var img=new Image();if(crossOrigin)img.crossOrigin="anonymous";
- img.onload=function(){st.img=img;st.naam=veiligeNaam(naam);st.forceer=false;verwerk();};
+ img.onload=function(){st.img=img;st.naam=veiligeNaam(naam);st.pid=pid||null;st.forceer=false;verwerk();};
  img.onerror=function(){meld("fout",crossOrigin?"Deze foto kon niet worden opgehaald voor bewerking (de winkel-CDN staat het niet toe). Open de foto, sla hem op en sleep hem hierheen.":"Dit bestand is geen leesbare afbeelding.");};
  img.src=src;
 }
@@ -151,17 +154,40 @@ function bestand(f){
  if(!f)return;
  if(!/^image\/(png|jpeg|webp)$/.test(f.type)){meld("fout","Alleen png, jpg of webp.");return;}
  if(f.size>BT.MAXMB*1048576){meld("fout","Dit bestand is groter dan "+BT.MAXMB+" MB.");return;}
- var url=URL.createObjectURL(f);laad(url,f.name,false);setTimeout(function(){URL.revokeObjectURL(url);},60000);
+ var m=/^(\d{5,})(?:-opgemaakt)?\.[a-z]+$/i.exec(f.name),pid=m&&vindProduct(m[1])?m[1]:null;
+ var url=URL.createObjectURL(f);laad(url,f.name,false,pid);setTimeout(function(){URL.revokeObjectURL(url);},60000);
 }
 function download(type){
  if(!st.uit)return;
  st.uit.toBlob(function(blob){
   if(!blob){meld("fout","Opslaan mislukt in deze browser.");return;}
-  var ext=blob.type==="image/webp"?"webp":"png";
-  if(type==="image/webp"&&ext!=="webp")meld("waarschuwing","Deze browser kan geen WebP maken; opgeslagen als PNG (ook doorzichtig).");
-  var a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=st.naam+"-opgemaakt."+ext;
-  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},5000);
+  var ext=blob.type==="image/webp"?"webp":"png",naam=st.pid?st.pid+"."+ext:st.naam+"-opgemaakt."+ext;
+  var a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=naam;
+  document.body.appendChild(a);a.click();a.remove();
+  if(st.pid&&ext==="webp"){naarSite(st.pid,u);return;}
+  setTimeout(function(){URL.revokeObjectURL(u);},5000);
+  if(type==="image/webp"&&ext!=="webp")meld("waarschuwing","Deze browser kan geen WebP maken; opgeslagen als PNG (ook doorzichtig)."+(st.pid?" De site gebruikt alleen WebP: probeer het in Chrome of Edge.":""));
+  else if(st.pid)meld("waarschuwing","Opgeslagen als "+naam+". De site gebruikt WebP: download WebP om het beeld op de site te zetten.");
  },type,0.9);
+}
+/* ---------- resultaat meteen op de site (deze sessie) ---------- */
+function vindProduct(id){return typeof CAT!=="undefined"?CAT.filter(function(x){return String(x.id)===String(id);})[0]:null;}
+function naarSite(pid,url){
+ var p=vindProduct(pid);
+ if(p){var T=window.BEELD_TERUG||(window.BEELD_TERUG={});if(!T[pid]&&!p._opgemaakt)T[pid]=p.img;p.img=url;p._opgemaakt=true;}
+ if(typeof BEELDEN!=="undefined")BEELDEN[pid]=1;
+ if(typeof BEELD_AANDACHT!=="undefined"&&BEELD_AANDACHT)for(var i=BEELD_AANDACHT.length-1;i>=0;i--)if(String(BEELD_AANDACHT[i].id)===pid)BEELD_AANDACHT.splice(i,1);
+ if(st.klaar.indexOf(pid)<0)st.klaar.push(pid);
+ var b=document.querySelector('#btAandacht .bt-hit[data-id="'+pid+'"]');if(b)b.classList.add("bt-klaar");
+ var n=$("btAantal");if(n)n.textContent=typeof BEELD_AANDACHT!=="undefined"?BEELD_AANDACHT.length:"";
+ klaarLijst();
+ meld("ok","Opgeslagen als "+pid+".webp en meteen op de productpagina gezet — alleen in deze browsersessie. Voor iedereen: draai 40_beelden_inladen.py en push.");
+}
+function klaarLijst(){
+ var e=$("btKlaar");if(!e)return;
+ e.style.display=st.klaar.length?"":"none";
+ e.innerHTML='<b>Klaar om te pushen: '+st.klaar.length+'</b> '+st.klaar.map(function(id){var p=vindProduct(id);return '<span title="'+esc(p?p.name:id)+'">'+esc(id)+'.webp</span>';}).join(" ")
+  +'<br><small>Staan in je Downloads. Draai <code>40_beelden_inladen.py</code> vanuit de map van de demo; daarna committen en pushen.</small>';
 }
 function zoek(q){
  var box=$("btHits");if(!box)return;q=(q||"").trim().toLowerCase();
@@ -177,8 +203,8 @@ function aandachtHtml(){
  var l=aandachtLijst();
  if(typeof BEELDEN==="undefined")return '<p class="bt-leeg" style="margin-top:14px">De automatische opmaak van de catalogus heeft nog niet gedraaid. Zodra dat is gebeurd, staan hier de foto\'s die aandacht nodig hebben.</p>';
  if(!l.length)return '<p class="bt-leeg" style="margin-top:14px">Geen foto\'s op de aandachtslijst: alles wat automatisch is opgemaakt, is gelukt.</p>';
- return '<div class="bt-aandacht"><div class="bt-akop">Aandacht nodig <span>'+l.length+'</span></div>'
-  +'<p class="bt-leeg">Deze foto\'s kon de automatische opmaak niet goed uitknippen. Op de site staat daarom de winkelfoto. Kies er een, maak hem op en download hem; de naam van het bestand bevat het product-ID.</p>'
+ return '<div class="bt-aandacht"><div class="bt-akop">Aandacht nodig <span id="btAantal">'+l.length+'</span></div>'
+  +'<p class="bt-leeg">Deze foto\'s kon de automatische opmaak niet goed uitknippen. Op de site staat daarom de winkelfoto. Kies er een, maak hem op en download de WebP: die heet dan naar het product-ID, staat meteen op de site en gaat van deze lijst af.</p>'
   +'<div id="btAandacht">'+l.slice(0,60).map(function(x){return '<button type="button" class="bt-hit" data-id="'+esc(x.id)+'"><span>'+esc(x.t)+'<br><small style="color:var(--muted)">'+esc(x.r)+'</small></span></button>';}).join("")
   +(l.length>60?'<p class="bt-leeg">…en nog '+(l.length-60)+'. Zoek hierboven op naam.</p>':'')+'</div></div>';
 }
@@ -195,6 +221,7 @@ var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:2
 +'.bt-paar canvas{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block}'
 +'.bt-diag{font-size:12.5px;margin:12px 0;padding:10px 12px;border-radius:9px;background:var(--card);border:1px solid var(--line)}.bt-waarschuwing{border-color:#c9963f}.bt-fout{border-color:#8a1c26;color:#8a1c26}'
 +'.bt-knoppen{display:flex;gap:8px;flex-wrap:wrap}.bt-leeg{font-size:12px;color:var(--muted);padding:6px}'
++'.bt-hit.bt-klaar{opacity:.45;text-decoration:line-through}.bt-klaar-lijst{margin-top:12px;font-size:12px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card)}.bt-klaar-lijst span{display:inline-block;margin:3px 4px 0 0;padding:1px 7px;border-radius:9px;border:1px solid var(--line);font-size:11px}.bt-klaar-lijst small{color:var(--muted)}'
 +'.bt-aandacht{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:8px;max-height:360px;overflow:auto}.bt-akop{font-size:13px;font-weight:700;padding:4px 6px}.bt-akop span{background:var(--amber);color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px}';
 
 window.vBeeldtool=function(){
@@ -212,6 +239,7 @@ window.vBeeldtool=function(){
  +'<div class="bt-paar"><figure><figcaption>Nu</figcaption><canvas id="btVoor" width="400" height="400"></canvas></figure><figure><figcaption>Opgemaakt</figcaption><canvas id="btNa" width="400" height="400"></canvas></figure></div>'
  +'<p id="btDiag" class="bt-diag bt-ok">Kies een foto of een product om te beginnen.</p>'
  +'<div class="bt-knoppen"><button type="button" class="btn btn-s" id="btForceer" style="display:none">Toch uitknippen</button><button type="button" class="btn btn-a btn-s" id="btWebp" disabled>Download WebP</button><button type="button" class="btn btn-s" id="btPng" disabled>Download PNG</button></div>'
+ +'<div id="btKlaar" class="bt-klaar-lijst" style="display:none"></div>'
  +'</div></div>';
 };
 window.btInit=function(){
@@ -226,8 +254,8 @@ window.btInit=function(){
   var p=CAT.filter(function(x){return String(x.id)===b.getAttribute("data-id");})[0];if(!p)return;
   $("btHits").innerHTML="";$("btZoek").value=p.name;
   /* altijd de winkelfoto als bron, nooit een eerder opgemaakt beeld */
-  var bron=(typeof BEELD_TERUG!=="undefined"&&p._opgemaakt&&BEELD_TERUG[String(p.img).replace(/^.*\/|\.webp$/g,"")])||p.img;
-  laad(bron,String(p.id),true);}
+  var T=window.BEELD_TERUG||{},bron=(p._opgemaakt&&(T[String(p.id)]||T[String(p.img).replace(/^.*\/|\.webp$/g,"")]))||p.img;
+  laad(bron,String(p.id),!/^blob:/.test(bron),String(p.id));}
  $("btHits").addEventListener("click",kies);
  var al=$("btAandacht");if(al)al.addEventListener("click",kies);
  $("btTol").addEventListener("input",function(e){st.tol=+e.target.value;$("btTolW").textContent=st.tol;verwerk();});
@@ -237,7 +265,8 @@ window.btInit=function(){
  $("btForceer").addEventListener("click",function(){st.forceer=!st.forceer;verwerk();});
  $("btWebp").addEventListener("click",function(){download("image/webp");});
  $("btPng").addEventListener("click",function(){download("image/png");});
- teken();
+ teken();klaarLijst();
+ st.klaar.forEach(function(id){var b=document.querySelector('#btAandacht .bt-hit[data-id="'+id+'"]');if(b)b.classList.add("bt-klaar");});
 };
 /* voor tests */
 window.__beeldtool={st:st,BT:BT,verwerk:verwerk,laad:laad};
