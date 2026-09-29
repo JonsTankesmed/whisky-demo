@@ -1060,6 +1060,30 @@ P.forEach(normEcht);
    bestand niet en valt de pagina automatisch terug op de voorbeeldcatalogus. */
 var LOKAAL=(typeof CATALOGUS_LOKAAL!=="undefined"&&CATALOGUS_LOKAAL&&CATALOGUS_LOKAAL.length)?CATALOGUS_LOKAAL:null;
 var CAT=P.concat(LOKAAL?LOKAAL.map(normEcht):genereer(DEMO_AANTAL));
+/* Uitgelichte flessen = echte catalogusproducten (keuze B, 29-09). De handgemaakte demoflessen (P)
+   worden vervangen door dezelfde fles uit de Lightspeed-catalogus: echte naam, prijs, beeld en
+   productpagina. Handmatig gecontroleerd op naam, inhoud en alcohol. Demoflessen zonder
+   catalogusfles (Lagavulin 16, Oban 14, Glenmorangie 21, Bruichladdich Old Skool) vervallen
+   tot Jack kiest. Alleen redactionele velden (reviewbron, festival, smaakas als de catalogus er
+   geen heeft) gaan mee. */
+var P_TWEELING={"macallan-12-dc":"161408813","redbreast-12-cs":"123364592","kilchoman-rockside":"163523863","nikka-coffey":"6780074","ledaig-rioja":"115083262","glenglassaugh-12":"146619276","glenglassaugh-portsoy":"146619765","teeling-wow4":"163124895","peats-beast-2010":"161970403","bruichladdich-21":"159158034","teaninich-12-gm":"127918219","strathmill-14-gm":"149082446","dailuaine-8-dl":"161503474","cb-orchard":"126103784","cb-artists":"123320498","bowmore-50":"148377109"};
+var P_ECHT=false;
+(function(){
+ if(!LOKAAL)return;
+ var byId={};LOKAAL.forEach(function(q){byId[String(q.id)]=q;});
+ var echt=[];
+ P.forEach(function(p){
+  var q=byId[P_TWEELING[p.id]];if(!q)return;
+  if(p.rev&&!q.rev)q.rev=p.rev;
+  if(p.fest)q.fest=p.fest;
+  if(q.geenprofiel&&p.t){q.t=p.t.slice();q.geenprofiel=false;q._turf=q.t[0]>=4?2:(q.t[0]>=2?1:0);if(!q.tags||!q.tags.length)q.tags=p.tags;q._profielDemo=true;}
+  q._uitgelicht=true;echt.push(q);
+ });
+ if(!echt.length)return;
+ P.length=0;echt.forEach(function(q){P.push(q);});
+ CAT=LOKAAL;P_ECHT=true;
+})();
+function wsUrl(p){return p&&p.url?"https://www.whiskysite.nl/"+encodeURIComponent(p.url)+".html":null;}
 var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
 /* ================= FACETTEN ================= */
 function bktLeeftijd(p){if(p._leeftijd===null)return "Geen leeftijd (NAS)";var a=p._leeftijd;
@@ -2082,7 +2106,8 @@ function render(){
 }
 /* ================= VIEWS ================= */
 function vHome(){
- var featured=P.filter(p=>p.was&&!p.rare).slice(0,4);
+ var featured=P_ECHT?P.filter(p=>!p.rare&&p._voorraad!==false).slice(0,4):P.filter(p=>p.was&&!p.rare).slice(0,4);
+ var held=featured[0];
  var nieuw=P.filter(p=>p.isNew);
  return '<div class="hero"><div class="wrap hero-in"><div>'
  +'<div class="kicker">Persoonlijk advies</div>'
@@ -2090,7 +2115,9 @@ function vHome(){
  +'<p>Tussen 10.000+ flessen vind je er één die voor jou is gemaakt. Wij helpen je hem vinden — op smaak, niet op label. En proef eerst een sample voordat je koopt.</p>'
  +'<a class="btn btn-a" href="#/ontdek">Help mij kiezen →</a> <a class="btn btn-g" href="#/collectie">Ik weet wat ik zoek</a>'
  +'<div class="stats"><div><b>10.000+</b><span>artikelen leverbaar</span></div><div><b>1.400+</b><span>whisky­samples</span></div><div><b>60+</b><span>independent bottlers</span></div></div>'
- +'</div><div class="hero-art"><img src="'+IMG.lag+'" alt=""><div class="hero-badge">Meest geproefd deze week: <b>Lagavulin 16</b> · sample €7,49</div></div></div></div>'
+ +'</div><div class="hero-art">'+(P_ECHT&&held
+   ?'<a href="#/product/'+held.id+'"><img src="'+held.img+'" alt="'+String(held.name).replace(/"/g,'&quot;')+'"></a><div class="hero-badge">Uitgelicht: <b>'+held.name+'</b> · '+eur(held.price)+'</div>'
+   :'<img src="'+IMG.lag+'" alt=""><div class="hero-badge">Meest geproefd deze week: <b>Lagavulin 16</b> · sample €7,49</div>')+'</div></div></div>'
  +'<div class="usp-bar"><div class="wrap usp"><div>'+I("phone",15)+'Hulp nodig? 071-5236054</div><div>'+I("pack",15)+'Zorgvuldig verpakt</div><div>'+I("sparkles",15)+'Dagelijks nieuwe flessen</div><div>'+I("flask",15)+'Proef eerst: 1.400+ samples</div></div></div>'
  +'<div style="background:linear-gradient(90deg,#33221a,#54301c);color:#fff"><div class="wrap" style="display:flex;align-items:center;gap:14px;padding:12px 24px;flex-wrap:wrap;font-size:13.5px"><span style="color:var(--gold)">'+I("sparkles",16)+'</span><b>Whisky in Leiden 2027</b><span style="opacity:.8">juni 2027 · Hooglandse Kerk · festivalbottelingen · masterclasses</span><a href="#/festival" style="margin-left:auto;color:var(--gold);font-weight:600">Bekijk het festival →</a></div></div>'
  +'<section><div class="wrap"><div class="kicker">Snel vinden</div><h2>Waar ben je naar op zoek?</h2>'
@@ -2101,7 +2128,7 @@ function vHome(){
  +'<a href="#/collectie" onclick="return snel({sort:\'priceDesc\',max:150})"><i>'+I("gift",24)+'</i><b>Cadeau</b><span>Memorabel verpakt</span></a>'
  +'<a href="#/collectie" onclick="return snel({cat:\'rare\',sort:\'priceDesc\'})"><i>'+I("crown",24)+'</i><b>Rare &amp; Old</b><span>Voor de kenner</span></a>'
  +'</div></div></section>'
- +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>Zomerse aanbiedingen</h2><a class="link-a" href="#/collectie">Bekijk alles →</a></div>'
+ +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>'+(P_ECHT?'Uitgelicht':'Zomerse aanbiedingen')+'</h2><a class="link-a" href="#/collectie">Bekijk alles →</a></div>'
  +'<div class="grid">'+featured.map(p=>card(p,null,{compact:true})).join("")+'</div></div></section>'
  +'<section style="padding-top:0"><div class="wrap"><div class="sec-head"><h2>Nieuw binnen</h2><span class="sec-sub" style="margin:0">Elke dag nieuwe flessen — dit kwam deze week binnen.</span></div>'
  +'<div class="grid">'+nieuw.map(p=>card(p,null,{compact:true})).join("")+'</div></div></section>'
@@ -2224,6 +2251,7 @@ function vProduct(rt){
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +'<button class="btn btn-g" onclick="cmpAdd(\''+p.id+'\')">+ Vergelijk</button>'
+ +(wsUrl(p)?'<a class="btn btn-g" href="'+wsUrl(p)+'" target="_blank" rel="noopener">Bekijk op whiskysite.nl →</a>':"")
  +'<button class="btn btn-g" style="gap:8px" onclick="wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+(wish.has(p.id)?" Bewaard":" Bewaar")+'</button></div>'
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="add(\'Sample: '+esc(p.name)+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
