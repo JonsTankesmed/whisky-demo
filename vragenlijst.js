@@ -220,6 +220,7 @@ function vAdminHiaten(){
    +'<div class="hkop"><span class="hnr">'+nr+'</span><b>'+wsH(x.t)+'</b></div>'
    +'<div class="hvraag">'+wsH(x.v)+'</div>'
    +(x.k&&x.k.length?'<ul class="hweet"><li class="hwkop">Wat we nu weten:</li>'+x.k.map(function(s){return '<li>'+wsH(s)+'</li>';}).join("")+'</ul>':'')
+   +(x.vb&&x.vb.length?'<div style="display:grid;gap:10px;margin:0 0 12px;max-width:90ch">'+x.vb.map(function(v){return '<div style="border:1px solid var(--line);border-radius:8px;padding:10px 14px'+(v.nu?';background:rgba(0,0,0,.04)':'')+'">'+'<div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px">'+wsH(v.l)+'</div>'+String(v.x||'').split('\n').map(function(r){return r?'<p style="font-size:14px;line-height:1.55;margin:0 0 6px">'+wsH(r)+'</p>':'';}).join('')+'</div>';}).join('')+'</div>':'')
    +'<div class="hkeuze">'+knoppen+'</div>'
    +'<div class="hvelden"><textarea id="ha-'+x.id+'" rows="2" maxlength="4000" placeholder="'+(x.opties?'Toelichting (optioneel)':'Jouw antwoord')+'"'+dis+'>'+wsH(a.antwoord||"")+'</textarea>'
    +'<input id="hb-'+x.id+'" maxlength="1000" placeholder="Bron of link (optioneel)" value="'+wsH(a.bron||"")+'"'+dis+'>'
