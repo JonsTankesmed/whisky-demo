@@ -1907,10 +1907,8 @@ function vStreek(rt){
  +'<span class="statuschip">'+I("pin",13)+' Concept — nog niet goedgekeurd</span>'
  +'<h1>'+s.kop+'</h1>'+s.intro.map(function(t){return '<p style="margin-bottom:10px">'+t+'</p>';}).join("")
  +beeldCredit(beelden)+'</div>'
- +'<div class="streekblok"><h2>Hoe smaakt het</h2><p>'+s.smaak+'</p></div>'
- +'<div class="streekblok"><h2>Wie er zit</h2><div class="distgrid">'
- +s.dists.map(function(d){return '<div class="distcard"><b>'+d[0]+'</b><span>'+d[1]+'</span></div>';}).join("")+'</div></div>'
- +'<div class="streekblok"><h2>Waar je begint</h2><div class="grid">'+start.map(function(p){return card(p,null,{compact:true});}).join("")+'</div></div>'
+ +'<div class="streekblok"><h2>Waar je begint</h2><div class="grid">'+start.map(function(p){return card(p,null,{compact:true});}).join("")+'</div>'
+ +'<p style="margin-top:14px;font-size:13.5px"><a class="link-a" href="#/inspiratie/streek/'+rt.id+'">Wie er in '+(s.toon||s.id)+' stookt — lees de streekgids in Inspiratie →</a></p></div>'
  +'<div class="streekblok"><h2>'+s.vraag[0]+'</h2><p>'+s.vraag[1]+'</p></div>'
  +'<div class="streekblok"><h2>Alles uit '+(s.toon||s.id)+' <span style="font-size:13px;color:var(--muted);font-weight:400">('+inStreek.length+' flessen)</span></h2>'
  +'<p style="margin-bottom:14px">Deze knop zet het streekfilter aan in de collectie — dezelfde selectie, met alle overige filters erbij.</p>'
@@ -2061,6 +2059,7 @@ function route(){
  var vol=location.hash||"#/";
  var deel=vol.split("?"),h=deel[0]||"#/";
  if(h==="#/collectie")urlNaarF(deel[1]||"");
+ if(h.startsWith("#/inspiratie/streek/"))return{r:"streekgids",id:h.slice(20)};
  if(h.startsWith("#/streek/"))return{r:"streek",id:h.slice(9)};
  if(h.startsWith("#/product/"))return{r:"product",id:h.slice(10)};
  if(h.startsWith("#/admin"))return{r:"admin",sub:h.split("/")[2]||"dashboard"};
@@ -2069,9 +2068,9 @@ function route(){
 }
 function render(){
  var rt=route();
- document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("act",a.dataset.r===rt.r));
+ document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("act",a.dataset.r===(rt.r==="streekgids"?"inspiratie":rt.r)));
  document.querySelectorAll(".catnav a").forEach(a=>a.classList.toggle("act",rt.r==="collectie"&&a.dataset.c===F.cat));
- var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin,streek:vStreek,kaart:vKaart}[rt.r];
+ var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin,streek:vStreek,streekgids:vStreekgids,kaart:vKaart}[rt.r];
  var fk=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.fk:null;
  beeldStop();
  el("app").innerHTML=v(rt);
@@ -2282,10 +2281,26 @@ function vBijdragers(){
   +'<a href="https://'+b.u+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px;font-weight:600;display:inline-block;margin-top:8px">'+b.u+' →</a></div></div>';}).join("")
  +'</div>';
 }
+function vStreekgids(rt){
+ var s=STREEK[rt.id];
+ if(!s)return '<section><div class="wrap">Deze streekgids bestaat nog niet. <a href="#/inspiratie" style="color:var(--amber)">Naar Inspiratie</a></div></section>';
+ var naam=s.toon||s.id;
+ return '<section><div class="wrap" style="max-width:860px">'
+ +'<a class="link-a" href="#/inspiratie">← Inspiratie</a>'
+ +'<div class="kicker" style="margin-top:18px">Regiogids · '+naam+'</div>'
+ +'<h1 style="font-family:var(--serif);font-size:clamp(28px,4vw,40px);margin:6px 0 12px">Wie er in '+naam+' stookt</h1>'
+ +'<p style="margin-bottom:18px"><span class="demoflag">concept · nog niet goedgekeurd</span></p>'
+ +'<div class="streekblok"><h2>Zo smaakt '+naam+'</h2><p>'+s.smaak+'</p></div>'
+ +'<div class="streekblok"><h2>De distilleerderijen</h2><div class="distgrid">'
+ +s.dists.map(function(d){return '<div class="distcard"><b>'+d[0]+'</b><span>'+d[1]+'</span></div>';}).join("")+'</div></div>'
+ +'<div class="streekblok"><a class="btn btn-a" href="#/streek/'+rt.id+'">Naar de flessen uit '+naam+' →</a></div>'
+ +'<p style="font-size:11.5px;color:var(--muted);margin-top:26px">Tekstrecord: taal '+s.taal+' · status '+s.status+' · versie '+s.versie+' · bijgewerkt '+s.bijgewerkt+'. Zelfde record als de streekpagina; verplaatst naar Inspiratie op 28-09.</p>'
+ +'</div></section>';
+}
 function vInspiratie(){
  var UP="?auto=format&fit=crop&w=800&q=70";
  var items=[
-  {ic:"pin",g:"linear-gradient(135deg,#2b1d12,#503018)",img:"https://images.unsplash.com/photo-1605558162119-2de4d9ff8130"+UP,k:"Regiogids",t:"Islay: het eiland dat naar zee smaakt",p:"Negen distilleerderijen op één eiland — van medicinale turfbommen tot elegante, ongeturfde stijlen. Ontdek waarom Islay-whisky naar zee smaakt.",m:"6 min"},
+  {ic:"pin",g:"linear-gradient(135deg,#2b1d12,#503018)",img:"https://images.unsplash.com/photo-1605558162119-2de4d9ff8130"+UP,k:"Regiogids",href:"#/inspiratie/streek/islay",t:"Islay: het eiland dat naar zee smaakt",p:"Negen distilleerderijen op één eiland — van medicinale turfbommen tot elegante, ongeturfde stijlen. Ontdek waarom Islay-whisky naar zee smaakt.",m:"6 min"},
   {ic:"flask",g:"linear-gradient(135deg,#1e2a24,#2f5240)",img:"https://images.unsplash.com/photo-1529264978834-666a0e99f884"+UP,k:"Proeven",t:"Zo werkt een sample-proeverij",p:"Kies vijf samples rond één thema, proef van licht naar zwaar en noteer je favoriet. Wij stellen graag een set samen op basis van je smaakprofiel.",m:"4 min"},
   {ic:"pack",g:"linear-gradient(135deg,#241a2e,#4b3a6e)",img:"https://images.unsplash.com/photo-1608232385022-8ba61bec6c59"+UP,k:"Kennis",t:"Wat is een independent bottler?",p:"Bottelaars als Gordon & MacPhail en Signatory bottelen vaten op eigen kracht — vaak op vatsterkte, ongefilterd en verrassend geprijsd. Wij voeren er 60+.",m:"7 min"},
   {ic:"utensils",g:"linear-gradient(135deg,#30231a,#7a4a22)",img:"https://images.unsplash.com/photo-1589881210718-42da05899fe4"+UP,k:"Food pairing",t:"Whisky &amp; food pairing",p:"Rokerige Islay bij blauwe kaas, sherry-gerijpte Speyside bij pure chocolade. De basisregel: match intensiteit met intensiteit.",m:"5 min"},
@@ -2297,8 +2312,10 @@ function vInspiratie(){
  +'<div><div class="kicker">Uitgelicht · Gids</div><h1>Hoe kies je de juiste whisky?</h1>'
  +'<p>Een eenvoudig kader om uit duizenden flessen te kiezen — zonder overweldigd te raken. Start bij smaak, niet bij naam: bepaal je profiel, proef gericht met samples en bouw van daaruit je collectie op.</p>'
  +'<div style="display:flex;align-items:center;gap:16px"><a class="lees" href="#/ontdek">Lees verder <span>→</span></a><span class="rmeta">· 5 min</span></div></div></div>'
+ +'<div class="sec-head"><h2>Streekgidsen</h2><span class="rmeta">Wie er stookt en hoe het smaakt — per Schotse streek</span></div>'
+ +'<div class="distgrid" style="margin-bottom:34px">'+Object.keys(STREEK).map(function(k){var g=STREEK[k];return '<a class="distcard" href="#/inspiratie/streek/'+k+'" style="text-decoration:none;color:inherit"><b>'+(g.toon||g.id)+'</b><span>Wie er stookt · <span style="color:var(--amber);display:inline">lees →</span></span></a>';}).join("")+'</div>'
  +'<div class="sec-head"><h2>Verhalen, gidsen &amp; kennis</h2><span class="rmeta">Een platform deelt kennis — en verdient daarmee vertrouwen én vindbaarheid (SEO)</span></div>'
- +'<div class="insp">'+items.map(x=>'<div class="icard" onclick="toast(\'Artikel-detail volgt in de volgende iteratie\')"><div class="art sm" style="background:'+x.g+'"><img src="'+x.img+'" loading="lazy" alt=""><span class="ibadge">'+I(x.ic,15)+'</span></div>'
+ +'<div class="insp">'+items.map(x=>'<div class="icard" onclick="'+(x.href?'location.hash=\''+x.href+'\'':'toast(\'Artikel-detail volgt in de volgende iteratie\')')+'"><div class="art sm" style="background:'+x.g+'"><img src="'+x.img+'" loading="lazy" alt=""><span class="ibadge">'+I(x.ic,15)+'</span></div>'
  +'<div class="icard-body"><div class="kicker" style="font-size:10px">'+x.k+'</div><h3>'+x.t+'</h3><p>'+x.p+'</p>'
  +'<div style="display:flex;align-items:center;gap:12px;margin-top:12px"><span class="lees" style="margin:0">Lees verder →</span><span class="rmeta">· '+x.m+'</span></div></div></div>').join("")+'</div>'
  +vBijdragers()
