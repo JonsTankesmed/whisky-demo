@@ -331,6 +331,11 @@ h2{font-size:29px}
 .ov-bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin:7px 0 3px}
 .ov-bar i{display:block;height:100%;background:var(--green);border-radius:4px}
 .ov-sub{font-size:11.5px;color:var(--muted)}
+.ov-soort{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:6px 0 4px;color:var(--text);font-size:12.5px}
+.ov-soort:hover span{color:var(--amber)}
+.ov-soort em{font-style:normal;font-size:11.5px;color:var(--muted)}
+.ov-soort i{grid-column:1/3;display:block;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.ov-soort i b{display:block;height:100%;background:var(--green)}
 .ov-lnk{display:inline-block;margin-top:10px;font-size:12.5px;font-weight:600;color:var(--amber)}
 @media(max-width:640px){.ov-route{grid-template-columns:1fr}.ov-stap:before{display:none}}
 .vgf label{display:block;font-size:13px;font-weight:600;margin:18px 0 3px}
@@ -2438,16 +2443,18 @@ var VOORTGANG=[
  {dt:"2026-08-21",s:"Voorstel besproken en akkoord",d:"Gesprek met Jack, Tino en zoon verwerkt; offerte verstuurd conform voorstel.",st:"ok",lbl:"Afgerond"},
  {dt:"2026-07-23",s:"Demo-concept opgeleverd",d:"Deze demo, met echte productdata en prijzen (juli 2026) in de huisstijl van de site.",st:"ok",lbl:"Afgerond"},
  {dt:"2026-08-27",s:"Read-only API-toegang ontvangen",d:"Inhoud en producten op lezen — genoeg om de bron te inventariseren zonder risico op wijzigingen.",st:"ok",lbl:"Afgerond"},
- {s:"Inventarisatie van de catalogus",d:"Eerst de 5.000 whisky's en 1.400 samples: welke velden zijn gevuld, waar ontbreken smaakkenmerken, welke foto's voldoen niet aan even groot / scherp / witte achtergrond. Wijn en overige dranken volgen in een latere fase.",st:"warn",lbl:"Loopt"},
+ {dt:"2026-09-24",s:"Inventarisatie van de catalogus",d:"Eerst de 5.000 whisky's en 1.400 samples: welke velden zijn gevuld, waar ontbreken smaakkenmerken, welke foto's voldoen niet aan even groot / scherp / witte achtergrond. Wijn en overige dranken volgen in een latere fase.",st:"ok",lbl:"Afgerond"},
  {dt:"2026-08-25",s:"Filteren en sorteren — werkende preview",d:"De collectie filtert nu op streek, distilleerderij, vatsoort, leeftijd, alcohol, turf, bottelaar en inhoud, met bij elk filter het aantal flessen dat overblijft. Sorteren kan op relevantie, prijs, leeftijd, nieuw binnen en hoogste korting. Elke filterstand heeft een eigen webadres, dus een selectie is te delen. Op de telefoon schuift het filterpaneel van onderen open. Om te kunnen beoordelen hoe dat voelt bij duizenden flessen staan er naast de 20 echte flessen 2.000 voorbeeldproducten in; die zijn als voorbeeld gemarkeerd. Deze pagina heeft geen koppeling met de winkel en bevat geen sleutel.",st:"ok",lbl:"Te bekijken"},
- {dt:"2026-08-25",s:"Streekpagina Campbeltown",d:"Voorstel van Jack overgenomen: kleinste Schotse regio eerst volledig af als sjabloon, daarna Islay, Speyside en de rest.",st:"warn",lbl:"Loopt"},
- {s:"Lijst met signaleringen uit de data",d:"Overzicht van producten waar iets aan mankeert — foto, omschrijving of ontbrekende kenmerken. Gaat naar Jack zodra de inventarisatie rond is.",st:"warn",lbl:"Gepland"},
+ {dt:"2026-08-25",s:"Streekpagina's Schotland",d:"Voorstel van Jack overgenomen: Campbeltown eerst als sjabloon, daarna de rest. Alle zes streken (Campbeltown, Islay, Speyside, Highland, Islands, Lowland) staan er nu als concept, met streekgids onder Inspiratie. Ze wachten op goedkeuring van de teksten en beelden.",st:"ok",lbl:"Afgerond"},
+ {s:"Lijst met signaleringen uit de data",d:"Overzicht van producten waar iets aan mankeert — foto, omschrijving of ontbrekende kenmerken. Gaat naar Jack zodra de inventarisatie rond is.",st:"warn",lbl:"Loopt"},
  {s:"Afstemming met technische partners",d:"Kort overleg met Dennis (it2help) en Dennis (2ndchapter) over hosting, domein en de bestaande site.",st:"warn",lbl:"Gepland"},
  {s:"Testversie met eigen catalogus",d:"Stap 1 uit het voorstel: eerst draaiend zien met jullie eigen producten.",st:"warn",lbl:"Gepland"},
  {s:"Livegang — streefdatum 1 januari",d:"Afgesproken in overleg (25 aug): de site gaat pas online als hij volledig werkt. Werkt hij niet naar behoren, dan schuift de datum op. Niet live tijdens de drukke maanden.",st:"warn",lbl:"Gepland"},
- {s:"Schrijfstijl vastleggen",d:"Uit de bestaande productteksten wordt afgeleid hoe Whiskysite schrijft: zinslengte, aanspreekvorm, hoeveel vakjargon, hoe proefnotities zijn opgebouwd. Jack wijst goede en minder goede voorbeelden aan; daaruit komt een stijlprofiel dat elke automatisch voorgestelde tekst volgt. Daarna krijgt Jack drie proefteksten in verschillende toon om uit te kiezen.",st:"warn",lbl:"Gepland"},
+ {s:"Schrijfstijl vastleggen",d:"Uit de bestaande productteksten wordt afgeleid hoe Whiskysite schrijft: zinslengte, aanspreekvorm, hoeveel vakjargon, hoe proefnotities zijn opgebouwd. Jack wijst goede en minder goede voorbeelden aan; daaruit komt een stijlprofiel dat elke automatisch voorgestelde tekst volgt. Daarna krijgt Jack drie proefteksten in verschillende toon om uit te kiezen.",st:"warn",lbl:"Loopt"},
  {s:"Automatische tekstvoorstellen bij nieuwe streek of distilleerderij",d:"Duikt er een distilleerderij, streek of serie in de catalogus op die nog geen eigen pagina heeft, dan signaleert de tool dat en maakt zelf een tekstvoorstel. Dat komt in dezelfde goedkeurlijst als de smaakprofielen te staan; Jack of Tino beoordeelt en publiceert. Zo groeit de site mee met wat er binnenkomt.",st:"warn",lbl:"Gepland"},
- {s:"Nieuw en aanbiedingen op de voorpagina",d:"Wens van Jack (25 aug): klanten kijken altijd eerst naar nieuw toegevoegde items en aanbiedingen. Die moeten prominent op de voorpagina staan.",st:"warn",lbl:"Gepland"},
+ {s:"Nieuw en aanbiedingen op de voorpagina",d:"Wens van Jack (25 aug): klanten kijken altijd eerst naar nieuw toegevoegde items en aanbiedingen. Die moeten prominent op de voorpagina staan.",st:"warn",lbl:"Loopt"},
+ {dt:"2026-09-27",s:"Beoordelen en vragen met opslag",d:"Beoordelen en Vragen voor Jack slaan je invoer na inloggen op, op elk apparaat. Je ziet per antwoord wat ermee gebeurt.",st:"ok",lbl:"Afgerond"},
+ {s:"Productfoto's opmaken",d:"Alle productfoto's vrijgemaakt van de achtergrond en op vaste hoogte gezet. Wat de automatische opmaak niet aankan, gaat via de beeldtool en komt daarna direct bij de fles op de site.",st:"warn",lbl:"Loopt"},
  {s:"Bouwomgeving voor de complete site",d:"Aparte afgeschermde omgeving waar de site als geheel wordt opgebouwd met de volledige catalogus, na goedkeuring van de onderdelen hier.",st:"warn",lbl:"Gepland"}
 ];
 var VRAAGLOG=[
@@ -2977,7 +2984,11 @@ function vAdminStart(){
  +'<div class="ov-grid">'
  +'<div class="ov-card echt"><h4>Wacht op jou</h4><div class="ov-wat">Werkt al. Wat je hier doet, gebruiken we direct in de bouw.</div>'
  +'<div class="ov-taak"><a href="#/admin/hiaten">Vragen voor Jack →</a>'+(hg===null?'<p>'+hz.length+' vragen. Log in om je stand te zien en antwoorden op te slaan.</p>':balk(hg,hz.length))+'</div>'
- +'<div class="ov-taak"><a href="#/admin/beoordeel">Beoordelen →</a><p>Per fles: klopt de omschrijving, het smaakprofiel, de herkomst?</p>'+balk(bg,bz.length)+'</div>'
+ +'<div class="ov-taak"><a href="#/admin/beoordeel" onclick="BFILTER=\'open\'">Beoordelen →</a><p>Klopt wat we bij een fles tonen? Begin bij de kleinste stapel.</p>'
+ +[["herkomst","Herkomst van een stokerij"],["turf","Turflabel"],["vat","Vatsoort"],["product","Per fles"]].map(function(so){
+   var t=bz.filter(function(x){return x.k===so[0];}),g=t.filter(function(x){return BSLT[x.id];}).length,p=t.length?Math.round(g/t.length*100):0;
+   return '<a class="ov-soort" href="#/admin/beoordeel" onclick="BFILTER=\''+so[0]+'\'"><span>'+so[1]+'</span><em>'+nl(g)+' / '+nl(t.length)+'</em><i><b style="width:'+Math.max(p,g?3:0)+'%"></b></i></a>';}).join("")
+ +(bz.filter(function(x){return x.k==="vat"||x.k==="turf";}).length?'<p style="margin-top:6px">Vat en turf kun je per stapel in één keer overnemen.</p>':'')+'</div>'
  +'<div class="ov-taak"><a href="#/admin/beeld">Beeldvoorstellen →</a><p>Foto\'s voor de streekpagina\'s goedkeuren of afwijzen.</p></div>'
  +'<div class="ov-taak"><a href="#/admin/beeldtool">Beeldtool →</a><p>Productfoto\'s vrijmaken en op vaste hoogte zetten.</p></div></div>'
  +'<div class="ov-card bouw"><h4>Hoe ver de bouw is</h4><div class="ov-wat">Fase 1 van 2 · '+af+' van '+VOORTGANG.length+' stappen afgerond.</div>'
@@ -3030,7 +3041,7 @@ function vAdmin(rt){
   +'<div class="sync-box"><b>● Stap 1 — testversie in voorbereiding</b><p>Laatst bijgewerkt: '+(wzLijst().length?wzDatum(wzLijst()[wzLijst().length-1].d)+" 2026":"24 aug 2026")+' · Eerst een werkende testversie met de eigen catalogus, daarna pas het besluit over livegang.</p></div>'
   +'<div class="kpis"><div class="kpi"><span>Fase</span><b>1 van 2</b><small>testversie</small></div>'
   +'<div class="kpi"><span>Stappen afgerond</span><b>'+VOORTGANG.filter(v=>v.lbl==="Afgerond").length+' van '+VOORTGANG.length+'</b><small>'+VOORTGANG.filter(v=>v.lbl==="Loopt").length+' lopen nu</small></div>'
-  +'<div class="kpi"><span>Eerste streekpagina</span><b>Campbeltown</b><small>voorstel Jack</small></div>'
+  +'<div class="kpi"><span>Streekpagina\'s</span><b>'+Object.keys(STREEK).length+' van 6</b><small>als concept, wachten op goedkeuring</small></div>'
   +'<div class="kpi"><span>Openstaande vragen</span><b>'+VRAAGLOG.filter(q=>q.st!=="ok").length+'</b><small>zie archief</small></div></div>'
   +'<h3 style="font-size:16px;margin:22px 0 10px">Waar we nu mee bezig zijn</h3>'
   +'<table class="atable"><tr><th>Stap</th><th>Toelichting</th><th>Status</th></tr>'
