@@ -11,7 +11,7 @@
    verlaat de browser niet.
    Gekozen uit de catalogus of de aandachtslijst? Dan heet de download <product-ID>.webp,
    staat het beeld meteen op de site (alleen in deze sessie) en gaat het van de lijst af.
-   40_beelden_inladen.py zet de downloads in beelden/p en werkt het manifest bij. */
+   start-beelden.ps1 -Handmatig <Downloads> (script 39) neemt ze op en publiceert naar de demo. */
 (function(){
 "use strict";
 var BT={KADER:800,DOELHOOGTE:0.92,MAXBREEDTE:0.94,TOL:14,UNIFORM:0.97,WIT:244,RAND:3,MAXBRON:2400,MAXMB:20};
@@ -181,13 +181,13 @@ function naarSite(pid,url){
  var b=document.querySelector('#btAandacht .bt-hit[data-id="'+pid+'"]');if(b)b.classList.add("bt-klaar");
  var n=$("btAantal");if(n)n.textContent=typeof BEELD_AANDACHT!=="undefined"?BEELD_AANDACHT.length:"";
  klaarLijst();
- meld("ok","Opgeslagen als "+pid+".webp en meteen op de productpagina gezet — alleen in deze browsersessie. Voor iedereen: draai 40_beelden_inladen.py en push.");
+ meld("ok","Opgeslagen als "+pid+".webp en meteen op de productpagina gezet — alleen in deze browsersessie. Voor iedereen: draai start-beelden.ps1 -Handmatig en push.");
 }
 function klaarLijst(){
  var e=$("btKlaar");if(!e)return;
  e.style.display=st.klaar.length?"":"none";
  e.innerHTML='<b>Klaar om te pushen: '+st.klaar.length+'</b> '+st.klaar.map(function(id){var p=vindProduct(id);return '<span title="'+esc(p?p.name:id)+'">'+esc(id)+'.webp</span>';}).join(" ")
-  +'<br><small>Staan in je Downloads. Draai <code>40_beelden_inladen.py</code> vanuit de map van de demo; daarna committen en pushen.</small>';
+  +'<br><small>Staan in je Downloads. Draai in DevWhiskysite <code>.\\start-beelden.ps1 -Handmatig "$env:USERPROFILE\\Downloads"</code>; daarna committen en pushen.</small>';
 }
 function zoek(q){
  var box=$("btHits");if(!box)return;q=(q||"").trim().toLowerCase();
