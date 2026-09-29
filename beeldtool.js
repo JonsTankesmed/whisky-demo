@@ -7,16 +7,16 @@
       wit binnen een etiket blijft staan;
    4. kaderen: 800 x 800, fles op 92% van de hoogte (hooguit 94% breed), gecentreerd;
    5. bewaren met doorzichtige achtergrond (WebP, anders PNG).
-   Geen generatieve AI en geen model (besluit F-c). Er wordt niets geüpload: de foto
-   verlaat de browser niet.
-   Gekozen uit de catalogus of de aandachtslijst? Dan heet de download <product-ID>.webp,
-   staat het beeld meteen op de site (alleen in deze sessie) en gaat het van de lijst af.
-   start-beelden.ps1 -Handmatig <Downloads> (script 39) neemt ze op en publiceert naar de demo. */
+   Geen generatieve AI en geen model (besluit F-c). De bewerking gebeurt in de browser.
+   Gekozen uit de catalogus of de aandachtslijst? Dan zet 'Opslaan op de site' de WebP als
+   <product-ID>.webp in Supabase (opslag ws-beelden, tabel ws_beelden). beelden-live.js toont
+   hem daarna bij iedere bezoeker op dat product; geen push nodig. Alleen met login (RLS).
+   Het archiveren in de repo (beelden/p/) doet John apart met haal-beelden.ps1. */
 (function(){
 "use strict";
 var BT={KADER:800,DOELHOOGTE:0.92,MAXBREEDTE:0.94,TOL:14,UNIFORM:0.97,WIT:244,RAND:3,MAXBRON:2400,MAXMB:20};
 var TEGELS=[["grijs","Grijs","#ece8e3"],["wit","Wit","#ffffff"],["creme","Crème","#f7f3ee"],["donker","Donker","#241b16"],["ruit","Ruit",""]];
-var st={img:null,naam:"foto",pid:null,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
+var st={img:null,naam:"foto",pid:null,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function $(id){return document.getElementById(id);}
@@ -126,7 +126,7 @@ function verwerk(){
  if(k.schaal>1.5){niveau="waarschuwing";regels.push("Let op: de bron is klein en is "+k.schaal.toFixed(1)+"× vergroot. Dat kan onscherp ogen.");}
  st.uit=k.canvas;teken();meld(niveau,regels.join(" "));
  var fk=$("btForceer");if(fk){fk.style.display=(ag.soort==="niet-uniform"&&!st.laatStaan&&ag.egaal>=0.75)?"":"none";fk.textContent=st.forceer?"Toch niet uitknippen":"Toch uitknippen";}
- ["btWebp","btPng"].forEach(function(id){var b=$(id);if(b)b.disabled=false;});
+ knoppen();
 }
 
 /* ---------- weergave ---------- */
@@ -143,7 +143,7 @@ function teken(){
 }
 function meld(niveau,tekst){var e=$("btDiag");if(!e)return;e.className="bt-diag bt-"+niveau;e.textContent=tekst;}
 function laad(src,naam,crossOrigin,pid){
- st.uit=null;["btWebp","btPng"].forEach(function(id){var b=$(id);if(b)b.disabled=true;});
+ st.uit=null;st.pid=pid||null;knoppen();
  meld("ok","Foto laden…");
  var img=new Image();if(crossOrigin)img.crossOrigin="anonymous";
  img.onload=function(){st.img=img;st.naam=veiligeNaam(naam);st.pid=pid||null;st.forceer=false;verwerk();};
@@ -162,32 +162,53 @@ function download(type){
  st.uit.toBlob(function(blob){
   if(!blob){meld("fout","Opslaan mislukt in deze browser.");return;}
   var ext=blob.type==="image/webp"?"webp":"png",naam=st.pid?st.pid+"."+ext:st.naam+"-opgemaakt."+ext;
+  if(st.pid&&type==="image/webp"){
+   if(ext!=="webp"){meld("fout","Deze browser kan geen WebP maken. Gebruik Chrome of Edge om de foto op de site te zetten.");return;}
+   naarSite(st.pid,blob);return;}
   var a=document.createElement("a"),u=URL.createObjectURL(blob);a.href=u;a.download=naam;
   document.body.appendChild(a);a.click();a.remove();
-  if(st.pid&&ext==="webp"){naarSite(st.pid,u);return;}
   setTimeout(function(){URL.revokeObjectURL(u);},5000);
   if(type==="image/webp"&&ext!=="webp")meld("waarschuwing","Deze browser kan geen WebP maken; opgeslagen als PNG (ook doorzichtig)."+(st.pid?" De site gebruikt alleen WebP: probeer het in Chrome of Edge.":""));
-  else if(st.pid)meld("waarschuwing","Opgeslagen als "+naam+". De site gebruikt WebP: download WebP om het beeld op de site te zetten.");
+  else if(st.pid)meld("ok","Gedownload als "+naam+" (alleen voor eigen gebruik). Op de site zetten gaat met 'Opslaan op de site'.");
  },type,0.9);
 }
 /* ---------- resultaat meteen op de site (deze sessie) ---------- */
 function vindProduct(id){return typeof CAT!=="undefined"?CAT.filter(function(x){return String(x.id)===String(id);})[0]:null;}
-function naarSite(pid,url){
- var p=vindProduct(pid);
- if(p){var T=window.BEELD_TERUG||(window.BEELD_TERUG={});if(!T[pid]&&!p._opgemaakt)T[pid]=p.img;p.img=url;p._opgemaakt=true;}
- if(typeof BEELDEN!=="undefined")BEELDEN[pid]=1;
- if(typeof BEELD_AANDACHT!=="undefined"&&BEELD_AANDACHT)for(var i=BEELD_AANDACHT.length-1;i>=0;i--)if(String(BEELD_AANDACHT[i].id)===pid)BEELD_AANDACHT.splice(i,1);
- if(st.klaar.indexOf(pid)<0)st.klaar.push(pid);
- var b=document.querySelector('#btAandacht .bt-hit[data-id="'+pid+'"]');if(b)b.classList.add("bt-klaar");
- var n=$("btAantal");if(n)n.textContent=typeof BEELD_AANDACHT!=="undefined"?BEELD_AANDACHT.length:"";
- klaarLijst();
- meld("ok","Opgeslagen als "+pid+".webp en meteen op de productpagina gezet — alleen in deze browsersessie. Voor iedereen: draai start-beelden.ps1 -Handmatig en push.");
+function magOpslaan(){return typeof WS!=="undefined"&&WS.sb&&WS.gebruiker&&!WS.fout;}
+function naarSite(pid,blob){
+ if(!magOpslaan()){meld("fout","Log eerst in (bovenaan dit scherm) om foto's op de site te zetten.");return;}
+ if(st.bezig)return;st.bezig=true;knoppen();
+ meld("ok","Bezig met opslaan…");
+ var sb=WS.sb,pad=pid+".webp";
+ sb.storage.from("ws-beelden").upload(pad,blob,{upsert:true,contentType:"image/webp",cacheControl:"3600"})
+ .then(function(r){if(r.error)throw r.error;
+  return sb.from("ws_beelden").upsert({product_id:pid,versie:new Date().toISOString()},{onConflict:"product_id"}).select("versie").single();})
+ .then(function(r){if(r.error)throw r.error;
+  var versie=Date.parse(r.data.versie)||Date.now();
+  if(typeof beeldLivePasToe==="function")beeldLivePasToe(pid,versie);
+  if(st.klaar.indexOf(pid)<0)st.klaar.push(pid);
+  var b=document.querySelector('#btAandacht .bt-hit[data-id="'+pid+'"]');if(b)b.classList.add("bt-klaar");
+  var n=$("btAantal");if(n)n.textContent=typeof BEELD_AANDACHT!=="undefined"?BEELD_AANDACHT.length:"";
+  klaarLijst();
+  var p=vindProduct(pid);
+  meld("ok","Opgeslagen. De foto staat nu op de productpagina"+(p?" van "+p.name:"")+", voor iedere bezoeker.");
+ })
+ .catch(function(e){
+  var m=String(e&&e.message||e);
+  meld("fout",/row-level|policy|403|Unauthorized/i.test(m)?"Opslaan geweigerd: dit account mag geen foto's op de site zetten.":"Opslaan mislukt. Probeer het opnieuw. ("+m+")");
+ })
+ .then(function(){st.bezig=false;knoppen();});
+}
+function knoppen(){
+ var w=$("btWebp");if(!w)return;
+ w.textContent=st.pid?(st.bezig?"Bezig…":"Opslaan op de site"):"Download WebP";
+ w.disabled=!st.uit||st.bezig;
+ var pn=$("btPng");if(pn)pn.disabled=!st.uit;
 }
 function klaarLijst(){
  var e=$("btKlaar");if(!e)return;
  e.style.display=st.klaar.length?"":"none";
- e.innerHTML='<b>Klaar om te pushen: '+st.klaar.length+'</b> '+st.klaar.map(function(id){var p=vindProduct(id);return '<span title="'+esc(p?p.name:id)+'">'+esc(id)+'.webp</span>';}).join(" ")
-  +'<br><small>Staan in je Downloads. Draai in DevWhiskysite <code>.\\start-beelden.ps1 -Handmatig "$env:USERPROFILE\\Downloads"</code>; daarna committen en pushen.</small>';
+ e.innerHTML='<b>Op de site gezet: '+st.klaar.length+'</b> '+st.klaar.map(function(id){var p=vindProduct(id);return '<span title="'+esc(id)+'">'+esc(p?p.name:id)+'</span>';}).join(" ");
 }
 function zoek(q){
  var box=$("btHits");if(!box)return;q=(q||"").trim().toLowerCase();
@@ -204,7 +225,7 @@ function aandachtHtml(){
  if(typeof BEELDEN==="undefined")return '<p class="bt-leeg" style="margin-top:14px">De automatische opmaak van de catalogus heeft nog niet gedraaid. Zodra dat is gebeurd, staan hier de foto\'s die aandacht nodig hebben.</p>';
  if(!l.length)return '<p class="bt-leeg" style="margin-top:14px">Geen foto\'s op de aandachtslijst: alles wat automatisch is opgemaakt, is gelukt.</p>';
  return '<div class="bt-aandacht"><div class="bt-akop">Aandacht nodig <span id="btAantal">'+l.length+'</span></div>'
-  +'<p class="bt-leeg">Deze foto\'s kon de automatische opmaak niet goed uitknippen. Op de site staat daarom de winkelfoto. Kies er een, maak hem op en download de WebP: die heet dan naar het product-ID, staat meteen op de site en gaat van deze lijst af.</p>'
+  +'<p class="bt-leeg">Deze foto\'s kon de automatische opmaak niet goed uitknippen. Op de site staat daarom de winkelfoto. Kies er een, maak hem op en klik op Opslaan op de site: de foto staat dan meteen op de productpagina en gaat van deze lijst af.</p>'
   +'<div id="btAandacht">'+l.slice(0,60).map(function(x){return '<button type="button" class="bt-hit" data-id="'+esc(x.id)+'"><span>'+esc(x.t)+'<br><small style="color:var(--muted)">'+esc(x.r)+'</small></span></button>';}).join("")
   +(l.length>60?'<p class="bt-leeg">…en nog '+(l.length-60)+'. Zoek hierboven op naam.</p>':'')+'</div></div>';
 }
@@ -227,7 +248,8 @@ var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:2
 window.vBeeldtool=function(){
  return '<style>'+CSS+'</style>'
  +'<h3 style="font-size:20px;margin-bottom:6px">Beeldtool</h3>'
- +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Maakt een productfoto op volgens de regels van de ontdeksite: een egale achtergrond gaat weg, de fles komt gecentreerd op 92% van de hoogte, en het resultaat is doorzichtig zodat elke pagina zijn eigen achtergrond kan kiezen. <b>Alles gebeurt in je eigen browser — er wordt niets geüpload.</b></p>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Maakt een productfoto op volgens de regels van de ontdeksite: een egale achtergrond gaat weg, de fles komt gecentreerd op 92% van de hoogte, en het resultaat is doorzichtig zodat elke pagina zijn eigen achtergrond kan kiezen. Kies je een product uit de catalogus, dan zet <b>Opslaan op de site</b> de foto direct op die productpagina.</p>'
+ +(typeof WS!=="undefined"?(WS.gebruiker?wsStatusRegel(""):wsLoginBlok("foto\'s op de site te zetten")):'')
  +'<div class="bt-grid"><div>'
  +'<label class="bt-drop" id="btDrop"><input type="file" id="btFile" accept="image/png,image/jpeg,image/webp"><b>Sleep een foto hierheen</b><span>of klik om te kiezen · png, jpg of webp, tot '+BT.MAXMB+' MB</span></label>'
  +'<div class="bt-zoek"><input id="btZoek" placeholder="…of zoek een product uit de catalogus" autocomplete="off"><div id="btHits"></div></div>'
@@ -238,7 +260,7 @@ window.vBeeldtool=function(){
  +'<div class="bt-tegels">'+TEGELS.map(function(t){return '<button type="button" data-tegel="'+t[0]+'"'+(t[0]===st.tegel?' class="on"':'')+'>'+t[1]+'</button>';}).join("")+'</div>'
  +'<div class="bt-paar"><figure><figcaption>Nu</figcaption><canvas id="btVoor" width="400" height="400"></canvas></figure><figure><figcaption>Opgemaakt</figcaption><canvas id="btNa" width="400" height="400"></canvas></figure></div>'
  +'<p id="btDiag" class="bt-diag bt-ok">Kies een foto of een product om te beginnen.</p>'
- +'<div class="bt-knoppen"><button type="button" class="btn btn-s" id="btForceer" style="display:none">Toch uitknippen</button><button type="button" class="btn btn-a btn-s" id="btWebp" disabled>Download WebP</button><button type="button" class="btn btn-s" id="btPng" disabled>Download PNG</button></div>'
+ +'<div class="bt-knoppen"><button type="button" class="btn btn-s" id="btForceer" style="display:none">Toch uitknippen</button><button type="button" class="btn btn-a btn-s" id="btWebp" disabled>Opslaan op de site</button><button type="button" class="btn btn-s" id="btPng" disabled>Download PNG</button></div>'
  +'<div id="btKlaar" class="bt-klaar-lijst" style="display:none"></div>'
  +'</div></div>';
 };
@@ -265,7 +287,7 @@ window.btInit=function(){
  $("btForceer").addEventListener("click",function(){st.forceer=!st.forceer;verwerk();});
  $("btWebp").addEventListener("click",function(){download("image/webp");});
  $("btPng").addEventListener("click",function(){download("image/png");});
- teken();klaarLijst();
+ teken();klaarLijst();knoppen();
  st.klaar.forEach(function(id){var b=document.querySelector('#btAandacht .bt-hit[data-id="'+id+'"]');if(b)b.classList.add("bt-klaar");});
 };
 /* voor tests */
