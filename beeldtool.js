@@ -16,7 +16,7 @@
 "use strict";
 var BT={KADER:800,DOELHOOGTE:0.92,MAXBREEDTE:0.94,TOL:14,UNIFORM:0.97,WIT:244,RAND:3,MAXBRON:2400,MAXMB:20};
 var TEGELS=[["grijs","Grijs","#ece8e3"],["wit","Wit","#ffffff"],["creme","Crème","#f7f3ee"],["donker","Donker","#241b16"],["ruit","Ruit",""]];
-var st={img:null,naam:"foto",pid:null,kies:null,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
+var st={img:null,naam:"foto",pid:null,kies:null,vakken:[],dicht:true,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function $(id){return document.getElementById(id);}
@@ -54,11 +54,11 @@ function achtergrond(d,w,h,tol){
 }
 /* Egale achtergrond weg, alleen wat vanaf de rand bereikbaar is. Al doorzichtige pixels zijn
    begaanbaar. Daarna één ring zachte overgang, zodat er op donker geen witte rand blijft. */
-function witWeg(c,k,tol){
+function witWeg(c,k,tol,bes){
  var w=c.width,h=c.height,x=c.getContext("2d",{willReadFrequently:true}),d=x.getImageData(0,0,w,h),a=d.data,n=w*h;
  var gelijk=new Uint8Array(n),weg=new Uint8Array(n),stapel=new Int32Array(n),sp=0,i,j,p,px,py;
  function afst(j){return Math.max(Math.abs(a[j]-k[0]),Math.abs(a[j+1]-k[1]),Math.abs(a[j+2]-k[2]));}
- for(i=0;i<n;i++){j=i*4;if(a[j+3]<=16||afst(j)<=tol)gelijk[i]=1;}
+ for(i=0;i<n;i++){j=i*4;if((a[j+3]<=16||afst(j)<=tol)&&!(bes&&bes[i]))gelijk[i]=1;}
  function zaai(i){if(gelijk[i]&&!weg[i]){weg[i]=1;stapel[sp++]=i;}}
  for(px=0;px<w;px++){zaai(px);zaai((h-1)*w+px);}
  for(py=0;py<h;py++){zaai(py*w);zaai(py*w+w-1);}
@@ -78,15 +78,15 @@ function witWeg(c,k,tol){
    pixel: een buur doet mee als hij bijna gelijk is aan de pixel waar hij aan grenst
    (stap), en niet te ver afwijkt van de randkleur (plafond). Een productrand is een sprong
    en houdt de groei tegen. Alleen op uitdrukkelijke keuze van de gebruiker. */
-function verloopWeg(c,k,tol){
+function verloopWeg(c,k,tol,bes){
  var w=c.width,h=c.height,x=c.getContext("2d",{willReadFrequently:true}),d=x.getImageData(0,0,w,h),a=d.data,n=w*h;
  var stap=Math.max(3,Math.round(tol/3)),plafond=tol*4,weg=new Uint8Array(n),stapel=new Int32Array(n),sp=0,p,px,py;
  function ver(i,j){i*=4;j*=4;return Math.max(Math.abs(a[i]-a[j]),Math.abs(a[i+1]-a[j+1]),Math.abs(a[i+2]-a[j+2]));}
- function bg(i){i*=4;return a[i+3]<=16||Math.max(Math.abs(a[i]-k[0]),Math.abs(a[i+1]-k[1]),Math.abs(a[i+2]-k[2]))<=plafond;}
+ function bg(i){if(bes&&bes[i])return false;i*=4;return a[i+3]<=16||Math.max(Math.abs(a[i]-k[0]),Math.abs(a[i+1]-k[1]),Math.abs(a[i+2]-k[2]))<=plafond;}
  /* Zaaien alleen op randpixels die echt de achtergrondkleur hebben (binnen de tolerantie).
     Een fles of doos die tegen de rand van de foto staat, wordt zo niet als achtergrond
     meegenomen; de groei daarna stopt bij elke sprong groter dan 'stap'. */
- function kern(i){i*=4;return a[i+3]<=16||Math.max(Math.abs(a[i]-k[0]),Math.abs(a[i+1]-k[1]),Math.abs(a[i+2]-k[2]))<=tol;}
+ function kern(i){if(bes&&bes[i])return false;i*=4;return a[i+3]<=16||Math.max(Math.abs(a[i]-k[0]),Math.abs(a[i+1]-k[1]),Math.abs(a[i+2]-k[2]))<=tol;}
  function zaai(i){if(!weg[i]&&kern(i)){weg[i]=1;stapel[sp++]=i;}}
  function groei(q,i){if(!weg[i]&&bg(i)&&(a[i*4+3]<=16||ver(q,i)<=stap)){weg[i]=1;stapel[sp++]=i;}}
  for(px=0;px<w;px++){zaai(px);zaai((h-1)*w+px);}
@@ -95,6 +95,33 @@ function verloopWeg(c,k,tol){
   if(px>0)groei(p,p-1);if(px<w-1)groei(p,p+1);if(py>0)groei(p,p-w);if(py<h-1)groei(p,p+w);}
  var tel=0;for(var i=0;i<n;i++)if(weg[i]){a[i*4+3]=0;tel++;}
  x.putImageData(d,0,0);return tel/n;
+}
+/* Vakken die de gebruiker om een doos trekt: binnen een vak wordt niets weggehaald.
+   Vakken staan in fracties van de hele foto; hier omgerekend naar de uitsnede. */
+function beschermMasker(w,h,v,cw,ch){
+ if(!st.vakken.length)return null;
+ var m=new Uint8Array(w*h),t=0;
+ st.vakken.forEach(function(r){
+  var x0=Math.max(0,Math.round(r.x0*cw)-v.x0),x1=Math.min(w-1,Math.round(r.x1*cw)-v.x0),
+      y0=Math.max(0,Math.round(r.y0*ch)-v.y0),y1=Math.min(h-1,Math.round(r.y1*ch)-v.y0);
+  for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++){m[y*w+x]=1;t++;}});
+ return t?m:null;
+}
+/* Een witte doos op een witte achtergrond wordt via een zwakke rand soms 'leeggelopen':
+   het witte vlak verdwijnt, de opdruk blijft zweven. Zulke weggehaalde pixels liggen dan
+   ingesloten in het product: links én rechts in dezelfde rij, en boven én onder in dezelfde
+   kolom staat nog product. Die zetten we terug naar het origineel. De ruimte tussen twee
+   losse voorwerpen (fles en doos) is niet ingesloten en blijft doorzichtig. */
+function gatenDicht(c,orig){
+ var w=c.width,h=c.height,x=c.getContext("2d",{willReadFrequently:true}),d=x.getImageData(0,0,w,h),a=d.data,o=orig.data,n=w*h,i,px,py;
+ var rl=new Int32Array(h).fill(w),rr=new Int32Array(h).fill(-1),kb=new Int32Array(w).fill(h),ko=new Int32Array(w).fill(-1),dek=0;
+ for(py=0;py<h;py++)for(px=0;px<w;px++){if(a[(py*w+px)*4+3]>128){dek++;
+  if(px<rl[py])rl[py]=px;if(px>rr[py])rr[py]=px;if(py<kb[px])kb[px]=py;if(py>ko[px])ko[px]=py;}}
+ var terug=0;
+ for(py=0;py<h;py++)for(px=0;px<w;px++){i=(py*w+px)*4;
+  if(a[i+3]<=128&&o[i+3]>16&&px>rl[py]&&px<rr[py]&&py>kb[px]&&py<ko[px]){a[i]=o[i];a[i+1]=o[i+1];a[i+2]=o[i+2];a[i+3]=o[i+3];terug++;}}
+ if(terug)x.putImageData(d,0,0);
+ return dek?terug/dek:0;
 }
 function kaderen(c){
  var x=c.getContext("2d",{willReadFrequently:true}),v=vak(x.getImageData(0,0,c.width,c.height),c.width,c.height,16);
@@ -117,15 +144,19 @@ function verwerk(){
  var v=vak(d,c.width,c.height,16);if(!v){meld("fout","De foto is helemaal doorzichtig — er staat niets op.");return;}
  var kern=uitsnede(c,v),kd=kern.getContext("2d",{willReadFrequently:true}).getImageData(0,0,kern.width,kern.height);
  var ag=achtergrond(kd,kern.width,kern.height,st.tol),regels=[],niveau="ok";
+ var bes=beschermMasker(kern.width,kern.height,v,c.width,c.height),geknipt=false;
  if(ag.soort==="transparant")regels.push("Achtergrond is al doorzichtig — niets weggehaald.");
  else if(st.laatStaan)regels.push("Achtergrond bewust laten staan ("+ag.soort+").");
  else if(ag.soort==="niet-uniform"&&!st.forceer){niveau="waarschuwing";
   regels.push("Achtergrond is niet egaal ("+Math.round(ag.egaal*100)+"% van de rand is gelijk). Die wordt niet automatisch weggehaald: raden hoort niet bij de regels."
    +(ag.egaal>=0.75?" Gaat het om een licht verloop of een schaduw, kies dan zelf voor 'Toch uitknippen'."
      :" Raken de fles of de doos de rand van de foto? Dan kan uitknippen toch goed gaan: kies 'Toch uitknippen' en controleer het resultaat op de donkere tegel."));}
- else if(ag.soort==="niet-uniform"){niveau="waarschuwing";var deelF=verloopWeg(kern,ag.kleur,st.tol);
+ else if(ag.soort==="niet-uniform"){niveau="waarschuwing";var deelF=verloopWeg(kern,ag.kleur,st.tol,bes);geknipt=true;
   regels.push("Op jouw keuze uitgeknipt, hoewel de achtergrond niet egaal is — "+Math.round(deelF*100)+"% doorzichtig gemaakt. Controleer de randen op de donkere tegel; zo nodig de tolerantie bijstellen.");}
- else{var deel=witWeg(kern,ag.kleur,st.tol);regels.push("Achtergrond "+(ag.soort==="wit"?"wit":"egaal gekleurd")+" ("+Math.round(ag.egaal*100)+"% van de rand gelijk) — "+Math.round(deel*100)+"% van het beeld doorzichtig gemaakt.");}
+ else{var deel=witWeg(kern,ag.kleur,st.tol,bes);geknipt=true;regels.push("Achtergrond "+(ag.soort==="wit"?"wit":"egaal gekleurd")+" ("+Math.round(ag.egaal*100)+"% van de rand gelijk) — "+Math.round(deel*100)+"% van het beeld doorzichtig gemaakt.");}
+ if(bes)regels.push(st.vakken.length+(st.vakken.length===1?" beschermd vak":" beschermde vakken")+": daarbinnen is niets weggehaald.");
+ if(geknipt&&st.dicht){var dt=gatenDicht(kern,kd);
+  if(dt>0.005)regels.push("Ingesloten gaten in het product teruggezet ("+Math.round(dt*100)+"% van het product), zodat een witte doos heel blijft. Klopt dat niet, zet dan 'Gaten dichten' uit.");}
  var k=kaderen(kern);if(!k){meld("fout","Na het uitknippen bleef er niets over. Verlaag de tolerantie.");return;}
  regels.push("Gekaderd op "+BT.KADER+" × "+BT.KADER+", fles op "+Math.round(k.hoogte*100)+"% van de hoogte.");
  if(k.schaal>1.5){niveau="waarschuwing";regels.push("Let op: de bron is klein en is "+k.schaal.toFixed(1)+"× vergroot. Dat kan onscherp ogen.");}
@@ -143,12 +174,15 @@ function teken(){
  var voor=$("btVoor"),na=$("btNa");if(!voor||!na)return;
  [voor,na].forEach(tegelStijl);
  if(st.img){var s=naarCanvas(st.img),f=Math.min(1,400/Math.max(s.width,s.height));
-  voor.width=Math.round(s.width*f);voor.height=Math.round(s.height*f);voor.getContext("2d").drawImage(s,0,0,voor.width,voor.height);}
+  voor.width=Math.round(s.width*f);voor.height=Math.round(s.height*f);var vx=voor.getContext("2d");vx.drawImage(s,0,0,voor.width,voor.height);
+  st.vakken.concat(st.trek?[st.trek]:[]).forEach(function(r){vx.save();vx.strokeStyle="#c9963f";vx.lineWidth=2;vx.setLineDash([6,4]);
+   vx.fillStyle="rgba(201,150,63,.12)";vx.fillRect(r.x0*voor.width,r.y0*voor.height,(r.x1-r.x0)*voor.width,(r.y1-r.y0)*voor.height);
+   vx.strokeRect(r.x0*voor.width,r.y0*voor.height,(r.x1-r.x0)*voor.width,(r.y1-r.y0)*voor.height);vx.restore();});}
  if(st.uit){na.width=400;na.height=400;var nx=na.getContext("2d");nx.clearRect(0,0,400,400);nx.imageSmoothingQuality="high";nx.drawImage(st.uit,0,0,400,400);}
 }
 function meld(niveau,tekst){var e=$("btDiag");if(!e)return;e.className="bt-diag bt-"+niveau;e.textContent=tekst;}
 function wis(){
- st.img=null;st.uit=null;st.pid=null;st.forceer=false;
+ st.img=null;st.uit=null;st.pid=null;st.forceer=false;st.vakken=[];st.trek=null;var vw=$("btVakWis");if(vw)vw.style.display="none";
  ["btVoor","btNa"].forEach(function(id){var c=$(id);if(c){c.getContext("2d").clearRect(0,0,c.width,c.height);}});
  var fk=$("btForceer");if(fk)fk.style.display="none";
  knoppen();
@@ -265,7 +299,7 @@ var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:2
 +'.bt-inst{margin-top:16px;font-size:12.5px}.bt-inst label{display:block;margin-top:10px}'
 +'.bt-tegels{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.bt-tegels button{font:inherit;font-size:12px;padding:6px 11px;border:1px solid var(--line);border-radius:20px;background:transparent;color:var(--text);cursor:pointer}.bt-tegels button.on{border-color:var(--amber);color:var(--amber);font-weight:600}'
 +'.bt-paar{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bt-paar figure{margin:0}.bt-paar figcaption{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}'
-+'.bt-paar canvas{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block}'
++'.bt-paar canvas{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block}#btVoor{cursor:crosshair;touch-action:none}'
 +'.bt-diag{font-size:12.5px;margin:12px 0;padding:10px 12px;border-radius:9px;background:var(--card);border:1px solid var(--line)}.bt-waarschuwing{border-color:#c9963f}.bt-fout{border-color:#8a1c26;color:#8a1c26}'
 +'.bt-knoppen{display:flex;gap:8px;flex-wrap:wrap}.bt-leeg{font-size:12px;color:var(--muted);padding:6px}'
 +'.bt-hit.bt-klaar{opacity:.45;text-decoration:line-through}.bt-klaar-lijst{margin-top:12px;font-size:12px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card)}.bt-klaar-lijst span{display:inline-block;margin:3px 4px 0 0;padding:1px 7px;border-radius:9px;border:1px solid var(--line);font-size:11px}.bt-klaar-lijst small{color:var(--muted)}'
@@ -281,7 +315,10 @@ window.vBeeldtool=function(){
  +'<div class="bt-zoek"><input id="btZoek" placeholder="…of zoek een product uit de catalogus" autocomplete="off"><div id="btHits"></div></div>'
  +aandachtHtml()
  +'<div class="bt-inst"><label>Tolerantie achtergrond: <b id="btTolW">'+st.tol+'</b><input type="range" id="btTol" min="4" max="40" value="'+st.tol+'"></label>'
- +'<label><input type="checkbox" id="btLaat"'+(st.laatStaan?" checked":"")+'> Achtergrond laten staan (alleen kaderen)</label></div>'
+ +'<label><input type="checkbox" id="btLaat"'+(st.laatStaan?" checked":"")+'> Achtergrond laten staan (alleen kaderen)</label>'
+ +'<label><input type="checkbox" id="btDicht"'+(st.dicht?" checked":"")+'> Gaten dichten (houdt een witte doos heel)</label>'
+ +'<p class="bt-leeg" style="margin-top:10px">Doos toch aangevreten? Trek in <b>Nu</b> met de muis een vak om de doos: binnen dat vak wordt niets weggehaald. '
+ +'<button type="button" class="btn btn-s" id="btVakWis" style="display:none;margin-top:6px">Vakken wissen</button></p></div>'
  +'</div><div>'
  +'<div class="bt-tegels">'+TEGELS.map(function(t){return '<button type="button" data-tegel="'+t[0]+'"'+(t[0]===st.tegel?' class="on"':'')+'>'+t[1]+'</button>';}).join("")+'</div>'
  +'<div class="bt-paar"><figure><figcaption>Nu</figcaption><canvas id="btVoor" width="400" height="400"></canvas></figure><figure><figcaption>Opgemaakt</figcaption><canvas id="btNa" width="400" height="400"></canvas></figure></div>'
@@ -308,6 +345,18 @@ window.btInit=function(){
  var al=$("btAandacht");if(al)al.addEventListener("click",kies);
  $("btTol").addEventListener("input",function(e){st.tol=+e.target.value;$("btTolW").textContent=st.tol;verwerk();});
  $("btLaat").addEventListener("change",function(e){st.laatStaan=e.target.checked;verwerk();});
+ $("btDicht").addEventListener("change",function(e){st.dicht=e.target.checked;verwerk();});
+ $("btVakWis").addEventListener("click",function(){st.vakken=[];this.style.display="none";teken();verwerk();});
+ /* vak trekken op de Nu-tegel; de tegel toont de foto met object-fit:contain */
+ var voor=$("btVoor"),begin=null;
+ function punt(e){var r=voor.getBoundingClientRect(),sc=Math.min(r.width/voor.width,r.height/voor.height),
+   ox=(r.width-voor.width*sc)/2,oy=(r.height-voor.height*sc)/2;
+  return {x:Math.min(1,Math.max(0,(e.clientX-r.left-ox)/sc/voor.width)),y:Math.min(1,Math.max(0,(e.clientY-r.top-oy)/sc/voor.height))};}
+ voor.addEventListener("pointerdown",function(e){if(!st.img)return;begin=punt(e);voor.setPointerCapture(e.pointerId);});
+ voor.addEventListener("pointermove",function(e){if(!begin)return;var q=punt(e);
+  st.trek={x0:Math.min(begin.x,q.x),y0:Math.min(begin.y,q.y),x1:Math.max(begin.x,q.x),y1:Math.max(begin.y,q.y)};teken();});
+ voor.addEventListener("pointerup",function(){if(!begin)return;begin=null;var r=st.trek;st.trek=null;
+  if(r&&(r.x1-r.x0)>0.02&&(r.y1-r.y0)>0.02){st.vakken.push(r);$("btVakWis").style.display="";}teken();verwerk();});
  document.querySelectorAll(".bt-tegels button").forEach(function(b){b.addEventListener("click",function(){
   st.tegel=b.getAttribute("data-tegel");document.querySelectorAll(".bt-tegels button").forEach(function(x){x.classList.toggle("on",x===b);});teken();});});
  $("btForceer").addEventListener("click",function(){st.forceer=!st.forceer;verwerk();});
