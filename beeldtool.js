@@ -16,7 +16,7 @@
 "use strict";
 var BT={KADER:800,DOELHOOGTE:0.92,MAXBREEDTE:0.94,TOL:14,UNIFORM:0.97,WIT:244,RAND:3,MAXBRON:2400,MAXMB:20};
 var TEGELS=[["grijs","Grijs","#ece8e3"],["wit","Wit","#ffffff"],["creme","Crème","#f7f3ee"],["donker","Donker","#241b16"],["ruit","Ruit",""]];
-var st={img:null,naam:"foto",pid:null,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
+var st={img:null,naam:"foto",pid:null,kies:null,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function $(id){return document.getElementById(id);}
@@ -83,7 +83,11 @@ function verloopWeg(c,k,tol){
  var stap=Math.max(3,Math.round(tol/3)),plafond=tol*4,weg=new Uint8Array(n),stapel=new Int32Array(n),sp=0,p,px,py;
  function ver(i,j){i*=4;j*=4;return Math.max(Math.abs(a[i]-a[j]),Math.abs(a[i+1]-a[j+1]),Math.abs(a[i+2]-a[j+2]));}
  function bg(i){i*=4;return a[i+3]<=16||Math.max(Math.abs(a[i]-k[0]),Math.abs(a[i+1]-k[1]),Math.abs(a[i+2]-k[2]))<=plafond;}
- function zaai(i){if(!weg[i]&&bg(i)){weg[i]=1;stapel[sp++]=i;}}
+ /* Zaaien alleen op randpixels die echt de achtergrondkleur hebben (binnen de tolerantie).
+    Een fles of doos die tegen de rand van de foto staat, wordt zo niet als achtergrond
+    meegenomen; de groei daarna stopt bij elke sprong groter dan 'stap'. */
+ function kern(i){i*=4;return a[i+3]<=16||Math.max(Math.abs(a[i]-k[0]),Math.abs(a[i+1]-k[1]),Math.abs(a[i+2]-k[2]))<=tol;}
+ function zaai(i){if(!weg[i]&&kern(i)){weg[i]=1;stapel[sp++]=i;}}
  function groei(q,i){if(!weg[i]&&bg(i)&&(a[i*4+3]<=16||ver(q,i)<=stap)){weg[i]=1;stapel[sp++]=i;}}
  for(px=0;px<w;px++){zaai(px);zaai((h-1)*w+px);}
  for(py=0;py<h;py++){zaai(py*w);zaai(py*w+w-1);}
@@ -117,7 +121,8 @@ function verwerk(){
  else if(st.laatStaan)regels.push("Achtergrond bewust laten staan ("+ag.soort+").");
  else if(ag.soort==="niet-uniform"&&!st.forceer){niveau="waarschuwing";
   regels.push("Achtergrond is niet egaal ("+Math.round(ag.egaal*100)+"% van de rand is gelijk). Die wordt niet automatisch weggehaald: raden hoort niet bij de regels."
-   +(ag.egaal>=0.75?" Gaat het om een licht verloop of een schaduw, kies dan zelf voor uitknippen.":" Kies liever een foto met een egale achtergrond."));}
+   +(ag.egaal>=0.75?" Gaat het om een licht verloop of een schaduw, kies dan zelf voor 'Toch uitknippen'."
+     :" Raken de fles of de doos de rand van de foto? Dan kan uitknippen toch goed gaan: kies 'Toch uitknippen' en controleer het resultaat op de donkere tegel."));}
  else if(ag.soort==="niet-uniform"){niveau="waarschuwing";var deelF=verloopWeg(kern,ag.kleur,st.tol);
   regels.push("Op jouw keuze uitgeknipt, hoewel de achtergrond niet egaal is — "+Math.round(deelF*100)+"% doorzichtig gemaakt. Controleer de randen op de donkere tegel; zo nodig de tolerantie bijstellen.");}
  else{var deel=witWeg(kern,ag.kleur,st.tol);regels.push("Achtergrond "+(ag.soort==="wit"?"wit":"egaal gekleurd")+" ("+Math.round(ag.egaal*100)+"% van de rand gelijk) — "+Math.round(deel*100)+"% van het beeld doorzichtig gemaakt.");}
@@ -125,7 +130,7 @@ function verwerk(){
  regels.push("Gekaderd op "+BT.KADER+" × "+BT.KADER+", fles op "+Math.round(k.hoogte*100)+"% van de hoogte.");
  if(k.schaal>1.5){niveau="waarschuwing";regels.push("Let op: de bron is klein en is "+k.schaal.toFixed(1)+"× vergroot. Dat kan onscherp ogen.");}
  st.uit=k.canvas;teken();meld(niveau,regels.join(" "));
- var fk=$("btForceer");if(fk){fk.style.display=(ag.soort==="niet-uniform"&&!st.laatStaan&&ag.egaal>=0.75)?"":"none";fk.textContent=st.forceer?"Toch niet uitknippen":"Toch uitknippen";}
+ var fk=$("btForceer");if(fk){fk.style.display=(ag.soort==="niet-uniform"&&!st.laatStaan)?"":"none";fk.textContent=st.forceer?"Toch niet uitknippen":"Toch uitknippen";}
  knoppen();
 }
 
@@ -142,19 +147,40 @@ function teken(){
  if(st.uit){na.width=400;na.height=400;var nx=na.getContext("2d");nx.clearRect(0,0,400,400);nx.imageSmoothingQuality="high";nx.drawImage(st.uit,0,0,400,400);}
 }
 function meld(niveau,tekst){var e=$("btDiag");if(!e)return;e.className="bt-diag bt-"+niveau;e.textContent=tekst;}
-function laad(src,naam,crossOrigin,pid){
- st.uit=null;st.pid=pid||null;knoppen();
+function wis(){
+ st.img=null;st.uit=null;st.pid=null;st.forceer=false;
+ ["btVoor","btNa"].forEach(function(id){var c=$(id);if(c){c.getContext("2d").clearRect(0,0,c.width,c.height);}});
+ var fk=$("btForceer");if(fk)fk.style.display="none";
+ knoppen();
+}
+function laad(src,naam,crossOrigin,pid,poging){
+ /* De vorige foto gaat eerst helemaal weg: anders kan een mislukte laadpoging een oud
+    resultaat onder het ID van de nieuwe fles laten opslaan. Het ID hoort pas bij de foto
+    als die echt geladen is. */
+ wis();
  meld("ok","Foto laden…");
  var img=new Image();if(crossOrigin)img.crossOrigin="anonymous";
- img.onload=function(){st.img=img;st.naam=veiligeNaam(naam);st.pid=pid||null;st.forceer=false;verwerk();};
- img.onerror=function(){meld("fout",crossOrigin?"Deze foto kon niet worden opgehaald voor bewerking (de winkel-CDN staat het niet toe). Open de foto, sla hem op en sleep hem hierheen.":"Dit bestand is geen leesbare afbeelding.");};
+ img.onload=function(){st.img=img;st.naam=veiligeNaam(naam);st.pid=pid||null;verwerk();};
+ img.onerror=function(){
+  if(!crossOrigin){meld("fout","Dit bestand is geen leesbare afbeelding.");return;}
+  if(!poging){laad(src+(src.indexOf("?")<0?"?":"&")+"bt=1",naam,true,pid,1);return;} /* browsercache zonder CORS-kop omzeilen */
+  var kaal=new Image();                                                             /* bestaat de foto wel? */
+  kaal.onload=function(){meld("fout","De webwinkel geeft deze foto niet vrij voor bewerking. Open de foto in de webwinkel, sla hem op en sleep hem hierheen"+bijWie()+".");};
+  kaal.onerror=function(){meld("fout","Deze fles heeft geen werkende foto in de webwinkel: de link geeft een foutmelding. Zoek of maak een eigen foto en sleep die hierheen"+bijWie()+".");};
+  kaal.src=src.replace(/[?&]bt=1$/,"");
+ };
  img.src=src;
+}
+function bijWie(){var p=st.kies&&vindProduct(st.kies);return p?"; hij wordt dan opgeslagen bij "+p.name:"";}
+function bijLabel(){
+ var e=$("btBij");if(!e)return;var p=st.kies&&vindProduct(st.kies);
+ e.innerHTML=p?"Wordt opgeslagen bij: <b>"+esc(p.name)+"</b>":"";e.style.display=p?"block":"none";
 }
 function bestand(f){
  if(!f)return;
  if(!/^image\/(png|jpeg|webp)$/.test(f.type)){meld("fout","Alleen png, jpg of webp.");return;}
  if(f.size>BT.MAXMB*1048576){meld("fout","Dit bestand is groter dan "+BT.MAXMB+" MB.");return;}
- var m=/^(\d{5,})(?:-opgemaakt)?\.[a-z]+$/i.exec(f.name),pid=m&&vindProduct(m[1])?m[1]:null;
+ var m=/^(\d{5,})(?:-opgemaakt)?\.[a-z]+$/i.exec(f.name),pid=m&&vindProduct(m[1])?m[1]:(st.kies||null);
  var url=URL.createObjectURL(f);laad(url,f.name,false,pid);setTimeout(function(){URL.revokeObjectURL(url);},60000);
 }
 function download(type){
@@ -251,7 +277,7 @@ window.vBeeldtool=function(){
  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Maakt een productfoto op volgens de regels van de ontdeksite: een egale achtergrond gaat weg, de fles komt gecentreerd op 92% van de hoogte, en het resultaat is doorzichtig zodat elke pagina zijn eigen achtergrond kan kiezen. Kies je een product uit de catalogus, dan zet <b>Opslaan op de site</b> de foto direct op die productpagina.</p>'
  +(typeof WS!=="undefined"?(WS.gebruiker?wsStatusRegel(""):wsLoginBlok("foto\'s op de site te zetten")):'')
  +'<div class="bt-grid"><div>'
- +'<label class="bt-drop" id="btDrop"><input type="file" id="btFile" accept="image/png,image/jpeg,image/webp"><b>Sleep een foto hierheen</b><span>of klik om te kiezen · png, jpg of webp, tot '+BT.MAXMB+' MB</span></label>'
+ +'<label class="bt-drop" id="btDrop"><input type="file" id="btFile" accept="image/png,image/jpeg,image/webp"><b>Sleep een foto hierheen</b><span>of klik om te kiezen · png, jpg of webp, tot '+BT.MAXMB+' MB</span><span id="btBij" style="display:none;margin-top:8px;color:var(--text)"></span></label>'
  +'<div class="bt-zoek"><input id="btZoek" placeholder="…of zoek een product uit de catalogus" autocomplete="off"><div id="btHits"></div></div>'
  +aandachtHtml()
  +'<div class="bt-inst"><label>Tolerantie achtergrond: <b id="btTolW">'+st.tol+'</b><input type="range" id="btTol" min="4" max="40" value="'+st.tol+'"></label>'
@@ -270,11 +296,11 @@ window.btInit=function(){
  ["dragenter","dragover"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add("over");});});
  ["dragleave","drop"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove("over");});});
  drop.addEventListener("drop",function(e){bestand(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]);});
- $("btZoek").addEventListener("input",function(e){zoek(e.target.value);});
+ $("btZoek").addEventListener("input",function(e){st.kies=null;bijLabel();zoek(e.target.value);});
  function kies(e){
   var b=e.target.closest(".bt-hit");if(!b)return;
   var p=CAT.filter(function(x){return String(x.id)===b.getAttribute("data-id");})[0];if(!p)return;
-  $("btHits").innerHTML="";$("btZoek").value=p.name;
+  $("btHits").innerHTML="";$("btZoek").value=p.name;st.kies=String(p.id);bijLabel();
   /* altijd de winkelfoto als bron, nooit een eerder opgemaakt beeld */
   var T=window.BEELD_TERUG||{},bron=(p._opgemaakt&&(T[String(p.id)]||T[String(p.img).replace(/^.*\/|\.webp$/g,"")]))||p.img;
   laad(bron,String(p.id),!/^blob:/.test(bron),String(p.id));}
