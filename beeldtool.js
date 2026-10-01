@@ -248,7 +248,7 @@ function naarSite(pid,blob){
   if(typeof beeldLivePasToe==="function")beeldLivePasToe(pid,versie);
   if(st.klaar.indexOf(pid)<0)st.klaar.push(pid);
   var b=document.querySelector('#btAandacht .bt-hit[data-id="'+pid+'"]');if(b)b.classList.add("bt-klaar");
-  var n=$("btAantal");if(n)n.textContent=typeof BEELD_AANDACHT!=="undefined"?BEELD_AANDACHT.length:"";
+  var n=$("btAantal");if(n)n.textContent=aandachtLijst().length;
   klaarLijst();
   var p=vindProduct(pid);
   meld("ok","Opgeslagen. De foto staat nu op de productpagina"+(p?" van "+p.name:"")+", voor iedere bezoeker.");
@@ -279,15 +279,24 @@ function zoek(q){
 }
 
 /* ---------- aandachtslijst: wat de automatische opmaak niet aankon ---------- */
-function aandachtLijst(){return (typeof BEELD_AANDACHT!=="undefined"&&BEELD_AANDACHT)||[];}
+/* 'bron ontbreekt' = de winkelfoto bestaat niet meer. Controle 01-10 (steekproef 60 van 364):
+   in alle gevallen bestaat het product zelf ook niet meer in de webwinkel (404). Daar valt in
+   de beeldtool niets te doen; die flessen staan apart, ingeklapt, buiten de werklijst. */
+function wegUitWinkel(x){return /bron ontbreekt/i.test(x.r||"");}
+function aandachtAlles(){return (typeof BEELD_AANDACHT!=="undefined"&&BEELD_AANDACHT)||[];}
+function aandachtLijst(){return aandachtAlles().filter(function(x){return !wegUitWinkel(x);});}
+function knop(x){return '<button type="button" class="bt-hit" data-id="'+esc(x.id)+'"><span>'+esc(x.t)+'<br><small style="color:var(--muted)">'+esc(x.r)+'</small></span></button>';}
 function aandachtHtml(){
- var l=aandachtLijst();
+ var l=aandachtLijst(),weg=aandachtAlles().filter(wegUitWinkel);
  if(typeof BEELDEN==="undefined")return '<p class="bt-leeg" style="margin-top:14px">De automatische opmaak van de catalogus heeft nog niet gedraaid. Zodra dat is gebeurd, staan hier de foto\'s die aandacht nodig hebben.</p>';
- if(!l.length)return '<p class="bt-leeg" style="margin-top:14px">Geen foto\'s op de aandachtslijst: alles wat automatisch is opgemaakt, is gelukt.</p>';
+ var wegHtml=weg.length?'<details class="bt-weg"><summary>'+weg.length+' flessen staan niet meer in de webwinkel</summary>'
+  +'<p class="bt-leeg">Product en foto zijn sinds de export van 13-09 uit de webwinkel verdwenen. Hier is niets op te maken; ze verdwijnen bij de volgende catalogusverversing ook van de demo. Heb je toch een eigen foto, kies de fles dan hier en sleep de foto naar het vak bovenaan.</p>'
+  +'<div id="btWeg">'+weg.slice(0,40).map(knop).join("")+(weg.length>40?'<p class="bt-leeg">…en nog '+(weg.length-40)+'.</p>':'')+'</div></details>':'';
+ if(!l.length)return '<p class="bt-leeg" style="margin-top:14px">Geen foto\'s op de aandachtslijst: alles wat automatisch is opgemaakt, is gelukt.</p>'+wegHtml;
  return '<div class="bt-aandacht"><div class="bt-akop">Aandacht nodig <span id="btAantal">'+l.length+'</span></div>'
   +'<p class="bt-leeg">Deze foto\'s kon de automatische opmaak niet goed uitknippen. Op de site staat daarom de winkelfoto. Kies er een, maak hem op en klik op Opslaan op de site: de foto staat dan meteen op de productpagina en gaat van deze lijst af.</p>'
-  +'<div id="btAandacht">'+l.slice(0,60).map(function(x){return '<button type="button" class="bt-hit" data-id="'+esc(x.id)+'"><span>'+esc(x.t)+'<br><small style="color:var(--muted)">'+esc(x.r)+'</small></span></button>';}).join("")
-  +(l.length>60?'<p class="bt-leeg">…en nog '+(l.length-60)+'. Zoek hierboven op naam.</p>':'')+'</div></div>';
+  +'<div id="btAandacht">'+l.slice(0,60).map(knop).join("")
+  +(l.length>60?'<p class="bt-leeg">…en nog '+(l.length-60)+'. Zoek hierboven op naam.</p>':'')+'</div></div>'+wegHtml;
 }
 
 /* ---------- scherm ---------- */
@@ -303,6 +312,7 @@ var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:2
 +'.bt-diag{font-size:12.5px;margin:12px 0;padding:10px 12px;border-radius:9px;background:var(--card);border:1px solid var(--line)}.bt-waarschuwing{border-color:#c9963f}.bt-fout{border-color:#8a1c26;color:#8a1c26}'
 +'.bt-knoppen{display:flex;gap:8px;flex-wrap:wrap}.bt-leeg{font-size:12px;color:var(--muted);padding:6px}'
 +'.bt-hit.bt-klaar{opacity:.45;text-decoration:line-through}.bt-klaar-lijst{margin-top:12px;font-size:12px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card)}.bt-klaar-lijst span{display:inline-block;margin:3px 4px 0 0;padding:1px 7px;border-radius:9px;border:1px solid var(--line);font-size:11px}.bt-klaar-lijst small{color:var(--muted)}'
++'.bt-weg{margin-top:10px;font-size:12px;color:var(--muted)}.bt-weg summary{cursor:pointer;padding:6px}.bt-weg #btWeg{max-height:240px;overflow:auto}'
 +'.bt-aandacht{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:8px;max-height:360px;overflow:auto}.bt-akop{font-size:13px;font-weight:700;padding:4px 6px}.bt-akop span{background:var(--amber);color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;margin-left:6px}';
 
 window.vBeeldtool=function(){
@@ -343,6 +353,7 @@ window.btInit=function(){
   laad(bron,String(p.id),!/^blob:/.test(bron),String(p.id));}
  $("btHits").addEventListener("click",kies);
  var al=$("btAandacht");if(al)al.addEventListener("click",kies);
+ var aw=$("btWeg");if(aw)aw.addEventListener("click",kies);
  $("btTol").addEventListener("input",function(e){st.tol=+e.target.value;$("btTolW").textContent=st.tol;verwerk();});
  $("btLaat").addEventListener("change",function(e){st.laatStaan=e.target.checked;verwerk();});
  $("btDicht").addEventListener("change",function(e){st.dicht=e.target.checked;verwerk();});
