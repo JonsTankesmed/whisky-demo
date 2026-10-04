@@ -2948,8 +2948,7 @@ var ADMGROEP=[
  {k:"",items:[["start","Overzicht"]]},
  {k:"Werkt al",c:"echt",t:"echte gegevens",items:[["hiaten","Vragen voor Jack"],["beoordeel","Beoordelen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"]]},
  {k:"Voortgang",c:"bouw",t:"stand van de bouw",items:[["voortgang","Voortgang project"],["bronnen","Bronnen & partners"]]},
- {k:"Koppeling",c:"bouw",t:"Lightspeed, alleen lezen",items:[["producten","Producten"],["sync","Lightspeed-sync"]]},
- {k:"Voorbeeld",c:"mock",t:"toekomstige backend",items:[["dashboard","Winkeldashboard"],["orders","Orders"],["smaak","Smaakprofielen"]]}
+ {k:"Winkel",c:"echt",t:"Lightspeed, alleen lezen",items:[["dashboard","Winkeldashboard"],["orders","Orders"],["producten","Producten"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"]]}
 ];
 var ADMBAND={
  hiaten:["echt","<b>Werkt al.</b> Echte vragen over jullie catalogus en teksten. Je antwoorden worden na inloggen direct opgeslagen."],
@@ -2958,13 +2957,76 @@ var ADMBAND={
  beeldtool:["echt","<b>Werkt al.</b> Opgemaakte productfoto's komen via de opslag direct bij de fles op de site."],
  voortgang:["bouw","<b>Stand van de bouw.</b> Wat klaar is, wat nu loopt en wat nog van jullie nodig is."],
  bronnen:["bouw","<b>Stand van de bouw.</b> Welke bronnen we mogen gebruiken, en waarvoor nog toestemming nodig is."],
- dashboard:["mock","<b>Voorbeeld van de toekomstige backend.</b> Zo kan het dagelijkse beheer eruitzien als de site live is. De cijfers zijn verzonnen en er is nog niets gekoppeld."],
- producten:["bouw","<b>In aanbouw.</b> Echte producten, prijzen en voorraad uit Lightspeed, zodra de koppeling draait. Alleen lezen: hier wordt niets gewijzigd."],
- orders:["mock","<b>Voorbeeld.</b> Orders en betalingen blijven in Lightspeed. Deze orders zijn verzonnen."],
- smaak:["mock","<b>Voorbeeld.</b> Zo kan de goedkeuring van smaakprofielen straks werken. Bron en reviewstatus zijn verzonnen; het echte beoordelen gebeurt onder <a href=\"#/admin/beoordeel\" style=\"color:var(--amber)\">Beoordelen</a>."],
- sync:["bouw","<b>In aanbouw.</b> De echte koppeling met Lightspeed. Alleen lezen; de sleutel staat veilig op de server, nooit in de site."]
+ dashboard:["echt","<b>Live.</b> Omzet, orders en catalogus uit Lightspeed, alleen lezen. Alleen zichtbaar na inloggen."],
+ producten:["echt","<b>Live.</b> Producten, prijzen en voorraad uit Lightspeed, alleen lezen. Hier wordt niets gewijzigd."],
+ orders:["echt","<b>Live.</b> Orders uit Lightspeed, alleen lezen, laatste 90 dagen. Zonder namen, adressen of e-mail: die blijven in Lightspeed."],
+ smaak:["echt","<b>Werkt al.</b> De echte profielen uit de pijplijn, met Jacks oordeel uit Beoordelen."],
+ sync:["echt","<b>Live.</b> De koppeling met Lightspeed. Alleen lezen; de sleutel staat veilig op de server, nooit in de site."]
 };
 function admGroep(sub){for(var i=0;i<ADMGROEP.length;i++)for(var j=0;j<ADMGROEP[i].items.length;j++)if(ADMGROEP[i].items[j][0]===sub)return ADMGROEP[i];return ADMGROEP[0];}
+/* ---------- Smaakprofielen (echte gegevens) ----------
+   Bron: de pijplijn (beoordeling.js: vier assen met herkomst per as) en het oordeel
+   van Jack uit Beoordelen (BSLT, opgeslagen in Supabase na inloggen). Geen nepcijfers. */
+var SPF={filter:"alle",zoek:"",pagina:0,stap:40};
+function spItems(){
+ if(typeof BEOORDELING==="undefined")return [];
+ if(spItems._c)return spItems._c;
+ var per={};(typeof CAT!=="undefined"?CAT:[]).forEach(function(p){per[String(p.id)]=p;});
+ return spItems._c=BEOORDELING.items.filter(function(x){return x.k==="product"&&x.assen;}).map(function(x){
+  var geschat=(x.herk||[]).filter(function(h){return BGESCHAT[h];}).length;
+  return {it:x,p:per[x.pid]||null,geschat:geschat};});
+}
+function spStatus(r){
+ var b=BSLT[r.it.id];if(!b)return {k:"open",l:"Wacht op oordeel",st:"warn"};
+ var w=b.w||{};
+ if(w.a&&w.was&&JSON.stringify(w.a)!==JSON.stringify(w.was))return {k:"bij",l:"Bijgesteld door Jack",st:"ok"};
+ if(w==="nee"||w.oms==="nee")return {k:"af",l:"Niet plaatsen",st:"err"};
+ return {k:"ok",l:"Akkoord",st:"ok"};
+}
+function spZet(k,v){SPF[k]=v;SPF.pagina=0;render();}
+function vAdminSmaak(){
+ var alle=spItems();
+ if(!alle.length)return '<h3 style="font-size:20px">Smaakprofielen</h3><p style="color:var(--muted)">De profielen zijn niet geladen.</p>';
+ var totaalCat=(typeof CAT!=="undefined"&&CAT.length)||0;
+ var st=alle.map(spStatus),tel={open:0,ok:0,bij:0,af:0};st.forEach(function(x){tel[x.k]++;});
+ var vol=alle.filter(function(r){return !r.geschat;}).length;
+ var z=SPF.zoek.toLowerCase();
+ var lijst=alle.filter(function(r,i){
+  if(SPF.filter==="open"&&st[i].k!=="open")return false;
+  if(SPF.filter==="beoordeeld"&&st[i].k==="open")return false;
+  if(SPF.filter==="bij"&&st[i].k!=="bij")return false;
+  if(SPF.filter==="geschat"&&!r.geschat)return false;
+  if(z&&!((r.p&&(r.p.name+" "+(r.p.dist||""))||"").toLowerCase().includes(z)))return false;
+  return true;});
+ var van=SPF.pagina*SPF.stap,deel=lijst.slice(van,van+SPF.stap),max=Math.ceil(lijst.length/SPF.stap);
+ var nl=function(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");};
+ var balk=function(a,was){return '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:center;font-size:11px;min-width:150px">'
+  +a.map(function(v,i){var w=was&&was[i]!==v;return '<span style="color:var(--muted)">'+DIMS[i]+'</span><span class="mini"><i style="width:'+((v||0)*14)+'px;'+(w?'background:var(--amber)':'')+'"></i></span><span'+(w?' style="color:var(--amber);font-weight:700" title="was '+was[i]+'"':'')+'>'+(v==null?"–":v)+'</span>';}).join("")+'</div>';};
+ return '<h3 style="font-size:20px;margin-bottom:6px">Smaakprofielen</h3>'
+ +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;max-width:75ch">Vier assen (rook, zoet, fruit, kruidig) op een schaal van vijf, door de pijplijn afgeleid uit proefnotities. Per as staat vast waar de waarde vandaan komt. Jack keurt goed of stelt bij onder <a href="#/admin/beoordeel" onclick="BFILTER=\'product\'" style="color:var(--amber)">Beoordelen</a> of op de productpagina zelf.</p>'
+ +'<div class="kpis">'
+ +'<div class="kpi"><span>Flessen met profiel</span><b>'+nl(alle.length)+'</b><small>'+(totaalCat?Math.round(alle.length/totaalCat*100)+'% van '+nl(totaalCat)+' in de catalogus':'')+'</small></div>'
+ +'<div class="kpi"><span>Volledig uit proefnotitie</span><b>'+nl(vol)+'</b><small>'+nl(alle.length-vol)+' deels geschat</small></div>'
+ +'<div class="kpi"><span>Beoordeeld door Jack</span><b>'+nl(alle.length-tel.open)+'</b><small>'+nl(tel.open)+' wachten nog</small></div>'
+ +'<div class="kpi"><span>Bijgesteld</span><b>'+nl(tel.bij)+'</b><small>'+nl(tel.af)+' niet plaatsen</small></div></div>'
+ +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'
+ +[["alle","Alle"],["open","Wacht op oordeel"],["beoordeeld","Beoordeeld"],["bij","Bijgesteld"],["geschat","Deels geschat"]].map(function(f){return '<button class="bfil'+(SPF.filter===f[0]?" aan":"")+'" onclick="spZet(\'filter\',\''+f[0]+'\')">'+f[1]+'</button>';}).join("")
+ +'<input value="'+String(SPF.zoek).replace(/"/g,"&quot;")+'" onchange="spZet(\'zoek\',this.value)" placeholder="Zoek fles of distilleerderij…" style="font:inherit;font-size:13px;padding:7px 11px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text);flex:1 1 200px;max-width:300px"></div>'
+ +(deel.length?'<table class="atable"><tr><th>Fles</th><th>Profiel</th><th>Herkomst</th><th>Oordeel</th></tr>'
+ +deel.map(function(r){
+  var b=BSLT[r.it.id],a=(b&&b.w&&b.w.a)?b.w.a:r.it.assen,was=(b&&b.w&&b.w.was)?b.w.was:null,s=spStatus(r);
+  var naam=r.p?r.p.name:("Product "+r.it.pid);
+  return '<tr><td><a href="#/product/'+r.it.pid+'" style="color:var(--text);font-weight:600">'+naam+'</a><br><span style="color:var(--muted);font-size:11.5px">'+((r.p&&r.p.dist)||"")+'</span></td>'
+  +'<td>'+balk(a,was)+'</td>'
+  +'<td style="font-size:12px">'+(r.geschat?'<span class="st warn">Deels geschat</span><br><span style="color:var(--muted)">'+r.geschat+' van 4 assen</span>':'<span class="st ok">Uit proefnotitie</span>')
+  +'<br><span style="color:var(--muted);font-size:11px">'+(r.it.bronnen||[]).map(function(x){return x.n;}).filter(function(n){return n!=="titel";}).slice(0,2).join(" · ")+'</span></td>'
+  +'<td><span class="st '+s.st+'">'+s.l+'</span></td></tr>';}).join("")+'</table>':'<div class="sync-box"><b>Niets gevonden</b><p>Pas het filter of de zoekterm aan.</p></div>')
+ +(max>1?'<div style="display:flex;gap:10px;align-items:center;margin-top:12px">'
+  +'<button class="btn btn-g btn-s" '+(SPF.pagina?'':'disabled')+' onclick="SPF.pagina--;render()">← Vorige</button>'
+  +'<span style="font-size:12.5px;color:var(--muted)">Pagina '+(SPF.pagina+1)+' van '+max+' · '+nl(lijst.length)+' flessen</span>'
+  +'<button class="btn btn-g btn-s" '+(SPF.pagina+1<max?'':'disabled')+' onclick="SPF.pagina++;render()">Volgende →</button></div>':'')
+ +'<p style="font-size:12px;color:var(--muted);margin-top:12px">Een rood cijfer is door Jack bijgesteld; het oude cijfer staat in de tooltip. Zonder inloggen zie je alleen de oordelen die op dit apparaat zijn gegeven.</p>';
+}
 function vAdminStart(){
  var hz=typeof HIATEN!=="undefined"?HIATEN.items:[];
  var ingelogd=typeof WS!=="undefined"&&!!WS.gebruiker;
@@ -2977,12 +3039,12 @@ function vAdminStart(){
  function nl(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");}
  function balk(n,t){var p=t?Math.round(n/t*100):0;return '<div class="ov-bar"><i style="width:'+Math.max(p,n?2:0)+'%"></i></div><div class="ov-sub">'+nl(n)+' van '+nl(t)+' gedaan'+(t>500?' · in je eigen tempo, per soort te filteren':'')+'</div>';}
  return '<h3 style="font-size:20px;margin-bottom:6px">Overzicht</h3>'
- +'<p style="font-size:13px;color:var(--muted);margin-bottom:18px;max-width:70ch">Wat er op je wacht, hoe ver de bouw is en hoe het beheer er na livegang uit kan zien.</p>'
+ +'<p style="font-size:13px;color:var(--muted);margin-bottom:18px;max-width:70ch">Wat er op je wacht, hoe ver de bouw is en hoe je winkel ervoor staat.</p>'
  +'<div class="ov-route">'
  +'<div class="ov-stap nu"><i></i><b>1 · Demo en onderdelen</b><span>Nu. Losse onderdelen bouwen en met jou testen.</span></div>'
  +'<div class="ov-stap"><i></i><b>2 · Testversie</b><span>De complete site met jullie eigen catalogus, afgeschermd.</span></div>'
  +'<div class="ov-stap"><i></i><b>3 · Livegang</b><span>Streefdatum 1 januari, alleen als alles werkt.</span></div></div>'
- +'<div class="ov-leg"><span><i class="dot echt"></i>Werkt al, met echte gegevens</span><span><i class="dot bouw"></i>Stand van de bouw</span><span><i class="dot mock"></i>Voorbeeld, verzonnen cijfers</span></div>'
+ +'<div class="ov-leg"><span><i class="dot echt"></i>Werkt al, met echte gegevens</span><span><i class="dot bouw"></i>Stand van de bouw</span></div>'
  +'<div class="ov-grid">'
  +'<div class="ov-card echt"><h4>Wacht op jou</h4><div class="ov-wat">Werkt al. Wat je hier doet, gebruiken we direct in de bouw.</div>'
  +'<div class="ov-taak"><a href="#/admin/hiaten">Vragen voor Jack →</a>'+(hg===null?'<p>'+hz.length+' vragen. Log in om je stand te zien en antwoorden op te slaan.</p>':balk(hg,hz.length))+'</div>'
@@ -2998,8 +3060,9 @@ function vAdminStart(){
  +'<div class="ov-taak"><b style="font-size:12px;color:var(--muted);font-weight:600">Laatst gewijzigd op de demo</b>'
  +wz.map(function(w){return '<p><span style="color:var(--text)">'+wzDatum(w.d)+'</span> · '+w.o+'</p>';}).join("")+'</div>'
  +'<a class="ov-lnk" href="#/admin/voortgang">Volledige voortgang en logboek →</a><br><a class="ov-lnk" style="margin-top:4px" href="#/admin/bronnen">Bronnen &amp; partners →</a></div>'
- +'<div class="ov-card mock"><h4>Zo kan de backend eruitzien</h4><div class="ov-wat">Voorbeeldschermen met verzonnen cijfers. Na livegang staan hier omzet, orders, voorraad en de koppeling met Lightspeed. Er is nog niets gekoppeld, dus je kunt niets kapotmaken.</div>'
- +ADMGROEP[4].items.map(function(it){return '<div class="ov-taak"><a href="#/admin/'+it[0]+'">'+it[1]+' →</a></div>';}).join("")+'</div>'
+ +'<div class="ov-card echt"><h4>Je winkel</h4><div class="ov-wat">Live uit Lightspeed, alleen lezen. Er wordt niets in de winkel gewijzigd.</div>'
+ +[["dashboard","Winkeldashboard","Omzet, orders en catalogus in één oogopslag."],["orders","Orders","Laatste 90 dagen, met wat nog verzonden of betaald moet worden."],["producten","Producten","Prijzen en voorraad per fles."],["smaak","Smaakprofielen","Welke flessen een profiel hebben en wat je ervan vond."],["sync","Lightspeed-sync","Gegevens opnieuw ophalen."]]
+  .map(function(it){return '<div class="ov-taak"><a href="#/admin/'+it[0]+'">'+it[1]+' →</a><p>'+it[2]+'</p></div>';}).join("")+'</div>'
  +'</div>';
 }
 function vAdmin(rt){
@@ -3018,14 +3081,9 @@ function vAdmin(rt){
  }else if(sub==="producten"){
   body=typeof vLsProducten==="function"?vLsProducten():'<p>lightspeed.js ontbreekt.</p>';
  }else if(sub==="orders"){
-  body='<h3 style="font-size:20px;margin-bottom:16px">Recente orders</h3>'
-  +'<table class="atable"><tr><th>Order</th><th>Klant</th><th>Inhoud</th><th>Totaal</th><th>Status</th></tr>'
-  +ORDERS.map(o=>'<tr><td><b>'+o.nr+'</b></td><td>'+o.kl+'</td><td>'+o.it+'</td><td>'+eur(o.tot)+'</td><td><span class="st '+o.st+'">'+o.lbl+'</span></td></tr>').join("")+'</table>'
-  +'<p style="font-size:12px;color:var(--muted);margin-top:14px">Orders en betalingen blijven volledig in Lightspeed — dit is een leesweergave via de sync-laag.</p>';
+  body=typeof vLsOrders==="function"?vLsOrders():'<p>lightspeed.js ontbreekt.</p>';
  }else if(sub==="smaak"){
-  body='<h3 style="font-size:20px;margin-bottom:6px">Smaakprofielen</h3><p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">AI stelt profielen voor op basis van productteksten; een mens keurt per batch. Vier assen: '+DIMS.join(" · ")+'.</p>'
-  +'<table class="atable"><tr><th>Product</th><th>Profiel</th><th>Bron</th><th>Review</th></tr>'
-  +P.slice(0,8).map((p,i)=>'<tr><td>'+p.name+'</td><td><span class="mini">'+p.t.map(v=>'<i style="width:'+(v*3)+'px"></i>').join("")+'</span></td><td>'+(i%3===0?"Handmatig":"AI-voorstel")+'</td><td><span class="st '+(i%3===2?"warn":"ok")+'">'+(i%3===2?"Wacht op review":"Goedgekeurd")+'</span></td></tr>').join("")+'</table>';
+  body=vAdminSmaak();
  }else if(sub==="sync"){
   body=typeof vLsSync==="function"?vLsSync():'<p>lightspeed.js ontbreekt.</p>';
  }else if(sub==="bronnen"){
@@ -3061,22 +3119,14 @@ function vAdmin(rt){
   +'<p style="font-size:12px;color:var(--muted);margin-top:10px">'+VRAAGLOG.filter(q=>q.st==="ok").length+' vragen beantwoord · '+VRAAGLOG.filter(q=>q.st!=="ok").length+' open · '+VOORTGANG.length+' projectstappen · '+((typeof AFSTEMMING!=="undefined"&&AFSTEMMING)||[]).length+' afspraken · '+wzLijst().length+' wijzigingen in het logboek</p></div>';
  }else{
   sub="dashboard";
-  body='<h3 style="font-size:20px;margin-bottom:16px">Winkeldashboard</h3>'
-  +'<div class="kpis"><div class="kpi"><span>Omzet vandaag</span><b>€2.847</b><small>+18% vs vorige week</small></div>'
-  +'<div class="kpi"><span>Orders</span><b>31</b><small>+6</small></div>'
-  +'<div class="kpi"><span>Sample-attach rate</span><b>34%</b><small>+9pt sinds discovery</small></div>'
-  +'<div class="kpi"><span>AI-sommelier sessies</span><b>112</b><small>23% → aankoop</small></div></div>'
-  +'<div class="sync-box"><b>● Lightspeed-sync gezond</b><p>Laatste webhook 09:41 · 0 conflicten · <a href="#/admin/sync" style="color:var(--amber)">bekijk log →</a></p></div>'
-  +'<h3 style="font-size:16px;margin:18px 0 10px">Recente orders</h3>'
-  +'<table class="atable"><tr><th>Order</th><th>Klant</th><th>Totaal</th><th>Status</th></tr>'
-  +ORDERS.slice(0,3).map(o=>'<tr><td>'+o.nr+'</td><td>'+o.kl+'</td><td>'+eur(o.tot)+'</td><td><span class="st '+o.st+'">'+o.lbl+'</span></td></tr>').join("")+'</table>';
+  body=typeof vLsDashboard==="function"?vLsDashboard():'<p>lightspeed.js ontbreekt.</p>';
  }
  var band=ADMBAND[sub]?'<div class="'+ADMBAND[sub][0]+'band">'+ADMBAND[sub][1]+'</div>':'';
  var zij=ADMGROEP.map(function(g){
   return (g.k?'<div class="agrp"><i class="dot '+g.c+'"></i>'+g.k+'</div><div class="agrt">'+g.t+'</div>':'')
   +g.items.map(function(s){return '<a href="#/admin/'+s[0]+'" class="'+(sub===s[0]?"act ":"")+(g.c==="mock"?"mock":"")+'">'+s[1]+'</a>';}).join("");
  }).join("");
- return '<section><div class="wrap"><div class="kicker">Demo — beheeromgeving</div><h2>Beheer <span style="font-size:13px;color:var(--muted);font-family:var(--sans);font-weight:400">groen werkt al met echte gegevens · gestippeld is een voorbeeld van de toekomstige backend</span></h2>'
+ return '<section><div class="wrap"><div class="kicker">Demo — beheeromgeving</div><h2>Beheer <span style="font-size:13px;color:var(--muted);font-family:var(--sans);font-weight:400">groen werkt met echte gegevens · goud is de stand van de bouw</span></h2>'
  +'<div class="adm"><div class="adm-side">'+zij+'</div>'
  +'<div class="adm-main">'+band+body+'</div></div></div></section>';
 }
