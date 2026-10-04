@@ -3,7 +3,7 @@
    Alleen accounts in ws_toegang kunnen lezen (RLS). De Lightspeed-sleutel staat
    uitsluitend server-side in de Edge Function ws-ls-sync; nooit in dit bestand.
    De sync doet alleen GET-verzoeken: er wordt niets in Lightspeed gewijzigd. */
-var LS={prod:null,log:null,tel:null,laden:false,fout:"",zoek:"",pagina:0,bezig:false,stap:50};
+var LS={prod:null,log:null,tel:null,laden:false,fout:"",zoek:"",pagina:0,bezig:false,voortgang:"",stap:50};
 function lsKlaar(){return typeof WS!=="undefined"&&WS.sb&&WS.gebruiker&&!WS.fout;}
 function lsNl(n){return n==null?"—":String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");}
 function lsTijd(t){if(!t)return"—";var d=new Date(t);return d.toLocaleDateString("nl-NL",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});}
@@ -21,15 +21,29 @@ function lsLaad(){
 function lsVernieuw(){LS.prod=null;LS.log=null;lsLaad();}
 function lsZoek(v){clearTimeout(LS.zt);LS.zt=setTimeout(function(){LS.zoek=v.trim();LS.pagina=0;lsVernieuw();},350);}
 function lsBlad(d){LS.pagina=Math.max(0,LS.pagina+d);lsVernieuw();}
-function lsDraai(soort){
- if(LS.bezig||!lsKlaar())return;LS.bezig=true;wsHerteken();
- WS.sb.functions.invoke("ws-ls-sync",{body:{soort:soort}}).then(function(r){
-  LS.bezig=false;
+/* De sync draait in porties van ~100 s (grens van de Edge Function). Zolang de functie
+   "verder" meldt, roepen we hem opnieuw aan met dezelfde logregel. Tab sluiten = sync stopt;
+   de functie markeert zo'n achtergelaten sync na 15 minuten als afgebroken. */
+var LSFASE={merken:"merken",producten:"producten",varianten:"prijzen en voorraad"};
+function lsDraai(soort,vervolg){
+ if(!lsKlaar())return;
+ if(!vervolg){if(LS.bezig)return;LS.bezig=true;LS.voortgang="Starten…";wsHerteken();}
+ WS.sb.functions.invoke("ws-ls-sync",{body:vervolg?{soort:soort,log_id:vervolg.log_id,fase:vervolg.fase,pagina:vervolg.pagina}:{soort:soort}}).then(function(r){
   var d=r.data||{};
-  if(r.error||d.status!=="ok")toast("Sync mislukt"+(d.melding?": "+d.melding:""));
+  if(!r.error&&d.status==="verder"){
+   LS.voortgang="Bezig met "+(LSFASE[d.fase]||d.fase)+" · pagina "+d.pagina+" · "+lsNl(d.producten)+" producten, "+lsNl(d.varianten)+" varianten";
+   wsHerteken();lsDraai(soort,d);return;
+  }
+  LS.bezig=false;LS.voortgang="";
+  if(r.error||d.status!=="ok"){
+   var m=d.melding;
+   if(!m&&r.error&&r.error.context&&typeof r.error.context.json==="function"){
+    r.error.context.json().then(function(j){toast("Sync mislukt"+(j&&j.melding?": "+j.melding:""));}).catch(function(){toast("Sync mislukt");});
+   }else toast("Sync mislukt"+(m?": "+m:""));
+  }
   else toast("Sync klaar: "+lsNl(d.producten)+" producten, "+lsNl(d.varianten)+" varianten");
   lsVernieuw();
- }).catch(function(){LS.bezig=false;toast("Sync mislukt");lsVernieuw();});
+ }).catch(function(){LS.bezig=false;LS.voortgang="";toast("Sync onderbroken. Start opnieuw; een halve sync wordt na 15 minuten vanzelf afgesloten.");lsVernieuw();});
 }
 function lsNietIngelogd(){
  return typeof wsLoginBlok==="function"?wsLoginBlok("de gegevens uit Lightspeed te zien"):'<p>Log in via Vragen voor Jack.</p>';
@@ -71,9 +85,10 @@ function vLsSync(){
  +'<button class="btn btn-g btn-s" '+(LS.bezig?'disabled':'')+' onclick="lsDraai(\'incrementeel\')">Alleen wijzigingen</button>'
  +'<button class="btn btn-g btn-s" '+(LS.bezig?'disabled':'')+' onclick="lsDraai(\'volledig\')">Volledige sync</button>'
  +'<button class="btn btn-g btn-s" onclick="lsVernieuw()">Vernieuwen</button></div>'
+ +(LS.bezig&&LS.voortgang?'<div class="bouwband"><b>Sync loopt.</b> '+wsH(LS.voortgang)+'. Laat dit tabblad open; een volledige sync duurt enkele minuten.</div>':'')
  +(LS.fout?'<p class="wsfout">'+wsH(LS.fout)+'</p>':'')
  +(log.length?'<table class="atable"><tr><th>Gestart</th><th>Soort</th><th>Producten</th><th>Varianten</th><th>Status</th></tr>'
   +log.map(function(l){return '<tr><td>'+lsTijd(l.gestart_op)+'</td><td>'+l.soort+'</td><td>'+lsNl(l.producten_bijgewerkt)+'</td><td>'+lsNl(l.varianten_bijgewerkt)+'</td>'
   +'<td><span class="st '+(l.status==="ok"?"ok":"warn")+'" title="'+wsH(l.melding||"")+'">'+(l.status==="ok"?"OK":l.status==="bezig"?"Bezig":"Fout")+'</span></td></tr>';}).join("")+'</table>':'')
- +'<p style="font-size:12px;color:var(--muted);margin-top:12px">De sync leest producten, prijzen en voorraad. Er wordt niets in Lightspeed gewijzigd.</p>';
+ +'<p style="font-size:12px;color:var(--muted);margin-top:12px">De sync leest producten, prijzen en voorraad. Er wordt niets in Lightspeed gewijzigd. Een volledige sync loopt in porties van anderhalve minuut en gaat vanzelf door zolang dit tabblad open is.</p>';
 }
