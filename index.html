@@ -648,7 +648,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
     </div>
     <button class="hbtn" title="Verlanglijst" onclick="toast(wish.size+' whisky\'s op je verlanglijst')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.4 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3.4 1-4.5 2.5C10.9 4 9.3 3 7.5 3A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.1 3 5.5l7 7z"/></svg><b id="wishN" style="display:none">0</b></button>
     <button class="hbtn" title="Vergelijk" onclick="go('#/vergelijk')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg><b id="cmpN" style="display:none">0</b></button>
-    <button class="hbtn" title="Winkelwagen">
+    <button class="hbtn" title="Winkelwagen" onclick="go('#/winkelwagen')">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.6 13a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
       <b id="cartN">0</b>
     </button>
@@ -756,6 +756,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 <script src="hiaten.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
 <script src="lightspeed.js" onerror="void 0"></script>
+<script src="winkelmand.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ================= DATA (prijzen/afbeeldingen: whiskysite.nl juli 2026; smaakprofielen indicatief) ================= */
@@ -991,8 +992,8 @@ function card(p,prof,opt){
  +(p.rev?'<div class="rev" style="color:var(--muted);font-weight:500">Proefnotitie voorzien · '+p.rev.s+'</div>':"")
  +(compact?"":'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'+bars(p.t,p.geenprofiel))
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
- +'<div class="prow"><button class="add" '+(p.rare?"disabled":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
- +(p.sample?'<button class="smp" onclick="add(\'Sample: '+esc(p.name)+'\')">Sample '+eur(p.sample)+'</button>':"")+'</div>'
+ +'<div class="prow"><button class="add" '+(p.rare?"disabled":"")+' onclick="wmToe(\''+p.id+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
+ +(p.sample?'<button class="smp" onclick="wmSample(\''+p.id+'\')">Sample '+eur(p.sample)+'</button>':"")+'</div>'
  +(compact?'<a class="cardlink" href="#/product/'+p.id+'">Smaakprofiel bekijken →</a>':'<label class="cmp"><input type="checkbox" '+(compareSet.has(p.id)?"checked":"")+' onchange="cmp(\''+p.id+'\',this)"> Vergelijk</label>')+'</div></div>';
 }
 /* ================= DATA-LAAG (fase 1) =================
@@ -2128,6 +2129,7 @@ function route(){
  var deel=vol.split("?"),h=deel[0]||"#/";
  if(h==="#/collectie")urlNaarF(deel[1]||"");
  if(h.startsWith("#/inspiratie/streek/"))return{r:"streekgids",id:h.slice(20)};
+ if(h==="#/winkelwagen")return{r:"winkelwagen"};
  if(h.startsWith("#/streek/"))return{r:"streek",id:h.slice(9)};
  if(h.startsWith("#/product/"))return{r:"product",id:h.slice(10)};
  if(h.startsWith("#/admin"))return{r:"admin",sub:h.split("/")[2]||"start"};
@@ -2138,7 +2140,7 @@ function render(){
  var rt=route();
  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("act",a.dataset.r===(rt.r==="streekgids"?"inspiratie":rt.r)));
  document.querySelectorAll(".catnav a").forEach(a=>a.classList.toggle("act",rt.r==="collectie"&&a.dataset.c===F.cat));
- var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin,streek:vStreek,streekgids:vStreekgids,kaart:vKaart}[rt.r];
+ var v={home:vHome,ontdek:vOntdek,collectie:vCollectie,product:vProduct,vergelijk:vVergelijk,inspiratie:vInspiratie,festival:vFestival,admin:vAdmin,streek:vStreek,streekgids:vStreekgids,kaart:vKaart,winkelwagen:function(){return typeof vMand==="function"?vMand():"";}}[rt.r];
  var fk=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.fk:null;
  beeldStop();
  el("app").innerHTML=v(rt);
@@ -2293,11 +2295,11 @@ function vProduct(rt){
  +(p.rev?revBlok(p):"")
  +'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
- +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="add(\''+esc(p.name)+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
+ +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="wmToe(\''+p.id+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +'<button class="btn btn-g" onclick="cmpAdd(\''+p.id+'\')">+ Vergelijk</button>'
  +(wsUrl(p)?'<a class="btn btn-g" href="'+wsUrl(p)+'" target="_blank" rel="noopener">Bekijk op whiskysite.nl →</a>':"")
  +'<button class="btn btn-g" style="gap:8px" onclick="wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+(wish.has(p.id)?" Bewaard":" Bewaar")+'</button></div>'
- +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="add(\'Sample: '+esc(p.name)+'\')">Bestel sample</button></div>':"")
+ +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="wmSample(\''+p.id+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
  +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+plaats(p)+'</td></tr><tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+(p.abv||"—")+'</td></tr><tr><th>Vatsoort</th><td>'+(p.cask||"—")+'</td></tr><tr><th>Inhoud</th><td>'+volTekst(p)+'</td></tr></table>'
  /* De 20 handgemaakte producten hebben een spijsadvies, de 6.371 uit de winkel
@@ -2328,7 +2330,7 @@ function vVergelijk(){
  +row("Review",p=>'<td>'+(p.rev?'<span style="color:var(--muted);font-size:12px">proefnotitie voorzien</span><br><a href="'+revLink(p)+'" target="_blank" rel="noopener" style="color:var(--amber);font-size:12px">'+p.rev.s+' ('+p.rev.u+') →</a>':"—")+'</td>')
  +DIMS.map((d,i)=>row(d,p=>(p.geenprofiel||p.t[i]==null)?'<td style="color:var(--muted)">—</td>':'<td><span class="mini"><i style="width:'+(p.t[i]*18)+'px"></i><em>'+p.t[i]+'</em></span></td>')).join("")
  +row("Karakter",p=>'<td>'+((p.tags||[]).join(", ")||"—")+'</td>')
- +row("",p=>'<td><button class="btn btn-a btn-s" onclick="add(\''+esc(p.name)+'\')">In winkelwagen</button></td>')
+ +row("",p=>'<td><button class="btn btn-a btn-s" onclick="wmToe(\''+p.id+'\')">In winkelwagen</button></td>')
  +'</table></div></div></section>';
 }
 /* Schrijvers wier proefnotities bij de flessen komen te staan.
@@ -3187,6 +3189,7 @@ function ask(preset){
  b.scrollTop=b.scrollHeight;
 }
 /* ================= INIT ================= */
+if(typeof wmKoppel==="function"){wmKoppel();wmTel();}
 render();
 </script>
 <!-- ============================================================
