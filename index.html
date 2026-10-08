@@ -710,6 +710,32 @@ footer.voetmini .f18{padding-bottom:22px}
  -webkit-mask:url(beelden/merk/ws.svg) center/contain no-repeat;mask:url(beelden/merk/ws.svg) center/contain no-repeat}
 .wsm.d{background:#4a0d14;opacity:.42;mix-blend-mode:multiply}
 .wsm.l{background:#f6ead6;opacity:.6;mix-blend-mode:screen}
+
+/* ===== 09-10b: verfijnen binnen een selectie, andere ingangen als infographic ===== */
+.selkop{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#2b1d12,#503018);color:#f6efe6;border-radius:16px;padding:16px 20px;margin:12px 0 14px}
+.selkop .mono{flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+.selkop .kicker{color:#e8c48a;margin:0 0 2px;font-size:10px}
+.selkop h1{font-family:var(--serif);font-size:26px;line-height:1.15;margin:0}
+.selkop h1 small{font-family:var(--sans,inherit);font-size:13px;font-weight:400;opacity:.75;margin-left:6px}
+.selkop .selterug{margin-left:auto;color:#f6efe6;font-size:12.5px;border:1px solid rgba(255,255,255,.3);border-radius:18px;padding:6px 12px;white-space:nowrap}
+.selkop .selterug:hover{background:rgba(255,255,255,.1)}
+.qchips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;margin-bottom:6px;scrollbar-width:thin}
+.qchips .dchip{flex:0 0 auto;white-space:nowrap}
+.qchips .dchip.on{background:var(--amber);border-color:var(--amber);color:#fff}
+.qchips .dchip.on u{color:#fff;opacity:.8}
+.qlabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:4px 0 6px}
+.abars{display:flex;flex-direction:column;gap:3px}
+.abar{display:grid;grid-template-columns:26px minmax(0,1fr) 54px 30px;align-items:center;gap:8px;padding:4px 6px;border-radius:9px;color:var(--text);text-decoration:none;font-size:12.5px}
+.abar:hover{background:var(--bg2)}
+.abar .mono{font-size:9px!important}
+.abar .an{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.abar .ab{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.abar .ab i{display:block;height:100%;background:linear-gradient(90deg,var(--copper),var(--amber));border-radius:3px}
+.abar u{text-decoration:none;font-size:11px;color:var(--muted);text-align:right}
+@media(max-width:700px){.selkop{padding:12px 14px}.selkop h1{font-size:21px}.selkop .selterug{display:none}}
+.selkop .mono,.abar .mono{margin:0!important}
+.selkop{text-align:left}
+.selanders a.abar{display:grid;margin:0}
 </style>
 </head>
 <body>
@@ -1497,7 +1523,11 @@ function vCollectie(){
   +' voorbeeldproducten, zodat het filteren en sorteren op schaal te beoordelen is. Er zit geen sleutel in deze pagina en er wordt niets bij Lightspeed opgehaald.')+'</div></div>'
  +(F.cat&&CATSUB[F.cat]?'<div class="tnote">'+CATSUB[F.cat]+'</div>':"")
  +(ingVoorCat()?ingTegels(ingVoorCat()):"")
- +'<div class="fsort" style="margin-top:16px">'
+ +collectieBody(lijst,n,toon)
+ +'</div></section>';
+}
+function collectieBody(lijst,n,toon){
+ return '<div class="fsort" style="margin-top:16px">'
  +'<button class="fmobbtn" onclick="fPaneel()">'+I("search",15)+' Filters'+(fAantalActief()?" ("+fAantalActief()+")":"")+'</button>'
  +'<input type="text" placeholder="Zoek op naam, distilleerderij, vat…" value="'+(F.q||"").replace(/"/g,"&quot;")+'" aria-label="Zoeken binnen de collectie" onchange="fZet(\'q\',this.value)">'
  +'<select aria-label="Sorteren" onchange="fZet(\'sort\',this.value)">'
@@ -1508,7 +1538,7 @@ function vCollectie(){
  +'<div class="colwrap">'+fPaneelHtml()
  +'<div>'+(n?'<div class="grid">'+toon.map(function(p){return card(p,PROFILE);}).join("")+'</div>'
    :'<div class="empty">Geen whisky\'s gevonden.<br>Tip: haal een filter weg — de aantallen naast elk filter laten zien wat nog overblijft.</div>')
- +'</div></div></div></section>';
+ +'</div></div>';
 }
 /* ================= BEELD BIJ STREEK EN DISTILLEERDERIJ =================
    Elk beeld is een record met herkomst, maker, licentie en status — net als de
@@ -2207,6 +2237,7 @@ function vsItem(vs){var d=(vs||"").split(":");return d.length===2?{soort:d[0],it
 function eurKort(x){return eur(x);}
 function vSelectie(rt){
  var g=INGANG[rt.soort],it=ingItem(rt.soort,rt.id);
+ if(g&&it&&rt.verfijnd)return vSelectieVerfijnd(rt,g,it);
  if(!g||!it)return '<section><div class="wrap">Deze selectie bestaat niet. <a href="#/collectie" style="color:var(--amber)">Naar de collectie</a></div></section>';
  var lijst=ingLijst(rt.soort,it),gids=gidsVan(g.gsoort,it.id);
  var flessen=lijst.filter(function(p){return !p._sample;}),samples=lijst.filter(function(p){return p._sample;});
@@ -2243,21 +2274,60 @@ function vSelectie(rt){
  +(rt.soort==="rare"?'<p style="margin-bottom:12px">Bij zulke oude whisky is een sample de voordeligste manier om te proeven voordat je een fles koopt.</p>':'')
  +'<div class="grid">'+start.map(function(p){return card(p,null,{compact:true});}).join("")+'</div></div>'
  +(topd.length?'<div class="streekblok"><h2>Distilleerderijen in deze selectie</h2><div class="dchips">'
-   +topd.map(function(d){return '<button class="dchip" onclick="ingNaarCollectie(\''+rt.soort+'\',\''+it.id+'\',{dist:[\''+esc(d)+'\']})">'+d+' <u>'+dt[d]+'</u></button>';}).join("")+'</div></div>':'')
- +'<div class="streekblok"><button class="btn btn-a" onclick="ingNaarCollectie(\''+rt.soort+'\',\''+it.id+'\')">Bekijk alle '+lijst.length.toLocaleString("nl-NL")+' flessen en samples →</button>'
+   +topd.map(function(d){return '<button class="dchip" onclick="selVerfijn(\''+rt.soort+'\',\''+it.id+'\',{dist:[\''+esc(d)+'\']})">'+d+' <u>'+dt[d]+'</u></button>';}).join("")+'</div></div>':'')
+ +'<div class="streekblok"><button class="btn btn-a" onclick="selVerfijn(\''+rt.soort+'\',\''+it.id+'\')">Bekijk alle '+lijst.length.toLocaleString("nl-NL")+' flessen en samples →</button>'
  +'<p style="margin-top:10px;font-size:13px">In de collectie staat dezelfde selectie, met alle filters erbij: smaak, vat, leeftijd en prijs.</p></div>'
  +'</div><aside>'
  +(gids?'<a class="gidsteaser" href="#/gids/'+g.gsoort+'/'+it.id+'"><div class="kicker" style="font-size:10px">'+g.gidsnaam+' · '+gids.lt+' min</div><b>'+gids.t+'</b>'
    +'<span>Wat '+it.n+' is, wie erachter zit en wat je wel en niet uit de naam kunt afleiden — met bronnen.</span><em>Lees de gids →</em></a>'
    :'<div class="gidsteaser leeg"><b>Gids volgt</b><span>Voor '+it.n+' staat nog geen gids in de kennisbank.</span></div>')
- +(anders.length?'<div class="selanders"><div class="kicker" style="font-size:10px;margin-bottom:6px">Andere '+g.n.toLowerCase()+'</div>'
-   +anders.map(function(x){return '<a href="#/selectie/'+rt.soort+'/'+x.id+'">'+x.n+'</a>';}).join("")+'</div>':'')
+ +(anders.length?andereInfo(rt.soort,it):'')
  +'</aside></div>'
  +'<p style="font-size:11.5px;color:var(--muted);margin-top:26px">Overzichtspagina, automatisch samengesteld uit de catalogus. De tekst bovenaan komt uit de gids'
  +(gids?' (content status '+gids.st+', bijgewerkt '+gids.bijgewerkt+')':'')+'. '
  +(beelden.length?'Beeld: '+beelden.length+' voorstel(len), status '+beelden[0].status+', met herkomst en licentie per foto. ':'')
  +'Gaat pas live als Jack of Tino de gids vrijgeeft.</p>'
  +'</div></section>';
+}
+/* Verfijnen zonder de selectie te verlaten: naam en monogram blijven bovenaan, daaronder
+   de gewone filters. De filterstand staat in de URL achter de selectie. */
+function selVerfijn(soort,id,extra){
+ var g=INGANG[soort],it=ingItem(soort,id),o={cat:g.cat};
+ if(g.facet)o[g.facet]=it.w.slice();else o.vs=soort+":"+id;
+ if(it.sort)o.sort=it.sort;
+ for(var k in (extra||{}))o[k]=extra[k];
+ F=nieuwF(o);go("#/selectie/"+soort+"/"+id+fNaarUrl());return false;
+}
+function vSelectieVerfijnd(rt,g,it){
+ F.cat=g.cat;
+ /* Haalt iemand de selectie zelf weg in het filter, dan is dit gewoon de collectie. */
+ var binnen=g.facet?(F[g.facet]||[]).some(function(v){return it.w.indexOf(v)>=0;}):F.vs===rt.soort+":"+rt.id;
+ if(!binnen){setTimeout(function(){location.replace("#/collectie"+fNaarUrl());},0);return "";}
+ var alle=ingLijst(rt.soort,it),dt={};
+ alle.forEach(function(p){if(p.dist&&p.dist!=="Onbekend")dt[p.dist]=(dt[p.dist]||0)+1;});
+ var topd=Object.keys(dt).sort(function(a,b){return dt[b]-dt[a]||a.localeCompare(b);}).slice(0,16);
+ var gekozen=F.dist||[],idx=g.items.indexOf(it);
+ var lijst=sorteer(selectie(null)),n=lijst.length,toon=lijst.slice(0,120);
+ return '<section><div class="wrap">'
+ +'<div class="selkop">'+mono(it,idx<0?0:idx,52)+'<div><div class="kicker">'+g.enk+'</div><h1>'+it.n+(it.toel?'<small>'+it.toel+'</small>':'')+'</h1></div>'
+ +'<a class="selterug" href="#/selectie/'+rt.soort+'/'+rt.id+'">↩ Overzicht '+it.n+'</a></div>'
+ +(topd.length>1?'<div class="qlabel">Verfijn op distilleerderij</div><div class="qchips">'
+   +'<button class="dchip'+(gekozen.length?'':' on')+'" onclick="fWis(\'dist\')">Alle <u>'+alle.length+'</u></button>'
+   +topd.map(function(d){var aan=gekozen.indexOf(d)>=0;return '<button class="dchip'+(aan?' on':'')+'" aria-pressed="'+aan+'" onclick="fTog(\'dist\',\''+esc(d)+'\')">'+d+' <u>'+dt[d]+'</u></button>';}).join("")
+   +'</div>':'')
+ +collectieBody(lijst,n,toon)
+ +'</div></section>';
+}
+/* De andere ingangen van dezelfde soort als kleine staafgrafiek: hoeveel flessen per bottelaar, land of streek. */
+function andereInfo(soort,huidig){
+ var g=INGANG[soort];
+ var rijen=g.items.map(function(x,i){return {x:x,i:i,n:ingLijst(soort,x).length};}).filter(function(r){return r.n&&r.x!==huidig;});
+ rijen.sort(function(a,b){return b.n-a.n;});
+ var max=rijen.length?rijen[0].n:1;
+ return '<div class="selanders"><div class="kicker" style="font-size:10px;margin-bottom:8px">Andere '+g.n.toLowerCase()+' · flessen in de collectie</div><div class="abars">'
+ +rijen.map(function(r){return '<a class="abar" href="#/selectie/'+soort+'/'+r.x.id+'" title="'+r.x.n+(r.x.toel?' ('+r.x.toel+')':'')+'">'+mono(r.x,r.i,26)
+   +'<span class="an">'+r.x.n+'</span><span class="ab"><i style="width:'+Math.max(4,Math.round(100*r.n/max))+'%"></i></span><u>'+r.n.toLocaleString("nl-NL")+'</u></a>';}).join("")
+ +'</div></div>';
 }
 var BRONKWAL={A:"officiële of primaire bron",B:"gezaghebbende secundaire bron",C:"vakjournalistiek",D:"producent of merk",E:"community of onbevestigd"};
 function vGids(rt){
@@ -2449,7 +2519,7 @@ function route(){
  var oud={island:"islands"};
  if(h.startsWith("#/inspiratie/streek/")){var gi=h.slice(20);return{r:"gids",soort:"streek",id:oud[gi]||gi};}
  if(h.startsWith("#/gids/")){var gd=h.split("/");return{r:"gids",soort:gd[2],id:gd[3]};}
- if(h.startsWith("#/selectie/")){var sd=h.split("/");return{r:"selectie",soort:sd[2],id:sd[3]};}
+ if(h.startsWith("#/selectie/")){var sd=h.split("/");if(deel[1])urlNaarF(deel[1]);return{r:"selectie",soort:sd[2],id:sd[3],verfijnd:!!deel[1]};}
  if(h==="#/winkelwagen")return{r:"winkelwagen"};
  if(h.startsWith("#/streek/")){var si=h.slice(9);return{r:"selectie",soort:"streek",id:oud[si]||si};}
  if(h.startsWith("#/product/"))return{r:"product",id:h.slice(10)};

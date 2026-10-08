@@ -16,7 +16,7 @@ import json, os, sys
 import numpy as np
 from PIL import Image
 
-MERK_RATIO = 0.62  # hoogte/breedte van het merk (WS-monogram)
+MERK_RATIO = 0.95  # hoogte/breedte van het WS-monogram (cirkel met W en S)
 
 
 def runs(bool_arr):
