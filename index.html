@@ -658,6 +658,58 @@ a.gidsteaser:hover{border-color:var(--amber2)}
 .smaaknoot{font-size:10.5px;color:var(--muted);line-height:1.45;margin:2px 0 4px}
 .fsub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:12px 0 0}
 .gidswrap sup.fn+sup.fn::before{content:",";color:var(--muted)}
+
+/* ===== 09-10: ingangen op één rij, meelopend filter, minifooter, WS-merk ===== */
+.ingrij{margin:4px 0 20px}
+.ingkop{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.ingkop .kicker{margin:0}
+.ingzoek{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12.5px;color:var(--muted)}
+.ingzoek input{border:0;outline:0;background:transparent;font:inherit;color:var(--text);width:150px}
+.ingzoek:focus-within{border-color:var(--amber2)}
+.ingwrap{position:relative}
+.ingstrip{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scroll-behavior:smooth;padding:2px 2px 12px;scrollbar-width:thin;scrollbar-color:var(--amber) transparent;
+ -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl,0px),#000 calc(100% - var(--fr,0px)),transparent 100%)}
+.ingstrip::-webkit-scrollbar{height:5px}.ingstrip::-webkit-scrollbar-thumb{background:var(--amber);border-radius:3px}.ingstrip::-webkit-scrollbar-track{background:var(--line);border-radius:3px}
+.ingstrip .sub{flex:0 0 136px;scroll-snap-align:start;padding:12px 10px}
+.ingstrip .sub .mono{transition:transform .2s}
+.ingstrip .sub:hover .mono{transform:rotate(-8deg) scale(1.08)}
+.ingstrip .sub.weg{display:none}
+.ingpijl{position:absolute;top:calc(50% - 6px);transform:translateY(-50%);z-index:2;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--amber);font-size:18px;line-height:1;box-shadow:0 6px 16px rgba(60,40,20,.14);display:grid;place-items:center;transition:opacity .2s}
+.ingpijl.l{left:-14px}.ingpijl.r{right:-14px}
+.ingpijl[hidden]{display:none}
+.ingleeg{font-size:12.5px;color:var(--muted);padding:14px 4px;display:none}
+@media(max-width:700px){.ingpijl{display:none!important}.ingzoek input{width:110px}}
+/* filterkolom loopt mee en scrolt zelf */
+@media(min-width:901px){
+ .colwrap>.fpanel{top:calc(var(--hdr,150px) + 14px);max-height:calc(100vh - var(--hdr,150px) - 28px - var(--fbar,44px));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+}
+/* minifooter: smalle balk, klapt helemaal open bij hover of tik */
+body{padding-bottom:var(--fbar,44px)}
+footer.voetmini{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:0;max-height:var(--fbar,44px);overflow:hidden;transition:max-height .4s cubic-bezier(.2,.8,.2,1),box-shadow .3s;box-shadow:0 -4px 14px rgba(60,40,20,.06)}
+footer.voetmini:hover,footer.voetmini:focus-within,footer.voetmini.open{max-height:80vh;overflow:auto;box-shadow:0 -22px 50px rgba(60,40,20,.22)}
+footer.voetmini .fbar{max-width:1200px;margin:0 auto;padding:0 24px;box-sizing:border-box}
+.fbar{height:var(--fbar,44px);display:flex;align-items:center;gap:18px;font-size:12.5px;color:var(--muted);cursor:pointer;white-space:nowrap;overflow:hidden}
+.fbar b{color:var(--text);font-weight:600}
+.fbar .fmeer{margin-left:auto;color:var(--amber);font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.fbar .fmeer i{font-style:normal;display:inline-block;transition:transform .3s}
+footer.voetmini:hover .fmeer i,footer.voetmini.open .fmeer i{transform:rotate(180deg)}
+footer.voetmini .frow{padding-top:18px}
+footer.voetmini .f18{padding-bottom:22px}
+@media(max-width:700px){.fbar .fweg{display:none}}
+.fab{bottom:calc(22px + var(--fbar,44px))}.som{bottom:calc(84px + var(--fbar,44px))}.cbar{bottom:calc(20px + var(--fbar,44px))}
+@media(max-width:900px){.fab{bottom:calc(14px + var(--fbar,44px))}.som{bottom:calc(72px + var(--fbar,44px))}}
+/* WS-merk op het productbeeld */
+.wsb{position:relative;display:block;aspect-ratio:1/1;line-height:0}
+.wsb img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain}
+.pimg .wsb{width:min(178px,80%)}
+.pd-img .wsb{width:min(400px,100%)}
+.hero-art .wsb{width:min(330px,100%);filter:drop-shadow(0 24px 40px rgba(80,50,30,.22))}
+.hero-art .wsb img{filter:none}
+@media(max-width:700px){.pimg .wsb{width:min(132px,80%)}.pd-img .wsb{width:min(260px,100%)}}
+.wsm{position:absolute;transform:translate(-50%,-50%);aspect-ratio:1/.62;pointer-events:none;
+ -webkit-mask:url(beelden/merk/ws.svg) center/contain no-repeat;mask:url(beelden/merk/ws.svg) center/contain no-repeat}
+.wsm.d{background:#4a0d14;opacity:.42;mix-blend-mode:multiply}
+.wsm.l{background:#f6ead6;opacity:.6;mix-blend-mode:screen}
 </style>
 </head>
 <body>
@@ -775,7 +827,8 @@ a.gidsteaser:hover{border-color:var(--amber2)}
   </div>
 </div>
 
-<footer>
+<footer class="voetmini" id="voet" tabindex="-1">
+  <div class="wrap fbar" onclick="document.getElementById('voet').classList.toggle('open')"><b>Whiskysite.nl</b><span class="fweg">Rosmolen 32, Leiden</span><span class="fweg">071-5236054</span><span class="fweg">Geen 18, geen alcohol</span><span class="fmeer">Meer <i>▴</i></span></div>
   <div class="wrap frow">
     <div>
       <h4>Whiskysite.nl — World of Fine Spirits</h4>
@@ -825,6 +878,7 @@ a.gidsteaser:hover{border-color:var(--amber2)}
 <script src="vendor/supabase.js" onerror="void 0"></script>
 <script src="hiaten.js" onerror="void 0"></script>
 <script src="gidsen.js" onerror="void 0"></script>
+<script src="merkposities.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
 <script src="lightspeed.js" onerror="void 0"></script>
 <script src="winkelmand.js" onerror="void 0"></script>
@@ -1054,7 +1108,7 @@ function card(p,prof,opt){
  /* compact: rustige kaart voor de homepage — smaaktags en smaakbalkjes staan op de productpagina */
  var compact=!!(opt&&opt.compact);
  return '<div class="pcard'+(compact?" compact":"")+'">'
- +'<div class="pimg" onclick="go(\'#/product/'+p.id+'\')"><img loading="lazy" src="'+p.img+'" alt="">'+samplLabel(p)
+ +'<div class="pimg" onclick="go(\'#/product/'+p.id+'\')">'+fotoMerk(p.img,'<img loading="lazy" src="'+p.img+'" alt="">')+samplLabel(p)
  +'<div class="badges">'+(p.fest?'<span class="badge" style="background:var(--gold);color:#241a0c">FESTIVAL</span>':"")+(p.was?'<span class="badge sale">SALE</span>':"")+(p.rare?'<span class="badge rare">RARE & OLD</span>':"")+(p.isNew?'<span class="badge new">NIEUW</span>':"")+'<span class="badge">'+p.region+'</span></div>'
  +(m!==null?'<div class="match-ring">'+m+'%<small>match</small></div>':"")
  +'<button class="wish" onclick="event.stopPropagation();wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+'</button></div>'
@@ -2091,14 +2145,55 @@ function ingNaarCollectie(soort,id,extra){
  return snel(o);
 }
 function ingTegels(soort){
- var g=INGANG[soort];
- return '<div class="kicker" style="margin:4px 0 8px">'+g.kop+'</div><div class="subs">'
- +g.items.map(function(it,i){
+ var g=INGANG[soort],veel=g.items.length>7;
+ var tegels=g.items.map(function(it,i){
    var n=ingLijst(soort,it).length,doel="go(\'#/selectie/"+soort+"/"+it.id+"\')";
    if(!n)return "";
-   return '<div class="sub" role="button" tabindex="0" onclick="'+doel+'" onkeydown="if(event.key===\'Enter\'){'+doel+'}">'
+   return '<div class="sub" role="button" tabindex="0" data-z="'+(it.n+" "+(it.toel||"")+" "+it.id).toLowerCase()+'" onclick="'+doel+'" onkeydown="if(event.key===\'Enter\'){'+doel+'}">'
     +mono(it,i)+'<b>'+it.n+'</b><span>'+n.toLocaleString("nl-NL")+' flessen'+(gidsVan(g.gsoort,it.id)?' · gids':'')+'</span></div>';
- }).join("")+'</div>';
+ }).join("");
+ setTimeout(ingInit,0);
+ return '<div class="ingrij"><div class="ingkop"><div class="kicker">'+g.kop+'</div>'
+ +(veel?'<label class="ingzoek"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input type="search" placeholder="Zoek '+g.enk.toLowerCase()+'…" aria-label="Zoek in '+g.n.toLowerCase()+'" oninput="ingZoek(this)" onkeydown="ingEnter(event,this)"></label>':'')+'</div>'
+ +'<div class="ingwrap"><button class="ingpijl l" aria-label="Naar links" onclick="ingSchuif(this,-1)" hidden>‹</button>'
+ +'<div class="ingstrip" onscroll="ingRand(this)">'+tegels+'</div>'
+ +'<button class="ingpijl r" aria-label="Naar rechts" onclick="ingSchuif(this,1)" hidden>›</button>'
+ +'<div class="ingleeg">Niets gevonden. Probeer een andere naam, of zoek in de collectie hieronder.</div></div></div>';
+}
+/* Eén rij: schuiven met pijlen, slepen, het muiswiel of de schuifbalk; zoeken filtert de tegels. */
+function ingInit(){
+ document.querySelectorAll(".ingstrip").forEach(function(st){
+  ingRand(st);
+  if(st._init)return;st._init=1;
+  st.addEventListener("wheel",function(e){
+   if(st.scrollWidth<=st.clientWidth||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+   var max=st.scrollWidth-st.clientWidth;
+   if((e.deltaY<0&&st.scrollLeft<=0)||(e.deltaY>0&&st.scrollLeft>=max-1))return;
+   e.preventDefault();st.scrollLeft+=e.deltaY;},{passive:false});
+  var sx=null,sl=0,bewogen=false;
+  st.addEventListener("pointerdown",function(e){if(e.pointerType!=="mouse")return;sx=e.clientX;sl=st.scrollLeft;bewogen=false;});
+  window.addEventListener("pointermove",function(e){if(sx===null)return;var d=e.clientX-sx;if(Math.abs(d)>5){bewogen=true;st.style.scrollBehavior="auto";st.scrollLeft=sl-d;}});
+  window.addEventListener("pointerup",function(){if(sx!==null){sx=null;st.style.scrollBehavior="";}});
+  st.addEventListener("click",function(e){if(bewogen){e.stopPropagation();e.preventDefault();bewogen=false;}},true);
+ });
+}
+function ingRand(st){
+ var max=st.scrollWidth-st.clientWidth,w=st.parentNode;
+ var l=st.scrollLeft>4,r=st.scrollLeft<max-4;
+ st.style.setProperty("--fl",l?"36px":"0px");st.style.setProperty("--fr",r?"36px":"0px");
+ w.querySelector(".ingpijl.l").hidden=!l;w.querySelector(".ingpijl.r").hidden=!r;
+}
+function ingSchuif(b,r){var st=b.parentNode.querySelector(".ingstrip");st.scrollBy({left:r*st.clientWidth*0.8,behavior:"smooth"});}
+function ingZoek(inp){
+ var q=inp.value.trim().toLowerCase(),rij=inp.closest(".ingrij"),st=rij.querySelector(".ingstrip"),n=0;
+ st.querySelectorAll(".sub").forEach(function(t){var aan=!q||t.dataset.z.indexOf(q)>=0;t.classList.toggle("weg",!aan);if(aan)n++;});
+ rij.querySelector(".ingleeg").style.display=n?"none":"block";
+ st.scrollLeft=0;ingRand(st);
+}
+function ingEnter(e,inp){
+ if(e.key!=="Enter")return;
+ var eerste=inp.closest(".ingrij").querySelector(".ingstrip .sub:not(.weg)");
+ if(eerste)eerste.click();
 }
 /* Welke tegelrij hoort bij de gekozen categorie, en is er al een keuze gemaakt? */
 function ingVoorCat(){
@@ -2389,7 +2484,7 @@ function vHome(){
  +'<a class="btn btn-a" href="#/ontdek">Help mij kiezen →</a> <a class="btn btn-g" href="#/collectie">Ik weet wat ik zoek</a>'
  +'<div class="stats"><div><b>10.000+</b><span>artikelen leverbaar</span></div><div><b>1.400+</b><span>whisky­samples</span></div><div><b>60+</b><span>independent bottlers</span></div></div>'
  +'</div><div class="hero-art">'+(P_ECHT&&held
-   ?'<a href="#/product/'+held.id+'"><img src="'+held.img+'" alt="'+String(held.name).replace(/"/g,'&quot;')+'"></a><div class="hero-badge">Uitgelicht: <b>'+held.name+'</b> · '+eur(held.price)+'</div>'
+   ?'<a href="#/product/'+held.id+'">'+fotoMerk(held.img,'<img src="'+held.img+'" alt="'+String(held.name).replace(/"/g,'&quot;')+'">')+'</a><div class="hero-badge">Uitgelicht: <b>'+held.name+'</b> · '+eur(held.price)+'</div>'
    :'<img src="'+IMG.lag+'" alt=""><div class="hero-badge">Meest geproefd deze week: <b>Lagavulin 16</b> · sample €7,49</div>')+'</div></div></div>'
  +'<div class="usp-bar"><div class="wrap usp"><div>'+I("phone",15)+'Hulp nodig? 071-5236054</div><div>'+I("pack",15)+'Zorgvuldig verpakt</div><div>'+I("sparkles",15)+'Dagelijks nieuwe flessen</div><div>'+I("flask",15)+'Proef eerst: 1.400+ samples</div></div></div>'
  +'<div style="background:linear-gradient(90deg,#33221a,#54301c);color:#fff"><div class="wrap" style="display:flex;align-items:center;gap:14px;padding:12px 24px;flex-wrap:wrap;font-size:13.5px"><span style="color:var(--gold)">'+I("sparkles",16)+'</span><b>Whisky in Leiden 2027</b><span style="opacity:.8">juni 2027 · Hooglandse Kerk · festivalbottelingen · masterclasses</span><a href="#/festival" style="margin-left:auto;color:var(--gold);font-weight:600">Bekijk het festival →</a></div></div>'
@@ -2454,10 +2549,20 @@ function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+
 /* Terugval (F-b): laadt een opgemaakt beeld niet, dan alsnog de winkelfoto. Nooit een leeg vak. */
 /* wordt al bij het inlezen van de catalogus gevuld (hierboven); hier alleen niet overschrijven */
 var BEELD_TERUG=window.BEELD_TERUG||{};
+/* Subtiel WS-merk op de flessenhals of de koker/doos. De plaats per beeld komt uit
+   merkposities.js (tools/ws_merk.py); het beeld zelf blijft onaangeroerd. Alleen voor
+   de opgemaakte beelden (beelden/p); een winkelfoto van Lightspeed krijgt geen merk. */
+var WSMERK_AAN=true;
+function fotoMerk(src,img){
+ var m=/beelden\/p\/([A-Za-z0-9_-]+)\.webp/.exec(src||""),pos=m&&typeof WSMERK!=="undefined"&&WSMERK[m[1]];
+ if(!WSMERK_AAN||!pos)return img;
+ return '<span class="wsb">'+img+'<i class="wsm '+pos[3]+'" style="left:'+pos[0]+'%;top:'+pos[1]+'%;width:'+pos[2]+'%" aria-hidden="true"></i></span>';
+}
 var GEEN_FOTO="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Cpath d='M88 18h24v58c0 10 26 22 26 52v146c0 9-7 14-16 14H78c-9 0-16-5-16-14V128c0-30 26-42 26-52z' fill='#d9d2c7'/%3E%3Crect x='86' y='10' width='28' height='12' rx='3' fill='#c4bbad'/%3E%3Crect x='68' y='160' width='64' height='70' rx='4' fill='#efeae2'/%3E%3Ctext x='100' y='200' font-family='sans-serif' font-size='13' text-anchor='middle' fill='#8a8174'%3Efoto volgt%3C/text%3E%3C/svg%3E";
 document.addEventListener("error",function(e){
  var t=e.target;if(!t||t.tagName!=="IMG")return;
  var m=/beelden\/p\/([A-Za-z0-9_-]+)\.webp/.exec(t.getAttribute("src")||"");
+ if(m){var mk=t.parentNode&&t.parentNode.querySelector&&t.parentNode.querySelector(".wsm");if(mk)mk.remove();}
  if(m&&BEELD_TERUG[m[1]]){t.src=BEELD_TERUG[m[1]];return;}
  /* Ook de winkelfoto ontbreekt (404 bij Lightspeed): neutrale fles, eenmalig, zodat er nooit een kapot plaatje staat. */
  if(t.dataset.geenFoto)return;
@@ -2515,7 +2620,7 @@ function vProduct(rt){
  return '<section><div class="wrap">'
  +'<a class="back" href="#/collectie">← Terug naar collectie</a>'
  +bPaneel(p)
- +'<div class="pd" style="margin-top:22px"><div class="pd-img" style="position:relative"><img src="'+p.img+'" alt="">'+samplLabel(p)+'</div><div>'
+ +'<div class="pd" style="margin-top:22px"><div class="pd-img" style="position:relative">'+fotoMerk(p.img,'<img src="'+p.img+'" alt="">')+samplLabel(p)+'</div><div>'
  +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
  +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
  +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
@@ -3416,6 +3521,9 @@ function ask(preset){
  b.scrollTop=b.scrollHeight;
 }
 /* ================= INIT ================= */
+function kopMaat(){var h=document.querySelector("header");if(h)document.documentElement.style.setProperty("--hdr",h.offsetHeight+"px");}
+window.addEventListener("resize",kopMaat);setTimeout(kopMaat,0);
+document.addEventListener("click",function(e){var v=document.getElementById("voet");if(v&&v.classList.contains("open")&&!v.contains(e.target))v.classList.remove("open");});
 if(typeof wmKoppel==="function"){wmKoppel();wmTel();}
 render();
 </script>
