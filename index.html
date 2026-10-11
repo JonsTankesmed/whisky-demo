@@ -966,6 +966,7 @@ footer.voetmini .f18{padding-bottom:22px}
 
 <script src="catalogus-lokaal.js" onerror="void 0"></script>
 <script src="beoordeling.js" onerror="void 0"></script>
+<script src="oordelen-jack.js" onerror="void 0"></script>
 <script src="wijzigingen.js" onerror="void 0"></script>
 <script src="afstemming.js" onerror="void 0"></script>
 <script src="beelden-manifest.js" onerror="void 0"></script>
@@ -1351,6 +1352,28 @@ var P_ECHT=false;
  if(!echt.length)return;
  P.length=0;echt.forEach(function(q){P.push(q);});
  CAT=LOKAAL;P_ECHT=true;
+})();
+/* Oordelen van Jack over de catalogus heen leggen (oordelen-jack.js, uit de kluis).
+   Turf afgekeurd = het voorstel 'peated / rokerig' klopt niet, maar wat wél klopt zegt het
+   niet. Daarom: turf 'Nog niet bepaald', rookas leeg, geen turftag (besluit John 09-10, A).
+   Een bijgesteld profiel neemt Jacks cijfers over; 'niet plaatsen' haalt de omschrijving weg. */
+(function(){
+ if(typeof OORDELEN==="undefined"||!OORDELEN)return;
+ var byId={};CAT.forEach(function(p){byId[String(p.id)]=p;});
+ (OORDELEN.turfNee||[]).forEach(function(id){var p=byId[id];if(!p)return;
+  if(!p.geenprofiel&&p.t)p.t[0]=null;p._turf=null;p._turfJack="nee";
+  if(p.tags)p.tags=p.tags.filter(function(t){return t!=="turf";});});
+ (OORDELEN.turfJa||[]).forEach(function(id){var p=byId[id];if(p)p._turfJack="ja";});
+ Object.keys(OORDELEN.profiel||{}).forEach(function(id){var p=byId[id];if(!p)return;
+  var a=OORDELEN.profiel[id];p.t=a.slice();p.geenprofiel=false;p._profielJack=true;
+  if(p._turfJack!=="nee")p._turf=a[0]==null?null:(a[0]>=4?2:(a[0]>=2?1:0));});
+ /* Vervolgvraag turf: licht = rook 2, ongeturfd = rook 0, toch uitgesproken = rook 4. */
+ var TG={"Licht turfig":[1,2],"Ongeturfd":[0,0],"Toch uitgesproken":[2,4]};
+ Object.keys(OORDELEN.turfGraad||{}).forEach(function(id){var p=byId[id],g=TG[OORDELEN.turfGraad[id]];if(!p||!g)return;
+  p._turf=g[0];if(!p.geenprofiel&&p.t)p.t[0]=g[1];p._turfJack="graad";
+  if(g[0]>0&&p.tags&&p.tags.indexOf("turf")<0)p.tags.push("turf");});
+ (OORDELEN.omsNee||[]).forEach(function(id){var p=byId[id];if(p){p.sum="";p._omsJack="nee";}});
+ Object.keys(OORDELEN.omsTekst||{}).forEach(function(id){var p=byId[id];if(p){p.sum=OORDELEN.omsTekst[id];p._omsJack="tekst";}});
 })();
 function wsUrl(p){return p&&p.url?"https://www.whiskysite.nl/"+encodeURIComponent(p.url)+".html":null;}
 var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
@@ -2396,6 +2419,8 @@ function soortDef(land,n){var l=WSOORT[land]||[];for(var i=0;i<l.length;i++)if(l
 function soortVan(p){
  if(p._soort!==undefined)return p._soort;
  var land=p.country,r=null;
+ var oj=(typeof OORDELEN!=="undefined"&&OORDELEN&&OORDELEN.soort)?OORDELEN.soort[String(p.id)]:null;
+ if(oj&&WSOORT[land]){p._soortJack=true;p._soort=soortDef(land,oj)||{n:oj,kl:"#7b6a58",def:"Door Jack opgegeven."};return p._soort;}
  if(WSOORT[land]){
   var n=(p.name||"").toLowerCase(),d=p.dist||"",abv=parseFloat(String(p.abv||"").replace(",","."))||0,k=null;
   if(/\b(honey|apple|fire|ginger|cinnamon|lemon|peach|cherry|moonshine|lightnin|liqueur|cream|cola|blackberry|maple|spiced)\b/.test(n)||(abv&&abv<40)||d==="Ole Smoky")k="Gearomatiseerd of likeur";
@@ -2936,7 +2961,8 @@ function vProduct(rt){
  +'<button class="btn btn-g" style="gap:8px" onclick="wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+(wish.has(p.id)?" Bewaard":" Bewaar")+'</button></div>'
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="wmSample(\''+p.id+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
- +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+plaats(p)+'</td></tr>'+(soortVan(p)?'<tr><th>Soort</th><td>'+soortVan(p).n+(p._soortAfg?' <small style="color:var(--muted)">(afgeleid uit het merk — wacht op controle)</small>':'')+'</td></tr>':'')+'<tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+(p.abv||"—")+'</td></tr><tr><th>Vatsoort</th><td>'+(p.cask||"—")+'</td></tr><tr><th>Inhoud</th><td>'+volTekst(p)+'</td></tr></table>'
+ +(p._turfJack==='nee'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Rook nog niet bepaald: Jack keurde het label \'uitgesproken turf\' af. Licht of geen turf volgt.</p>':p._profielJack?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Smaakprofiel bijgesteld door Jack.</p>':p._turfJack==='graad'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Turf: '+lblTurf(p).toLowerCase()+', volgens Jack.</p>':p._turfJack==='ja'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Turf bevestigd door Jack.</p>':'')
+ +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+plaats(p)+'</td></tr>'+(soortVan(p)?'<tr><th>Soort</th><td>'+soortVan(p).n+(p._soortJack?' <small style="color:var(--muted)">(bevestigd door Jack)</small>':p._soortAfg?' <small style="color:var(--muted)">(afgeleid uit het merk — wacht op controle)</small>':'')+'</td></tr>':'')+'<tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+(p.abv||"—")+'</td></tr><tr><th>Vatsoort</th><td>'+(p.cask||"—")+'</td></tr><tr><th>Inhoud</th><td>'+volTekst(p)+'</td></tr></table>'
  /* De 20 handgemaakte producten hebben een spijsadvies, de 6.371 uit de winkel
     niet. Dan valt de hele kop weg — een lege 'Lekker bij' is erger dan geen. */
  +((p.pair&&p.pair.length)?'<h3 style="font-size:18px">Lekker bij</h3><div class="pair">'+p.pair.map(x=>'<span>'+x+'</span>').join("")+'</div>':"")
@@ -3482,12 +3508,45 @@ function bNuInDemo(x){
   return '<div class="bnu">Nu in de demo: '+(d||"geen flessen meer onder deze naam")+'</div>';
  }
  if(x.k==="vat"||x.k==="turf")return '<div class="bnu">Staat al zo in de demo — jouw oordeel bepaalt of het blijft.</div>';
+ if(x.k==="turfgraad")return '<div class="bnu">Nu in de demo: turf nog niet bepaald.</div>';
+ if(x.k==="soort"){var p=byId(x.pid);return p?'<div class="bnu">Nu in de demo: '+(soortVan(p)||{n:"—"}).n+'</div>':"";}
  return "";
+}
+/* Vervolgvragen (12-10): komen voort uit eerdere oordelen en uit de soortindeling VS.
+   Ze worden hier in de bestaande rij gezet, zodat de antwoorden langs dezelfde weg
+   (ws_antwoorden, lijst 'beoordelen') binnenkomen als alle andere. Geen aparte lijst. */
+var BCATVRAGEN=[
+ {id:"catalogus:ledaig-lowland",titel:"Adelphi Ledaig 3 Years Old 2022 (fles en sample)",pid:"163805682",uitleg:"Streek staat op Lowland. Ledaig wordt gestookt bij Tobermory op Mull (Islands). Welke streek klopt?",opties:["Islands","Lowland klopt"]},
+ {id:"catalogus:stkilian-2015",titel:"Adelphi St. Kilian 6 Years Old 2015 (fles en sample)",pid:"163806560",uitleg:"Distillatiejaar 2015 lijkt vroeg voor St. Kilian. Klopt het jaar in de productnaam?",opties:["Klopt","Jaar is anders"]},
+ {id:"catalogus:land-kinglassie",titel:"KinGlassie (3 producten)",pid:"157898751",uitleg:"Land staat op Amerika. Lijkt een Schotse blended malt. Welk land?",opties:["Schotland","Amerika klopt"]},
+ {id:"catalogus:land-greign",titel:"Greign Grain Whisky 20 Years Old",pid:"123339817",uitleg:"Land staat op Amerika. Lijkt Schotse grain. Welk land?",opties:["Schotland","Amerika klopt"]},
+ {id:"catalogus:land-three-scottish-brothers",titel:"Three Scottish Brothers Single Grain 20 Years Old",pid:"123339810",uitleg:"Land staat op Amerika. Welk land?",opties:["Schotland","Amerika klopt"]},
+ {id:"catalogus:land-hellyers",titel:"Hellyers Road Single Malt Whisky Journeyman",pid:"153854772",uitleg:"Staat als Amerika onder Journeyman. Hellyers Road komt uit Tasmanië. Welk land en welke distilleerderij?",opties:["Australië, Hellyers Road","Amerika klopt"]},
+ {id:"catalogus:england-engeland",titel:"Land 'England' (16) naast 'Engeland' (41)",uitleg:"Twee spellingen voor hetzelfde land. Overal 'Engeland' gebruiken?",opties:["Ja, overal Engeland"]},
+ {id:"catalogus:as56-laphroaig",titel:"Laphroaig 10 Years Old Sherry Oak Finish",pid:"118389941",uitleg:"In september stelde je as 6 bij (1 → 4). Het profiel heeft nu vier assen: rook, zoet, fruit, kruid. Welke as bedoelde je, en welk cijfer?",opties:[]},
+ {id:"catalogus:as56-glenfiddich18",titel:"Glenfiddich 18 Years Old Small Batch Reserve",pid:"125993969",uitleg:"In september stelde je as 6 bij (1 → 4). Het profiel heeft nu vier assen: rook, zoet, fruit, kruid. Welke as bedoelde je, en welk cijfer?",opties:[]}
+];
+var BEXTRA=false;
+function bExtraVragen(){
+ if(BEXTRA||typeof BEOORDELING==="undefined"||typeof CAT==="undefined")return;BEXTRA=true;
+ var bij=[],byI={};CAT.forEach(function(p){byI[String(p.id)]=p;});
+ if(typeof OORDELEN!=="undefined"&&OORDELEN)(OORDELEN.turfNee||[]).forEach(function(id){var p=byI[id];if(!p)return;
+  bij.push({k:"turfgraad",id:"turfgraad:"+id,pid:id,titel:p.name,foto:p.img,uitleg:"Je keurde 'uitgesproken turf' af. Wat klopt wel?",opties:["Licht turfig","Ongeturfd","Toch uitgesproken"]});});
+ CAT.filter(function(p){return p.country==="Amerika";}).forEach(function(p){var x=soortVan(p);if(!x)return;
+  var onb=x.n.indexOf("Overig")===0;if(!onb&&!p._soortAfg)return;
+  bij.push({k:"soort",id:"soort:"+p.id,pid:String(p.id),titel:p.name,foto:p.img,
+   uitleg:onb?"Soort niet af te leiden uit naam of merk. Welke soort is het?":"Soort afgeleid uit het merk ("+p.dist+"). Klopt dat?",
+   huidig:onb?"onbekend":"afgeleid",voorstel:onb?"":x.n,
+   opties:onb?["Bourbon","Rye","Tennessee whiskey","American single malt","Blended"]:[x.n,"Rye","Tennessee whiskey"].filter(function(v,i,a){return a.indexOf(v)===i;})});});
+ BCATVRAGEN.forEach(function(q){var p=q.pid?byI[q.pid]:null;bij.push(Object.assign({k:"catalogus",foto:p?p.img:""},q));});
+ var al={};BEOORDELING.items.forEach(function(x){al[x.id]=1;});
+ BEOORDELING.items=bij.filter(function(x){return !al[x.id];}).concat(BEOORDELING.items);
 }
 function vAdminBeoordeel(){
  if(typeof BEOORDELING==="undefined")return '<h3 style="font-size:20px">Beoordelen</h3><p style="color:var(--muted)">De beoordeelrij is niet geladen.</p>';
+ bExtraVragen();
  var alle=BEOORDELING.items, gedaan=Object.keys(BSLT).length;
- var soorten=[["herkomst","Herkomst van een stokerij"],["product","Per product"],["turf","Turflabel"],["vat","Vatsoort"]];
+ var soorten=[["turfgraad","Turf: licht of geen"],["soort","Soort (VS)"],["catalogus","Catalogus"],["herkomst","Herkomst van een stokerij"],["product","Per product"],["turf","Turflabel"],["vat","Vatsoort"]];
  var tel={};soorten.forEach(function(s){tel[s[0]]=alle.filter(function(x){return x.k===s[0];}).length;});
  var open=alle.filter(function(x){return !BSLT[x.id];});
  var lijst=BFILTER==="open"?open:BFILTER==="gedaan"?alle.filter(function(x){return BSLT[x.id];}):alle.filter(function(x){return x.k===BFILTER;});
@@ -3510,6 +3569,12 @@ function vAdminBeoordeel(){
    keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
     +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+x.id+'\',v)">Ander land…</button>'
     +(x.twijfel?knop(x.id,"bottelaar","Is een bottelaar","neutraal")+knop(x.id,"geen naam","Geen naam","neutraal"):"")
+    +knop(x.id,"onbekend","Weet ik niet","neutraal");
+  }else if(x.k==="turfgraad"||x.k==="soort"||x.k==="catalogus"){
+   /* Vervolgvragen: vaste keuzes, plus ruimte voor een eigen antwoord. */
+   var eigen=b&&typeof b.w==="string"&&(x.opties||[]).indexOf(b.w)<0&&b.w!=="onbekend";
+   keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
+    +'<button class="bbtn'+(eigen?" aan":"")+'" title="'+(eigen?b.w.replace(/"/g,"&quot;"):"")+'" onclick="var v=prompt(\'Jouw antwoord:\''+(eigen?',\''+esc(b.w).replace(/"/g,"&quot;")+'\'':'')+');if(v&&v.trim())bZet(\''+x.id+'\',v.trim())">'+(x.opties&&x.opties.length?"Anders…":"Antwoorden…")+'</button>'
     +knop(x.id,"onbekend","Weet ik niet","neutraal");
   }else if(x.k==="product"){
    keuzes=knop(x.id,"ja","Alles klopt","ja")+knop(x.id,"onbekend","Weet ik niet","neutraal");
