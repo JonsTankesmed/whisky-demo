@@ -23,6 +23,7 @@ Gebruik (vanuit de whisky-demo-map; vereist shapely en pyproj):
     python tools/streekgrenzen_bouwer.py
 """
 import json, os, sys, urllib.parse, urllib.request
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pyproj import Transformer
 from shapely.geometry import Polygon, LineString, Point, box, shape
 from shapely.ops import unary_union, split
@@ -157,13 +158,20 @@ def main():
     ctx = unary_union([eenh(g) for g in context]).simplify(TOL * 2).intersection(kader)
 
     # --- distilleerderijen ------------------------------------------------------
-    s = open(os.path.join(DEMO, "index.html"), encoding="utf8").read()
-    i = s.index("var KAART="); j = s.index("\n", i)
+    # Uit de kluisexport (Wikidata via _Export/distilleerderij-locaties.json). Het gebied volgt
+    # uit de ligging op deze kaart (wettelijk), niet uit het regioveld van de catalogus.
+    from kaart_gemeen import distilleerderijen
+    gebieden = [("Islay", islay), ("Campbeltown", campbeltown), ("Speyside", speyside),
+                ("Lowland", lowland), ("Island", islands), ("Highland", highland)]
     punten = {}
-    for d in json.loads(s[i + 10:j].rstrip(";"))["distilleerderijen"]:
-        x, y = pt(d["lat"], d["lon"])
-        if kader.contains(Point(x, y)):
-            punten[d["naam"]] = [round(x), round(y)]
+    for d in distilleerderijen()[0]:
+        p = Point(pt(d["lat"], d["lon"]))
+        if land.distance(p) > 30:          # buiten Schotland (of verder dan 3 km uit de kust)
+            continue
+        gb = next((r for r, g in gebieden if g.contains(p)), None)
+        if not gb:
+            gb = min(gebieden, key=lambda rg: rg[1].distance(p))[0]
+        punten[d["id"]] = [round(p.x), round(p.y), gb]
 
     labels = {r: [round(v) for v in pt(lat, lon)] for r, (lat, lon) in {
         "Highland": (56.78, -4.7), "Speyside": (57.12, -3.3), "Lowland": (55.55, -3.35),

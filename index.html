@@ -659,11 +659,38 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 .km-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--amber);color:#fff;border:0;border-radius:24px;padding:11px 18px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;margin-top:4px}
 .km-cta:hover{background:var(--amber2)}
 .km-bron{font-size:11px;color:#8a7a62;margin-top:12px;line-height:1.6}
+.km-wl{stroke:#d9cfbd;stroke-width:calc(var(--k,1)*.6px);stroke-linejoin:round}
+.km-bol{fill:#e9e2d3;stroke:none}
+.km-wl.km-gb{cursor:pointer;transition:fill .2s}
+.km-wl.km-gb.hov{stroke:#5c3a1e;stroke-width:calc(var(--k,1)*1.1px)}
+.km-grat{fill:none;stroke:#ddd4c3;stroke-width:calc(var(--k,1)*.7px);pointer-events:none}
+.km-rand{fill:none;stroke:#d3c7b0;stroke-width:calc(var(--k,1)*1.2px);pointer-events:none}
+.km-buur{fill:#ece5d7;stroke:#fffdf8;stroke-width:calc(var(--k,1)*.8px);stroke-linejoin:round}
+.km-landvlak{fill:#fbf8f2}
+.km-staat{fill:none;stroke:#d9cdb6;stroke-width:calc(var(--k,1)*.8px);stroke-dasharray:calc(var(--k,1)*3px) calc(var(--k,1)*2.5px);pointer-events:none}
+.km-leeg{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:clamp(460px,calc(100vh - 220px),760px);background:#efe9dd;color:#8a7a62;font-size:13px}
+.km-laad{width:34px;height:34px;border-radius:50%;border:2.5px solid #d9cdb6;border-top-color:var(--amber);animation:kmdraai .9s linear infinite}
+@keyframes kmdraai{to{transform:rotate(360deg)}}
+.km-open{border-top:1px solid var(--line);padding-top:10px;font-size:13px}
+.km-open summary{cursor:pointer;font-weight:600;color:var(--text);list-style:none;display:flex;justify-content:space-between}
+.km-open summary::-webkit-details-marker{display:none}
+.km-open summary:after{content:"+";color:var(--muted);margin-left:8px}
+.km-open[open] summary:after{content:"−"}
+.km-open summary u{text-decoration:none;color:var(--muted);font-weight:400;margin-left:auto}
+.km-open p{font-size:12px;color:var(--muted);margin:6px 0}
+.km-open ul{list-style:none;margin:0;padding:0;columns:2;column-gap:14px}
+.km-open li{display:flex;justify-content:space-between;gap:6px;break-inside:avoid;padding:2px 0}
+.km-open li button{font:inherit;font-size:12.5px;background:none;border:0;padding:0;color:var(--text);cursor:pointer;text-align:left}
+.km-open li button:hover{color:var(--amber)}
+.km-open li u{text-decoration:none;color:var(--muted);font-size:11.5px}
+.km-wd{font-size:11.5px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.km-wd:hover{color:var(--amber)}
 @media(max-width:900px){
  .km{grid-template-columns:1fr}
  .km-kaart{height:min(72vh,560px)}
  .km-paneel{border-left:0;border-top:1px solid var(--line);max-height:none}
  .km-lab{font-size:calc(var(--k,1)*9.5px);letter-spacing:.16em}
+ .km-k-wereld{height:auto;aspect-ratio:1.45}
  .km-inzetlab{font-size:calc(var(--k,1)*8px)}
 }
 @media(max-width:640px){.klabel{font-size:13px}.knaam{display:none}}
@@ -1091,7 +1118,6 @@ footer.voetmini .f18{padding-bottom:22px}
 <script src="vendor/supabase.js" onerror="void 0"></script>
 <script src="hiaten.js" onerror="void 0"></script>
 <script src="gidsen.js" onerror="void 0"></script>
-<script src="streekgrenzen.js" onerror="void 0"></script>
 <script src="kaart.js" onerror="void 0"></script>
 <script src="merkposities.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
@@ -2938,10 +2964,7 @@ function kInfo(){
 }
 function vKaart(){
  if(typeof KAART==="undefined")return '<section><div class="wrap"><div class="empty">De kaartdata is nog niet ingeladen.</div></div></section>';
- if(KNIVEAU==="schotland"&&typeof kmView==="function"&&typeof KGRENZEN!=="undefined")
-  return '<section><div class="wrap"><div class="sec-head"><h2>Waar komt je whisky vandaan?</h2></div>'
-   +'<p class="sec-sub">Schotland kent vijf wettelijke whiskygebieden. Beweeg over de kaart, kies een gebied of klik op een distilleerderij.</p>'
-   +kmView()+'</div></section>';
+ if(typeof kmPagina==="function")return kmPagina();   /* kaart.js: wereld, Schotland en landen */
  var punten=kPunten();
  var kruim='<div class="kkruim"><button onclick="KNIVEAU=\'wereld\';KSTREEK=\'\';KGEKOZEN=null;render()">Wereld</button>'
   +(KNIVEAU==="schotland"?' › <button onclick="KSTREEK=\'\';KGEKOZEN=null;render()">Schotland</button>':' › <b>de whiskylanden</b>')
@@ -3000,7 +3023,7 @@ function render(){
  updateBadges();
  if(rt.r==="admin"&&rt.sub==="voortgang"&&typeof arRender==="function")arRender();
  if(rt.r==="admin"&&rt.sub==="beeldtool"&&typeof btInit==="function")btInit();
- if(rt.r==="kaart"&&KNIVEAU==="schotland"&&typeof kmInit==="function")kmInit();
+ if(rt.r==="kaart"&&typeof kmInit==="function")kmInit();
 }
 /* ================= VIEWS ================= */
 function vHome(){
