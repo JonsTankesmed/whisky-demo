@@ -587,6 +587,14 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 .kinfo button{font:inherit;font-size:12px;font-weight:600;background:#8a1c26;color:#fff;border:0;border-radius:8px;padding:6px 11px;cursor:pointer}
 .kinfo .sluit{position:absolute;top:4px;right:7px;background:none;color:#8a7351;padding:2px 4px}
 .kbron{font-size:11px;color:#8a7351;margin-top:10px;line-height:1.6}
+.kgebied{fill-opacity:.34;stroke:#efe6d4;stroke-width:.8;stroke-linejoin:round;cursor:pointer;transition:fill-opacity .15s}
+.kgebied:hover{fill-opacity:.48}
+.kgebied.aan{fill-opacity:.58}
+.kgebied.dim{fill-opacity:.1}
+.keiland{fill:url(#karcering);stroke:#4b3a6e;stroke-width:.8;stroke-dasharray:2.5 2;cursor:pointer}
+.keiland.dim{opacity:.25}
+.klijn{fill:none;stroke:#5c4a35;stroke-width:1.4;stroke-dasharray:5 3;pointer-events:none}
+.knoot{font-size:11px;color:#8a7351;margin-top:8px;line-height:1.6}
 @media(max-width:640px){.klabel{font-size:13px}.knaam{display:none}}
 /* ===== voorselecties, gidsen en smaakfilter (08-10) ===== */
 .selstats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:6px;font-size:13px;color:#e8dccd}
@@ -1012,6 +1020,7 @@ footer.voetmini .f18{padding-bottom:22px}
 <script src="vendor/supabase.js" onerror="void 0"></script>
 <script src="hiaten.js" onerror="void 0"></script>
 <script src="gidsen.js" onerror="void 0"></script>
+<script src="streekgrenzen.js" onerror="void 0"></script>
 <script src="merkposities.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
 <script src="lightspeed.js" onerror="void 0"></script>
@@ -2753,8 +2762,10 @@ var KAART={"wereld":[{"naam":"Fiji","nl":"","d":"M960.0,282.8 L960.0,284.1 L956.
 /* ================= KAART (wereld → Schotland → distilleerderij) =================
    Geen kaartdienst en geen tegels: KAART bevat platte SVG-paden uit Natural Earth
    (publiek domein) en coördinaten uit Wikidata (CC0), opgehaald door kaart_bouwer.py.
-   Streekgrenzen tekenen we niet — die bestaan officieel niet. De streek volgt uit
-   de distilleerderijen die erin liggen. */
+   Streekgrenzen komen uit streekgrenzen.js (KGRENZEN, tools/streekgrenzen_bouwer.py):
+   de vijf wettelijke gebieden uit reg. 10 van de Scotch Whisky Regulations 2009,
+   opgebouwd uit ONS-wards (OGL) en de Highland-Lowland-lijn. 'Islands' is geen
+   wettelijk gebied en staat er als gearceerde, traditionele laag op. */
 var KNIVEAU="wereld",KSTREEK="",KGEKOZEN=null;
 var KKLEUR={Islay:"#8a1c26",Speyside:"#a05e2a",Highland:"#2f5240",Island:"#4b3a6e",
             Lowland:"#6b6320",Campbeltown:"#1f4f63"};
@@ -2808,13 +2819,29 @@ function kHalo(punten,r){
   +' rx="'+Math.max(16,sx*2.1+13).toFixed(0)+'" ry="'+Math.max(16,sy*2.1+13).toFixed(0)+'"'
   +' fill="'+KKLEUR[r]+'" filter="url(#kvlek)"></ellipse>';
 }
+function kGebieden(){
+ /* Volgorde: Highland en Lowland als ondergrond, daarop Speyside (ligt binnen
+    Highland), Campbeltown en Islay, dan de gearceerde Islands en de lijn. */
+ var G=KGRENZEN,lagen=[["Highland","highland"],["Lowland","lowland"],["Speyside","speyside"],
+  ["Campbeltown","campbeltown"],["Islay","islay"]];
+ var uit=lagen.map(function(l){
+  var r=l[0],kl=KSTREEK?(KSTREEK===r?" aan":" dim"):"";
+  return '<path class="kgebied'+kl+'" d="'+G[l[1]]+'" fill="'+KKLEUR[r]+'"'
+   +' onclick="kStreek(\''+r+'\')"><title>'+r+(r==="Speyside"?" (ligt binnen Highland)":"")+'</title></path>';
+ }).join("");
+ uit+='<path class="keiland'+(KSTREEK&&KSTREEK!=="Island"?" dim":"")+'" d="'+G.islands+'"'
+  +' onclick="kStreek(\'Island\')"><title>Islands — traditionele indeling, geen wettelijk gebied</title></path>';
+ return uit+'<path class="klijn" d="'+G.lijn+'"></path>';
+}
 function kSchotland(){
  var v=kVak(),punten=kPunten();
  var tonen=STREKEN.filter(function(r){return !KSTREEK||r===KSTREEK;});
- var halos=tonen.map(function(r){return kHalo(punten,r);}).join("");
+ var halos=typeof KGRENZEN!=="undefined"?kGebieden():tonen.map(function(r){return kHalo(punten,r);}).join("");
  var labels=tonen.map(function(r){
   var groep=punten.filter(function(d){return d.streek===r;});
   if(!groep.length)return "";
+  var lp=typeof KGRENZEN!=="undefined"&&KGRENZEN.labels&&KGRENZEN.labels[r];
+  if(lp)return '<text class="klabel" x="'+lp[0]+'" y="'+lp[1]+'" text-anchor="middle">'+(r==="Island"?"Islands":r)+'</text>';
   var mx=groep.reduce(function(s,d){return s+d.x;},0)/groep.length;
   var my=groep.reduce(function(s,d){return s+d.y;},0)/groep.length;
   var dy=(r==="Islay"||r==="Campbeltown")?26:-24;
@@ -2835,7 +2862,8 @@ function kSchotland(){
   +'<path d="M'+(rx-13)+','+ry+' L'+rx+','+(ry-4)+' L'+(rx+13)+','+ry+' L'+rx+','+(ry+4)+'Z" opacity=".45"></path></g>'
   +'<text class="kroostekst" x="'+rx+'" y="'+(ry-18)+'" text-anchor="middle">N</text>';
  return '<svg class="ksvg" viewBox="'+v.join(" ")+'" role="img" aria-label="Kaart van Schotland met de distilleerderijen die we voeren">'
-  +'<defs><filter id="kvlek" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13"></feGaussianBlur></filter></defs>'
+  +'<defs><filter id="kvlek" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13"></feGaussianBlur></filter>'
+  +'<pattern id="karcering" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#4b3a6e" fill-opacity=".1"></rect><line x1="0" y1="0" x2="0" y2="4" stroke="#4b3a6e" stroke-width="1.1" stroke-opacity=".45"></line></pattern></defs>'
   +'<path class="kkust" d="'+KAART.schotland+'"></path>'
   +'<path class="kschot" d="'+KAART.schotland+'"></path>'
   +halos+stippen+labels+namen+roos+'</svg>';
@@ -2876,8 +2904,14 @@ function vKaart(){
      :'Elke stip is een distilleerderij; hoe groter, hoe meer flessen we ervan voeren. Kies een streek, of klik een stip aan.')+'</p>'
   +'<div class="kwrap">'+kruim
   +(KNIVEAU==="wereld"?kWereld():kSchotland())+kInfo()+legenda
+  +(KNIVEAU==="schotland"&&typeof KGRENZEN!=="undefined"
+    ?'<p class="knoot">De gekleurde gebieden zijn de vijf whiskygebieden die de wet vastlegt (Scotch Whisky Regulations 2009). '
+     +'Speyside ligt binnen Highland; een Speyside-distilleerderij mag ook \'Highland\' op het etiket zetten. '
+     +'De stippellijn is de wettelijke grens tussen Highland en Lowland. '
+     +'Islands (gearceerd) is een gangbare, maar geen wettelijke indeling: die eilanden vallen onder Highland.</p>':"")
   +'<p class="kbron">Landsgrenzen: Natural Earth (publiek domein) · locaties: Wikidata (CC0) · '
-  +punten.length+' distilleerderijen geplaatst. Streekgrenzen worden bewust niet getekend: die bestaan officieel niet — de streek volgt uit de distilleerderijen die erin liggen.</p>'
+  +(KNIVEAU==="schotland"&&typeof KGRENZEN!=="undefined"?'whiskygebieden: Scotch Whisky Regulations 2009, reg. 10; wardgrenzen ONS (Open Government Licence), Contains OS data © Crown copyright and database right · ':"")
+  +punten.length+' distilleerderijen geplaatst.</p>'
   +'</div></div></section>';
 }
 
