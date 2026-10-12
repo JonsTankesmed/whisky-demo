@@ -587,14 +587,85 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 .kinfo button{font:inherit;font-size:12px;font-weight:600;background:#8a1c26;color:#fff;border:0;border-radius:8px;padding:6px 11px;cursor:pointer}
 .kinfo .sluit{position:absolute;top:4px;right:7px;background:none;color:#8a7351;padding:2px 4px}
 .kbron{font-size:11px;color:#8a7351;margin-top:10px;line-height:1.6}
-.kgebied{fill-opacity:.34;stroke:#efe6d4;stroke-width:.8;stroke-linejoin:round;cursor:pointer;transition:fill-opacity .15s}
-.kgebied:hover{fill-opacity:.48}
-.kgebied.aan{fill-opacity:.58}
-.kgebied.dim{fill-opacity:.1}
-.keiland{fill:url(#karcering);stroke:#4b3a6e;stroke-width:.8;stroke-dasharray:2.5 2;cursor:pointer}
-.keiland.dim{opacity:.25}
-.klijn{fill:none;stroke:#5c4a35;stroke-width:1.4;stroke-dasharray:5 3;pointer-events:none}
-.knoot{font-size:11px;color:#8a7351;margin-top:8px;line-height:1.6}
+/* ===== kaart Schotland: wettelijke whiskygebieden (kaart.js) ===== */
+.km{display:grid;grid-template-columns:minmax(0,1fr) 330px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(60,40,20,.04),0 12px 32px -18px rgba(60,40,20,.18)}
+.km-kaart{position:relative;height:clamp(460px,calc(100vh - 220px),760px);background:#efe9dd;overflow:hidden}
+.km-svg{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.km-svg.sleept{cursor:grabbing}
+.km-ctx{fill:#e6dfd1;stroke:#d9cfbe;stroke-width:calc(var(--k,1)*.8px)}
+.km-ring{fill:none;stroke-linejoin:round;pointer-events:none}
+.km-r1{stroke:#e2d9c9;stroke-width:calc(var(--k,1)*13px)}
+.km-r2{stroke:#efe9dd;stroke-width:calc(var(--k,1)*11.4px)}
+.km-r3{stroke:#e0d6c5;stroke-width:calc(var(--k,1)*6.6px)}
+.km-r4{stroke:#efe9dd;stroke-width:calc(var(--k,1)*5px)}
+.km-kust{stroke:#a8977a;stroke-width:calc(var(--k,1)*1.6px)}
+.km-gb{stroke:#fffdf8;stroke-width:calc(var(--k,1)*1px);stroke-linejoin:round;cursor:pointer;transition:fill .25s,opacity .25s}
+.km-gb.aan{stroke-width:calc(var(--k,1)*1.4px)}
+.km-svg.sleept .km-gb{cursor:grabbing}
+.km-inzet{fill:none;stroke:#cbbd9f;stroke-width:calc(var(--k,1)*1px);stroke-dasharray:calc(var(--k,1)*4px) calc(var(--k,1)*3px)}
+.km-inzetlab{font-family:var(--sans);font-size:calc(var(--k,1)*9.5px);letter-spacing:.18em;text-transform:uppercase;fill:#9a8a70}
+.km-lijn{fill:none;stroke:#7d6c55;stroke-width:calc(var(--k,1)*1.3px);stroke-dasharray:calc(var(--k,1)*6px) calc(var(--k,1)*4px);stroke-linecap:round;pointer-events:none}
+.km-lab{font-family:var(--serif);font-size:calc(var(--k,1)*12.5px);font-weight:600;letter-spacing:.24em;text-transform:uppercase;fill:#6f5e47;pointer-events:none;paint-order:stroke;stroke:rgba(251,248,242,.85);stroke-width:calc(var(--k,1)*3px);stroke-linejoin:round;transition:opacity .3s}
+.km-lab.hov{fill:#2b2118}
+.km-lab.weg{opacity:0}
+.km-dot{stroke:#fffdf8;stroke-width:calc(var(--k,1)*1.6px);cursor:pointer;transition:opacity .25s}
+.km-dot:focus{outline:none;stroke:#2b2118}
+.km-dot.dim{opacity:.18}
+.km-dot.hl{stroke:#2b2118;stroke-width:calc(var(--k,1)*2px)}
+.km-naam{font-family:var(--sans);font-size:calc(var(--k,1)*11.5px);font-weight:500;fill:#2f261c;pointer-events:none;paint-order:stroke;stroke:rgba(251,248,242,.92);stroke-width:calc(var(--k,1)*3px);stroke-linejoin:round;opacity:0;transition:opacity .25s}
+.km-naam.aan{opacity:1}
+.km-kruim{position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:6px;background:rgba(255,253,248,.92);backdrop-filter:blur(6px);border:1px solid #e3d9c8;border-radius:20px;padding:5px 12px;font-size:12px;color:#8a7a62}
+.km-kruim button{font:inherit;background:none;border:0;padding:0;color:var(--amber);cursor:pointer}
+.km-kruim button:hover{text-decoration:underline;text-underline-offset:2px}
+.km-kruim b{color:#2b2118;font-weight:600}
+.km-kruim span span{margin-right:6px}
+.km-ctl{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;background:rgba(255,253,248,.95);border:1px solid #e3d9c8;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(60,40,20,.08)}
+.km-ctl button{width:36px;height:34px;border:0;background:none;font-size:18px;line-height:1;color:#4a3a28;display:grid;place-items:center;cursor:pointer}
+.km-ctl button+button{border-top:1px solid #ece3d3}
+.km-ctl button:hover{background:#f5efe4;color:var(--amber)}
+.km-schaal{position:absolute;left:16px;bottom:16px;font-size:10.5px;color:#8a7a62;letter-spacing:.04em;pointer-events:none}
+.km-schaal i{display:block;height:5px;border:1.5px solid #8a7a62;border-top:0;margin-bottom:3px}
+.km-noord{position:absolute;left:18px;top:56px;font-family:var(--serif);font-size:12px;color:#8a7a62;text-align:center;width:14px;pointer-events:none}
+.km-noord i{display:block;width:0;height:0;margin:2px auto 0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:14px solid #b8a789}
+.km-tip{position:absolute;transform:translate(-50%,calc(-100% - 12px));background:#2b2118;color:#fbf8f2;border-radius:10px;padding:8px 12px;font-size:12px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 8px 20px rgba(30,20,10,.25)}
+.km-tip.aan{opacity:1}
+.km-tip:after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#2b2118}
+.km-tip b{display:block;font-family:var(--serif);font-size:14px;font-weight:600}
+.km-tip span{display:flex;align-items:center;gap:6px;color:#d9ccb8}
+.km-tip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.km-paneel{border-left:1px solid var(--line);padding:24px 22px;overflow:auto;max-height:clamp(460px,calc(100vh - 220px),760px);display:flex;flex-direction:column;gap:12px}
+.km-paneel h3{font-family:var(--serif);font-size:25px;line-height:1.2;margin:0}
+.km-pk{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--amber)}
+.km-tekst{font-size:13.5px;line-height:1.65;color:#5a4c3b;margin:0}
+.km-terug{align-self:flex-start;font:inherit;font-size:12.5px;background:none;border:0;padding:0;color:var(--muted);cursor:pointer}
+.km-terug:hover{color:var(--amber)}
+.km-legenda{display:flex;flex-direction:column;margin:4px -8px 0}
+.km-legenda button{display:grid;grid-template-columns:18px 1fr auto;gap:12px;align-items:center;text-align:left;font:inherit;background:none;border:0;border-radius:10px;padding:9px 8px;cursor:pointer;color:var(--text)}
+.km-legenda button:hover,.km-legenda button.hov{background:#f6f0e5}
+.km-legenda i{width:16px;height:16px;border-radius:5px;border:1.5px solid}
+.km-legenda i.arc{background-image:repeating-linear-gradient(45deg,transparent 0 3px,rgba(75,58,110,.3) 3px 4.5px)}
+.km-legenda b{display:block;font-size:14px;font-weight:600}
+.km-legenda small{display:block;font-size:11.5px;color:var(--muted)}
+.km-legenda u{text-decoration:none;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.km-uitleg{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:auto}
+.km-stats{display:flex;gap:26px;padding:4px 0}
+.km-stats b{display:block;font-family:var(--serif);font-size:24px;color:var(--text);font-weight:600;line-height:1.1}
+.km-stats span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.km-lijst{display:flex;flex-direction:column;margin:0 -8px;border-top:1px solid var(--line);padding-top:6px}
+.km-lijst button{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;text-align:left;font:inherit;font-size:13.5px;background:none;border:0;border-radius:8px;padding:7px 8px;cursor:pointer;color:var(--text)}
+.km-lijst button:hover{background:#f6f0e5}
+.km-lijst i{width:8px;height:8px;border-radius:50%}
+.km-lijst u{text-decoration:none;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.km-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--amber);color:#fff;border:0;border-radius:24px;padding:11px 18px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;margin-top:4px}
+.km-cta:hover{background:var(--amber2)}
+.km-bron{font-size:11px;color:#8a7a62;margin-top:12px;line-height:1.6}
+@media(max-width:900px){
+ .km{grid-template-columns:1fr}
+ .km-kaart{height:min(72vh,560px)}
+ .km-paneel{border-left:0;border-top:1px solid var(--line);max-height:none}
+ .km-lab{font-size:calc(var(--k,1)*9.5px);letter-spacing:.16em}
+ .km-inzetlab{font-size:calc(var(--k,1)*8px)}
+}
 @media(max-width:640px){.klabel{font-size:13px}.knaam{display:none}}
 /* ===== voorselecties, gidsen en smaakfilter (08-10) ===== */
 .selstats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:6px;font-size:13px;color:#e8dccd}
@@ -1021,6 +1092,7 @@ footer.voetmini .f18{padding-bottom:22px}
 <script src="hiaten.js" onerror="void 0"></script>
 <script src="gidsen.js" onerror="void 0"></script>
 <script src="streekgrenzen.js" onerror="void 0"></script>
+<script src="kaart.js" onerror="void 0"></script>
 <script src="merkposities.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
 <script src="lightspeed.js" onerror="void 0"></script>
@@ -2762,10 +2834,8 @@ var KAART={"wereld":[{"naam":"Fiji","nl":"","d":"M960.0,282.8 L960.0,284.1 L956.
 /* ================= KAART (wereld → Schotland → distilleerderij) =================
    Geen kaartdienst en geen tegels: KAART bevat platte SVG-paden uit Natural Earth
    (publiek domein) en coördinaten uit Wikidata (CC0), opgehaald door kaart_bouwer.py.
-   Streekgrenzen komen uit streekgrenzen.js (KGRENZEN, tools/streekgrenzen_bouwer.py):
-   de vijf wettelijke gebieden uit reg. 10 van de Scotch Whisky Regulations 2009,
-   opgebouwd uit ONS-wards (OGL) en de Highland-Lowland-lijn. 'Islands' is geen
-   wettelijk gebied en staat er als gearceerde, traditionele laag op. */
+   Het Schotland-niveau tekent kaart.js (kmView) met de wettelijke whiskygebieden uit
+   streekgrenzen.js; kSchotland hieronder is alleen de terugval als die niet laden. */
 var KNIVEAU="wereld",KSTREEK="",KGEKOZEN=null;
 var KKLEUR={Islay:"#8a1c26",Speyside:"#a05e2a",Highland:"#2f5240",Island:"#4b3a6e",
             Lowland:"#6b6320",Campbeltown:"#1f4f63"};
@@ -2819,29 +2889,13 @@ function kHalo(punten,r){
   +' rx="'+Math.max(16,sx*2.1+13).toFixed(0)+'" ry="'+Math.max(16,sy*2.1+13).toFixed(0)+'"'
   +' fill="'+KKLEUR[r]+'" filter="url(#kvlek)"></ellipse>';
 }
-function kGebieden(){
- /* Volgorde: Highland en Lowland als ondergrond, daarop Speyside (ligt binnen
-    Highland), Campbeltown en Islay, dan de gearceerde Islands en de lijn. */
- var G=KGRENZEN,lagen=[["Highland","highland"],["Lowland","lowland"],["Speyside","speyside"],
-  ["Campbeltown","campbeltown"],["Islay","islay"]];
- var uit=lagen.map(function(l){
-  var r=l[0],kl=KSTREEK?(KSTREEK===r?" aan":" dim"):"";
-  return '<path class="kgebied'+kl+'" d="'+G[l[1]]+'" fill="'+KKLEUR[r]+'"'
-   +' onclick="kStreek(\''+r+'\')"><title>'+r+(r==="Speyside"?" (ligt binnen Highland)":"")+'</title></path>';
- }).join("");
- uit+='<path class="keiland'+(KSTREEK&&KSTREEK!=="Island"?" dim":"")+'" d="'+G.islands+'"'
-  +' onclick="kStreek(\'Island\')"><title>Islands — traditionele indeling, geen wettelijk gebied</title></path>';
- return uit+'<path class="klijn" d="'+G.lijn+'"></path>';
-}
 function kSchotland(){
  var v=kVak(),punten=kPunten();
  var tonen=STREKEN.filter(function(r){return !KSTREEK||r===KSTREEK;});
- var halos=typeof KGRENZEN!=="undefined"?kGebieden():tonen.map(function(r){return kHalo(punten,r);}).join("");
+ var halos=tonen.map(function(r){return kHalo(punten,r);}).join("");
  var labels=tonen.map(function(r){
   var groep=punten.filter(function(d){return d.streek===r;});
   if(!groep.length)return "";
-  var lp=typeof KGRENZEN!=="undefined"&&KGRENZEN.labels&&KGRENZEN.labels[r];
-  if(lp)return '<text class="klabel" x="'+lp[0]+'" y="'+lp[1]+'" text-anchor="middle">'+(r==="Island"?"Islands":r)+'</text>';
   var mx=groep.reduce(function(s,d){return s+d.x;},0)/groep.length;
   var my=groep.reduce(function(s,d){return s+d.y;},0)/groep.length;
   var dy=(r==="Islay"||r==="Campbeltown")?26:-24;
@@ -2862,8 +2916,7 @@ function kSchotland(){
   +'<path d="M'+(rx-13)+','+ry+' L'+rx+','+(ry-4)+' L'+(rx+13)+','+ry+' L'+rx+','+(ry+4)+'Z" opacity=".45"></path></g>'
   +'<text class="kroostekst" x="'+rx+'" y="'+(ry-18)+'" text-anchor="middle">N</text>';
  return '<svg class="ksvg" viewBox="'+v.join(" ")+'" role="img" aria-label="Kaart van Schotland met de distilleerderijen die we voeren">'
-  +'<defs><filter id="kvlek" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13"></feGaussianBlur></filter>'
-  +'<pattern id="karcering" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#4b3a6e" fill-opacity=".1"></rect><line x1="0" y1="0" x2="0" y2="4" stroke="#4b3a6e" stroke-width="1.1" stroke-opacity=".45"></line></pattern></defs>'
+  +'<defs><filter id="kvlek" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13"></feGaussianBlur></filter>'+'</defs>'
   +'<path class="kkust" d="'+KAART.schotland+'"></path>'
   +'<path class="kschot" d="'+KAART.schotland+'"></path>'
   +halos+stippen+labels+namen+roos+'</svg>';
@@ -2885,6 +2938,10 @@ function kInfo(){
 }
 function vKaart(){
  if(typeof KAART==="undefined")return '<section><div class="wrap"><div class="empty">De kaartdata is nog niet ingeladen.</div></div></section>';
+ if(KNIVEAU==="schotland"&&typeof kmView==="function"&&typeof KGRENZEN!=="undefined")
+  return '<section><div class="wrap"><div class="sec-head"><h2>Waar komt je whisky vandaan?</h2></div>'
+   +'<p class="sec-sub">Schotland kent vijf wettelijke whiskygebieden. Beweeg over de kaart, kies een gebied of klik op een distilleerderij.</p>'
+   +kmView()+'</div></section>';
  var punten=kPunten();
  var kruim='<div class="kkruim"><button onclick="KNIVEAU=\'wereld\';KSTREEK=\'\';KGEKOZEN=null;render()">Wereld</button>'
   +(KNIVEAU==="schotland"?' › <button onclick="KSTREEK=\'\';KGEKOZEN=null;render()">Schotland</button>':' › <b>de whiskylanden</b>')
@@ -2904,13 +2961,7 @@ function vKaart(){
      :'Elke stip is een distilleerderij; hoe groter, hoe meer flessen we ervan voeren. Kies een streek, of klik een stip aan.')+'</p>'
   +'<div class="kwrap">'+kruim
   +(KNIVEAU==="wereld"?kWereld():kSchotland())+kInfo()+legenda
-  +(KNIVEAU==="schotland"&&typeof KGRENZEN!=="undefined"
-    ?'<p class="knoot">De gekleurde gebieden zijn de vijf whiskygebieden die de wet vastlegt (Scotch Whisky Regulations 2009). '
-     +'Speyside ligt binnen Highland; een Speyside-distilleerderij mag ook \'Highland\' op het etiket zetten. '
-     +'De stippellijn is de wettelijke grens tussen Highland en Lowland. '
-     +'Islands (gearceerd) is een gangbare, maar geen wettelijke indeling: die eilanden vallen onder Highland.</p>':"")
   +'<p class="kbron">Landsgrenzen: Natural Earth (publiek domein) · locaties: Wikidata (CC0) · '
-  +(KNIVEAU==="schotland"&&typeof KGRENZEN!=="undefined"?'whiskygebieden: Scotch Whisky Regulations 2009, reg. 10; wardgrenzen ONS (Open Government Licence), Contains OS data © Crown copyright and database right · ':"")
   +punten.length+' distilleerderijen geplaatst.</p>'
   +'</div></div></section>';
 }
@@ -2949,6 +3000,7 @@ function render(){
  updateBadges();
  if(rt.r==="admin"&&rt.sub==="voortgang"&&typeof arRender==="function")arRender();
  if(rt.r==="admin"&&rt.sub==="beeldtool"&&typeof btInit==="function")btInit();
+ if(rt.r==="kaart"&&KNIVEAU==="schotland"&&typeof kmInit==="function")kmInit();
 }
 /* ================= VIEWS ================= */
 function vHome(){
