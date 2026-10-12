@@ -29,6 +29,8 @@ var KM_VOLGORDE=["Highland","Speyside","Lowland","Islay","Campbeltown","Island"]
 var KM_PAD={Highland:"highland",Lowland:"lowland",Speyside:"speyside",Campbeltown:"campbeltown",Islay:"islay",Island:"islands"};
 var KM_LANDNAAM={Amerika:"Verenigde Staten"};
 var KM_PAPIER="#fbf8f2",KM_ZEE="#efe9dd",KM_KOPER="#9a5b2b";
+/* Versie van de kaartdata: ophogen na elke nieuwe build, anders tonen browsers de oude bestanden. */
+var KM_VERSIE="20261013b";
 var KM={niveau:"wereld",land:"",vb:null,vak:null,km:null,sel:"",dist:"",hov:"",anim:0,sleep:null,tipEl:null};
 
 /* ---------- hulpjes ---------- */
@@ -45,6 +47,15 @@ function kmTint(r,stand){ /* Schotse gebieden — stand: 0 rust · 1 hover · 2 
 }
 function kmLandKey(c){return (typeof KLANDSLEUTEL!=="undefined"&&KLANDSLEUTEL[c])||c;}
 function kmLandNaam(k){return KM_LANDNAAM[k]||k;}
+function kmVoorselectie(k){ /* id van de voorselectiepagina (#/selectie/land/<id>) voor dit land */
+ if(typeof INGANG==="undefined"||!INGANG.land)return "";
+ var namen=kmCatLanden(k);
+ for(var i=0;i<INGANG.land.items.length;i++){
+  var it=INGANG.land.items[i];
+  if(it.w.some(function(w){return namen.indexOf(w)>=0;}))return it.id;
+ }
+ return "";
+}
 function kmCatLanden(k){ /* catalogusnamen die bij een kaartsleutel horen */
  var u=[k];if(typeof KLANDSLEUTEL!=="undefined")for(var c in KLANDSLEUTEL)if(KLANDSLEUTEL[c]===k)u.push(c);return u;
 }
@@ -71,7 +82,7 @@ var KM_LAAD={};
 function kmLaad(src){
  if(KM_LAAD[src])return KM_LAAD[src]==="ok";
  KM_LAAD[src]="bezig";
- var s=document.createElement("script");s.src=src;
+ var s=document.createElement("script");s.src=src+"?v="+KM_VERSIE;
  s.onload=function(){KM_LAAD[src]="ok";KM.dmap=null;if(/^#\/kaart/.test(location.hash||""))render();};
  s.onerror=function(){KM_LAAD[src]="fout";if(/^#\/kaart/.test(location.hash||""))render();};
  document.head.appendChild(s);return false;
@@ -252,7 +263,10 @@ function kmPaneelLand(){
   +'<div class="km-stats"><div><b>'+tel.toLocaleString("nl-NL")+'</b><span>flessen</span></div><div><b>'+ids.length+'</b><span>op de kaart</span></div></div>'
   +(ids.length?kmLijst(ids,"#8a1c26"):'<p class="km-tekst">Van dit land staat nog geen distilleerderij met een bevestigde locatie op de kaart.</p>')
   +kmOpenLijst(k)
-  +'<button class="km-cta" data-act="landflessen" data-v="'+kmE(k)+'">Alle flessen uit '+kmE(kmLandNaam(k))+' →</button>';
+  +(kmVoorselectie(k)
+    ?'<a class="km-cta" href="#/selectie/land/'+kmVoorselectie(k)+'">Naar de selectie '+kmE(kmLandNaam(k))+' →</a>'
+     +'<button class="km-link" data-act="landflessen" data-v="'+kmE(k)+'">Of bekijk alle '+tel.toLocaleString("nl-NL")+' flessen in de collectie</button>'
+    :'<button class="km-cta" data-act="landflessen" data-v="'+kmE(k)+'">Alle flessen uit '+kmE(kmLandNaam(k))+' →</button>');
 }
 function kmOpenLijst(k){
  var o=(typeof KDIST_OPEN!=="undefined"&&KDIST_OPEN[k])||[];
