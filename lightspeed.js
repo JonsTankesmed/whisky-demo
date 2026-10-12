@@ -24,7 +24,7 @@ function lsBlad(d){LS.pagina=Math.max(0,LS.pagina+d);lsVernieuw();}
 /* De sync draait in porties van ~100 s (grens van de Edge Function). Zolang de functie
    "verder" meldt, roepen we hem opnieuw aan met dezelfde logregel. Tab sluiten = sync stopt;
    de functie markeert zo'n achtergelaten sync na 15 minuten als afgebroken. */
-var LSFASE={merken:"merken",producten:"producten",varianten:"prijzen en voorraad",orders:"orders"};
+var LSFASE={merken:"merken",producten:"producten",varianten:"prijzen en voorraad",orders:"orders",categorieen:"categorieën",koppelingen:"actiecategorieën",kortingen:"kortingsregels"};
 function lsDraai(soort,vervolg,onderdeel){
  onderdeel=onderdeel||(vervolg&&vervolg.onderdeel)||"catalogus";
  if(!lsKlaar())return;
@@ -42,7 +42,7 @@ function lsDraai(soort,vervolg,onderdeel){
     r.error.context.json().then(function(j){toast("Sync mislukt"+(j&&j.melding?": "+j.melding:""));}).catch(function(){toast("Sync mislukt");});
    }else toast("Sync mislukt"+(m?": "+m:""));
   }
-  else toast(onderdeel==="orders"?"Orders opgehaald: "+lsNl(d.orders):"Sync klaar: "+lsNl(d.producten)+" producten, "+lsNl(d.varianten)+" varianten");
+  else toast(onderdeel==="orders"?"Orders opgehaald: "+lsNl(d.orders):onderdeel==="acties"?"Acties gelezen: "+lsNl(d.categorieen)+" categorieën, "+lsNl(d.koppelingen)+" producten in actiecategorieën · "+(d.kortingen||""):"Sync klaar: "+lsNl(d.producten)+" producten, "+lsNl(d.varianten)+" varianten");
   lsVernieuw();LO.rij=null;LD.d=null;if(typeof wsHerteken==="function")wsHerteken();
  }).catch(function(){LS.bezig=false;LS.voortgang="";toast("Sync onderbroken. Start opnieuw; een halve sync wordt na 15 minuten vanzelf afgesloten.");lsVernieuw();});
 }
@@ -85,13 +85,14 @@ function vLsSync(){
  +'<button class="btn btn-a btn-s" '+(LS.bezig?'disabled':'')+' onclick="lsDraai(\'test\')">'+(LS.bezig?'Bezig…':'Test-sync (250)')+'</button>'
  +'<button class="btn btn-g btn-s" '+(LS.bezig?'disabled':'')+' onclick="lsDraai(\'incrementeel\')">Alleen wijzigingen</button>'
  +'<button class="btn btn-g btn-s" '+(LS.bezig?'disabled':'')+' onclick="lsDraai(\'volledig\')">Volledige sync</button>'
+ +'<button class="btn btn-g btn-s" '+(LS.bezig?'disabled':'')+' onclick="lsDraai(\'volledig\',null,\'acties\')" title="Leest categorieën, de producten in actiecategorieën en de kortingsregels. Alleen lezen.">Acties lezen</button>'
  +'<button class="btn btn-g btn-s" onclick="lsVernieuw()">Vernieuwen</button></div>'
  +(LS.bezig&&LS.voortgang?'<div class="bouwband"><b>Sync loopt.</b> '+wsH(LS.voortgang)+'. Laat dit tabblad open; een volledige sync duurt enkele minuten.</div>':'')
  +(LS.fout?'<p class="wsfout">'+wsH(LS.fout)+'</p>':'')
  +(log.length?'<table class="atable"><tr><th>Gestart</th><th>Onderdeel · soort</th><th>Producten</th><th>Varianten</th><th>Status</th></tr>'
-  +log.map(function(l){return '<tr><td>'+lsTijd(l.gestart_op)+'</td><td>'+(l.onderdeel==="orders"?"orders":"catalogus")+' · '+l.soort+'</td><td>'+lsNl(l.producten_bijgewerkt)+'</td><td>'+lsNl(l.varianten_bijgewerkt)+'</td>'
+  +log.map(function(l){return '<tr><td>'+lsTijd(l.gestart_op)+'</td><td>'+(l.onderdeel==="orders"?"orders":l.onderdeel==="acties"?"acties":"catalogus")+' · '+l.soort+'</td><td>'+lsNl(l.producten_bijgewerkt)+'</td><td>'+lsNl(l.varianten_bijgewerkt)+'</td>'
   +'<td><span class="st '+(l.status==="ok"?"ok":"warn")+'" title="'+wsH(l.melding||"")+'">'+(l.status==="ok"?"OK":l.status==="bezig"?"Bezig":"Fout")+'</span></td></tr>';}).join("")+'</table>':'')
- +'<p style="font-size:12px;color:var(--muted);margin-top:12px">De sync leest producten, prijzen en voorraad. Er wordt niets in Lightspeed gewijzigd. Een volledige sync loopt in porties van anderhalve minuut en gaat vanzelf door zolang dit tabblad open is.</p>';
+ +'<p style="font-size:12px;color:var(--muted);margin-top:12px">De sync leest producten, prijzen (ook de doorgestreepte prijs, met een dagelijkse prijshistorie) en voorraad; \'Acties lezen\' haalt categorieën, actiecategorieën en kortingsregels op. Er wordt niets in Lightspeed gewijzigd. Een volledige sync loopt in porties van anderhalve minuut en gaat vanzelf door zolang dit tabblad open is.</p>';
 }
 
 /* ---------- Orders (alleen lezen) ----------
