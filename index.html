@@ -915,6 +915,14 @@ footer.voetmini .f18{padding-bottom:22px}
 .gidssoort h3{margin:0 0 4px;font-family:var(--serif)}
 .gidssoort>p{font-size:13px;color:var(--muted);margin:0 0 12px}
 
+.abeheer{border:1px dashed #c9a46a;background:#fdf7ec;border-radius:10px;padding:8px 12px;margin:10px 0;font-size:12.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.abeheer b{color:#8a6a3a;font-size:11px;letter-spacing:.08em;text-transform:uppercase}.abeheer select{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--card)}
+.alabel a{color:inherit;text-decoration:none;margin-left:4px}
+.ahoofd img.aprod{position:absolute;inset:8% 6% 8% auto;height:84%;width:auto;object-fit:contain;z-index:0}
+.ablok.enkel{grid-template-columns:1fr}
+.aplijst{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px}
+.aplijst div{display:flex;gap:8px;align-items:center;padding:5px 9px;font-size:12px;border-bottom:1px solid var(--line)}.aplijst div span{flex:1}.aplijst em{font-style:normal;color:#a33;font-size:11px}
+.aplijst button{border:0;background:none;cursor:pointer;color:var(--muted)}
 /* ===== 12-10: ontwerp acties en banners (voorbeeld) ===== */
 .abalk{background:#1f1813;color:#f3e9dc;font-size:13px;text-align:center;padding:9px 44px;position:relative}
 .abalk b{color:#f0c27a}.abalk code{font-family:inherit;font-weight:700;background:rgba(240,194,122,.16);border:1px dashed rgba(240,194,122,.6);padding:1px 7px;border-radius:5px;color:#f0c27a;letter-spacing:.06em}
@@ -1123,6 +1131,7 @@ footer.voetmini .f18{padding-bottom:22px}
 <script src="kaart.js?v=20261013b" onerror="void 0"></script>
 <script src="merkposities.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
+<script src="acties.js" onerror="void 0"></script>
 <script src="lightspeed.js" onerror="void 0"></script>
 <script src="winkelmand.js" onerror="void 0"></script>
 <script>
@@ -1776,6 +1785,7 @@ function collectieBody(lijst,n,toon){
  +SORTS.map(function(s){return '<option value="'+s[0]+'"'+(F.sort===s[0]?" selected":"")+'>'+s[1]+'</option>';}).join("")+'</select>'
  +'<span class="fcount" role="status" aria-live="polite">'+n.toLocaleString("nl-NL")+' resultaten'+(n>toon.length?" — eerste "+toon.length+" getoond":"")+'</span></div>'
  +fActieveHtml()
+ +(typeof acBulkBalk==="function"?acBulkBalk(lijst):"")
  +'<div class="colwrap">'+fPaneelHtml()
  +'<div>'+(n?'<div class="grid">'+toon.map(function(p){return card(p,PROFILE);}).join("")+'</div>'
    :'<div class="empty">Geen whisky\'s gevonden.<br>Tip: haal een filter weg — de aantallen naast elk filter laten zien wat nog overblijft.</div>')
@@ -2398,7 +2408,7 @@ function ingItem(soort,id){var g=INGANG[soort];if(!g)return null;for(var i=0;i<g
 function ingFacet(soort){var fid=INGANG[soort].facet;for(var i=0;i<FACETS.length;i++)if(FACETS[i].id===fid)return FACETS[i];return null;}
 function ingTreffer(soort,it,p){
  if(soort==="rare")return !!p.rare&&it.m(p);
- if(soort==="actie")return it.m(p);
+ if(soort==="actie")return typeof acTreffer==="function"&&it.ac?acTreffer(it.ac,p):false;
  var f=ingFacet(soort),w=waardenVan(p,f);
  for(var i=0;i<it.w.length;i++)if(w.indexOf(it.w[i])>=0)return true;
  return false;
@@ -2475,83 +2485,8 @@ function ingVoorCat(){
   return s;}
  return null;
 }
-/* ================= ACTIES EN BANNERS — ONTWERP (12-10) =================
-   Voorbeeld van hoe acties eruit komen te zien. Nog geen opslag: de acties hieronder staan
-   vast in de code. In de echte versie komen ze uit het beheer (Supabase, ws_acties) en gaan
-   ze op hun looptijd vanzelf aan en uit. Prijzen en kortingen komen uit Lightspeed. */
-var ACTIES_VB=[
- {id:"oktober-15",titel:"15% op het hele assortiment",regel:"De hele maand oktober",code:"WS2026",voorwaarden:"Niet op aanbiedingen en restanten.",van:"2026-10-01",tot:"2026-10-31",plek:["balk"]},
- {id:"ardnahoe",titel:"Ardnahoe op Islay",regel:"Alle flessen en samples van Ardnahoe, met de gewone filters erbij. Proef eerst met een sample.",knop:"Bekijk de Ardnahoe-flessen",van:"2026-10-05",tot:"2026-10-25",plek:["hoofd"],foto:["streek","islay"],m:function(p){return p.dist==="Ardnahoe";}},
- {id:"samples-tien",titel:"Proef eerst",regel:"Samples onder € 10",knop:"Bekijk",van:"2026-10-01",tot:"2026-12-31",plek:["tegel"],m:function(p){return !!p._sample&&p.price<10&&p._voorraad!==false;}},
- {id:"cadeau",titel:"Cadeautips",regel:"In geschenkverpakking",knop:"Bekijk",van:"2026-10-01",tot:"2026-12-24",plek:["tegel"],m:function(p){return /cadeau|gift|giftpack|geschenk/i.test(p.name);}},
- {id:"nieuw",titel:"Nieuw binnen",regel:"Deze week binnengekomen",knop:"Bekijk",van:"2026-10-01",tot:"2026-12-31",plek:["tegel"],m:function(p){return !!p.isNew;}}
-];
-INGANG.actie={n:"Acties",enk:"Actie",kop:"",cat:"actie",gsoort:"actie",gidsnaam:"",reeks:"",items:ACTIES_VB.filter(function(a){return a.m;}).map(function(a){return {id:a.id,n:a.titel,ini:"%",m:a.m};})};
-function actieVb(id){for(var i=0;i<ACTIES_VB.length;i++)if(ACTIES_VB[i].id===id)return ACTIES_VB[i];return null;}
-function actieLeverbaar(a){return a.m?CAT.filter(function(p){return a.m(p)&&p._voorraad!==false;}):[];}
-function actieDatum(d){var m=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"],x=d.split("-");return (+x[2])+" "+m[+x[1]-1];}
-function actieBalk(){
- var a=ACTIES_VB.filter(function(x){return x.plek.indexOf("balk")>=0;})[0];if(!a)return "";
- return '<div class="abalk"><b>'+a.titel+'</b> · '+a.regel.toLowerCase()+' met code <code>'+a.code+'</code><small>'+a.voorwaarden+' Geldig t/m '+actieDatum(a.tot)+'.</small><span class="avb" style="margin-left:10px;background:rgba(246,236,217,.15);color:#f0c27a;border-color:rgba(240,194,122,.5)">voorbeeld</span><button aria-label="Sluiten" onclick="this.parentNode.remove()">✕</button></div>';
-}
-function actieBlok(){
- var h=ACTIES_VB.filter(function(x){return x.plek.indexOf("hoofd")>=0;})[0];
- var tg=ACTIES_VB.filter(function(x){return x.plek.indexOf("tegel")>=0;}).slice(0,3);
- var foto=h&&h.foto?gidsFoto(h.foto[0],h.foto[1]):null,n=h?actieLeverbaar(h).length:0;
- return '<section style="padding-top:26px;padding-bottom:10px"><div class="wrap"><div class="sec-head"><h2>Nu in actie<span class="avb">voorbeeld</span></h2><a class="link-a" href="#/admin/acties">Zo beheert Jack dit →</a></div>'
- +'<div class="ablok">'
- +(h?'<a class="ahoofd" href="#/actie/'+h.id+'">'+(foto?'<img src="'+foto.url+'" alt="">':'')
-   +'<div class="ain"><div class="kicker">Actie · t/m '+actieDatum(h.tot)+'</div><h2>'+h.titel+'</h2><p>'+h.regel+'</p><span class="btn btn-a">'+h.knop+' ('+n+') →</span></div>'
-   +(foto?'<span class="acred">Foto: '+wsH(foto.maker||"")+' · '+wsH(foto.licentie||"")+'</span>':'')+'</a>':'')
- +'<div class="atiles">'+tg.map(function(a){var l=actieLeverbaar(a),p=l.filter(function(x){return x.img;})[0];
-   return '<a class="atile" href="#/actie/'+a.id+'"><div class="aimg">'+(p?'<img src="'+p.img+'" alt="">':'')+'</div><div><b>'+a.titel+'</b><span>'+a.regel+'</span><em>'+l.length.toLocaleString("nl-NL")+' flessen →</em></div></a>';}).join("")+'</div>'
- +'</div><p class="aregels">Plekken: één hoofdactie en maximaal drie tegels. Knoptekst noemt het aantal leverbare flessen; zakt dat onder drie, dan gaat de banner vanzelf uit.</p></div></section>';
-}
-function vActie(rt){
- var a=actieVb(rt.id),it=ingItem("actie",rt.id);
- if(!a||!it)return '<section><div class="wrap">Deze actie is afgelopen. <a href="#/collectie" style="color:var(--amber)">Naar de collectie</a></div></section>';
- if(!rt.verfijnd){F=nieuwF({vs:"actie:"+a.id});}
- var lijst=sorteer(selectie(null)),n=lijst.length,toon=lijst.slice(0,120),foto=a.foto?gidsFoto(a.foto[0],a.foto[1]):null;
- return '<section><div class="wrap">'
- +'<a class="back" href="#/">← Home</a>'
- +'<div class="streekhero'+(foto?" metbeeld":"")+'" style="margin-top:12px">'+(foto?beeldLagen([foto]):'')
- +'<span class="statuschip">Actie · loopt t/m '+actieDatum(a.tot)+' · voorbeeld</span><h1>'+a.titel+'</h1><p>'+a.regel+'</p>'
- +(foto?beeldCredit([foto]):'')+'</div>'
- +collectieBody(lijst,n,toon)
- +'</div></section>';
-}
-function vAdminActies(){
- var dag=new Date("2026-10-12"),s=new Date("2026-10-01"),e=new Date("2026-12-31"),tot=(e-s);
- var pos=function(d){return Math.max(0,Math.min(100,(new Date(d)-s)/tot*100));};
- var kl={balk:"#3a2b20",hoofd:"#a2463a",tegel:"#c27c2c"};
- return '<h3 style="font-size:20px;margin-bottom:6px">Acties en banners</h3>'
- +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Overzicht van wat nu live staat en wat eraan komt. Acties gaan op hun datum vanzelf aan en uit (Nederlandse tijd).</p>'
- +'<div class="atijd">'+ACTIES_VB.map(function(a,i){var l=pos(a.van),r=pos(a.tot);return '<i style="left:'+l+'%;width:'+Math.max(4,r-l)+'%;top:'+(4+i*14)+'px;background:'+kl[a.plek[0]]+'" title="'+a.titel+'">'+a.titel+'</i>';}).join("")+'<span class="nu" style="left:'+pos("2026-10-12")+'%"></span></div>'
- +'<table class="atable"><tr><th>Actie</th><th>Plek</th><th>Looptijd</th><th>Flessen</th><th>Status</th></tr>'
- +ACTIES_VB.map(function(a){return '<tr><td><b>'+a.titel+'</b>'+(a.code?'<br><span style="color:var(--muted)">code '+a.code+'</span>':'')+'</td><td>'+a.plek.join(", ")+'</td><td>'+actieDatum(a.van)+' – '+actieDatum(a.tot)+'</td><td>'+(a.m?actieLeverbaar(a).length:"hele assortiment")+'</td><td><span class="st ok">Live</span></td></tr>';}).join("")
- +'</table>'
- +'<h3 style="font-size:17px;margin:26px 0 4px">Nieuwe actie</h3>'
- +'<div class="astap"><span>1 · Actie</span><span>2 · Flessen</span><span class="on">3 · Banners en controle</span></div>'
- +'<div class="aform"><div>'
- +'<div class="aveld"><label>Naam</label><input value="Lagavulin-weken"></div>'
- +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="aveld"><label>Van</label><input type="date" value="2026-10-20"></div><div class="aveld"><label>Tot en met</label><input type="date" value="2026-11-02"></div></div>'
- +'<div class="aveld"><label>Flessen</label><select><option>Regel: distilleerderij is Lagavulin</option><option>Vaste lijst (per stuk, uit de collectie of geplakt)</option><option>Lightspeed-categorie (overgang)</option></select></div>'
- +'<div class="aveld"><label>Prijs</label><select><option>Actieprijs per fles (wordt in Lightspeed gezet)</option><option>Geen korting — alleen selectie</option></select></div>'
- +'<div class="aveld"><label>Plekken</label><div class="aslots"><label><input type="checkbox"> Mededelingenbalk</label><label><input type="checkbox" checked> Hoofdactie</label><label><input type="checkbox"> Tegel</label><label><input type="checkbox" checked> Islay-pagina</label><label><input type="checkbox" checked> Label op product</label></div></div>'
- +'<div class="aveld"><label>Titel · regel · knop</label><input value="Lagavulin, rook van de zuidkust" style="margin-bottom:6px"><input value="Twee weken lang de Lagavulins scherper geprijsd." style="margin-bottom:6px"><input value="Bekijk de Lagavulins"></div>'
- +'<div class="aveld"><label>Beeld</label><input value="lagavulin-baai.jpg · eigen foto Whiskysite · geen einddatum"></div>'
- +'</div><div>'
- +'<div class="aveld"><label>Controle vóór livegang</label></div>'
- +'<div class="awaar rood"><b>Geblokkeerd — Lagavulin 8 Years Old.</b> Actieprijs € 36,99 is 24,5% onder € 48,99. Samen met code WS2026 (15%) toont de site 35,8% korting. De Alcoholwet staat maximaal 25% toe. Sluit de fles uit van de code, of verhoog de actieprijs.</div>'
- +'<div class="awaar geel"><b>Let op — Lagavulin 16 Years Old.</b> De doorgestreepte prijs € 64,99 is niet de laagste prijs van de afgelopen 30 dagen (€ 59,99 op 28 sep). De site toont daarom geen doorgestreepte prijs, alleen de actieprijs.</div>'
- +'<div class="awaar geel"><b>Overlap.</b> 2 flessen staan ook in “Proef eerst”. Label op product toont de actie die het eerst afloopt.</div>'
- +'<div class="awaar groen"><b>In orde.</b> 7 van 9 flessen leverbaar · beeld met rechten vastgelegd · looptijd valt binnen de code-actie van Lightspeed.</div>'
- +'<div class="aveld" style="margin-top:14px"><label>Zo ziet de bezoeker de hoofdactie</label></div>'
- +'<div class="avoorbeeld"><div class="ahoofd" style="min-height:190px"><div class="ain" style="padding:18px"><div class="kicker">Actie · t/m 2 nov</div><h2 style="font-size:22px">Lagavulin, rook van de zuidkust</h2><p style="font-size:13px">Twee weken lang de Lagavulins scherper geprijsd.</p><span class="btn btn-a btn-s">Bekijk de Lagavulins (7) →</span></div></div></div>'
- +'<div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-a btn-s" disabled style="opacity:.45;cursor:not-allowed" title="Eerst de geblokkeerde fles oplossen">Inplannen</button><button class="btn btn-g btn-s">Bewaren als concept</button></div>'
- +'</div></div>'
- +'<p style="font-size:12px;color:var(--muted);margin-top:16px">Per stuk toevoegen kan ook vanaf de productpagina en productkaart; in bulk vanuit de collectie (“alle 37 resultaten toevoegen”) of door een lijst te plakken.</p>';
-}
+/* Acties en banners: zie acties.js (opslag in Supabase). Hier alleen een lege ingang tot die geladen is. */
+INGANG.actie={n:"Acties",enk:"Actie",kop:"",cat:"actie",gsoort:"actie",gidsnaam:"",reeks:"",items:[]};
 function vsItem(vs){var d=(vs||"").split(":");return d.length===2?{soort:d[0],it:ingItem(d[0],d[1])}:null;}
 function eurKort(x){return eur(x);}
 function vSelectie(rt){
@@ -3002,7 +2937,7 @@ function route(){
  var oud={island:"islands"};
  if(h.startsWith("#/inspiratie/streek/")){var gi=h.slice(20);return{r:"gids",soort:"streek",id:oud[gi]||gi};}
  if(h.startsWith("#/gids/")){var gd=h.split("/");return{r:"gids",soort:gd[2],id:gd[3]};}
- if(h.startsWith("#/actie/")){var ad=h.split("/");if(deel[1])urlNaarF(deel[1]);return{r:"actie",id:ad[2],verfijnd:!!deel[1]};}
+ if(h.startsWith("#/actie/")){var ad=h.split("/");if(deel[1])urlNaarF(deel[1]);return{r:"actie",id:decodeURIComponent(ad[2]||""),verfijnd:!!deel[1]};}
  if(h.startsWith("#/selectie/")){var sd=h.split("/");if(deel[1])urlNaarF(deel[1]);return{r:"selectie",soort:sd[2],id:sd[3],verfijnd:!!deel[1]};}
  if(h==="#/winkelwagen")return{r:"winkelwagen"};
  if(h.startsWith("#/streek/")){var si=h.slice(9);return{r:"selectie",soort:"streek",id:oud[si]||si};}
@@ -3032,7 +2967,7 @@ function vHome(){
  var featured=P_ECHT?P.filter(p=>!p.rare&&p._voorraad!==false).slice(0,4):P.filter(p=>p.was&&!p.rare).slice(0,4);
  var held=featured[0];
  var nieuw=P.filter(p=>p.isNew);
- return actieBalk()+'<div class="hero"><div class="wrap hero-in"><div>'
+ return (typeof actieBalk==="function"?actieBalk():"")+'<div class="hero"><div class="wrap hero-in"><div>'
  +'<div class="kicker">Persoonlijk advies</div>'
  +'<h1>Ontdek <em>jouw</em><br>perfecte whisky.</h1>'
  +'<p>Tussen 10.000+ flessen vind je er één die voor jou is gemaakt. Wij helpen je hem vinden — op smaak, niet op label. En proef eerst een sample voordat je koopt.</p>'
@@ -3043,7 +2978,7 @@ function vHome(){
    :'<img src="'+IMG.lag+'" alt=""><div class="hero-badge">Meest geproefd deze week: <b>Lagavulin 16</b> · sample €7,49</div>')+'</div></div></div>'
  +'<div class="usp-bar"><div class="wrap usp"><div>'+I("phone",15)+'Hulp nodig? 071-5236054</div><div>'+I("pack",15)+'Zorgvuldig verpakt</div><div>'+I("sparkles",15)+'Dagelijks nieuwe flessen</div><div>'+I("flask",15)+'Proef eerst: 1.400+ samples</div></div></div>'
  +'<div style="background:linear-gradient(90deg,#33221a,#54301c);color:#fff"><div class="wrap" style="display:flex;align-items:center;gap:14px;padding:12px 24px;flex-wrap:wrap;font-size:13.5px"><span style="color:var(--gold)">'+I("sparkles",16)+'</span><b>Whisky in Leiden 2027</b><span style="opacity:.8">juni 2027 · Hooglandse Kerk · festivalbottelingen · masterclasses</span><a href="#/festival" style="margin-left:auto;color:var(--gold);font-weight:600">Bekijk het festival →</a></div></div>'
- +actieBlok()
+ +(typeof actieBlok==="function"?actieBlok():"")
  +'<section><div class="wrap"><div class="kicker">Snel vinden</div><h2>Waar ben je naar op zoek?</h2>'
  +'<div class="qf">'
  +'<a href="#/ontdek"><i>'+I("wine",24)+'</i><b>Op smaak</b><span>Vind via smaakprofiel</span></a>'
@@ -3182,11 +3117,13 @@ function vProduct(rt){
  +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
  +(p.rev?revBlok(p):"")
  +'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
+ +(typeof acLabel==="function"?acLabel(p):"")
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-a" '+(p.rare?"disabled style='opacity:.5'":"")+' onclick="wmToe(\''+p.id+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +'<button class="btn btn-g" onclick="cmpAdd(\''+p.id+'\')">+ Vergelijk</button>'
  +(wsUrl(p)?'<a class="btn btn-g" href="'+wsUrl(p)+'" target="_blank" rel="noopener">Bekijk op whiskysite.nl →</a>':"")
  +'<button class="btn btn-g" style="gap:8px" onclick="wishTog(\''+p.id+'\')">'+HEART(wish.has(p.id))+(wish.has(p.id)?" Bewaard":" Bewaar")+'</button></div>'
+ +(typeof acProductKnop==="function"?acProductKnop(p):"")
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="wmSample(\''+p.id+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
  +(p._turfJack==='nee'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Rook nog niet bepaald: Jack keurde het label \'uitgesproken turf\' af. Licht of geen turf volgt.</p>':p._profielJack?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Smaakprofiel bijgesteld door Jack.</p>':p._turfJack==='graad'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Turf: '+lblTurf(p).toLowerCase()+', volgens Jack.</p>':p._turfJack==='ja'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Turf bevestigd door Jack.</p>':'')
@@ -3879,13 +3816,12 @@ function vAdminBeoordeel(){
 /* ---------- Beheer: indeling en overzicht ---------- */
 var ADMGROEP=[
  {k:"",items:[["start","Overzicht"]]},
- {k:"Werkt al",c:"echt",t:"echte gegevens",items:[["hiaten","Vragen voor Jack"],["beoordeel","Beoordelen"],["gidsen","Gidsen beoordelen"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"]]},
- {k:"Ontwerp",c:"mock",t:"voorbeeld, nog niet werkend",items:[["acties","Acties en banners"]]},
+ {k:"Werkt al",c:"echt",t:"echte gegevens",items:[["hiaten","Vragen voor Jack"],["beoordeel","Beoordelen"],["gidsen","Gidsen beoordelen"],["acties","Acties en banners"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"]]},
  {k:"Voortgang",c:"bouw",t:"stand van de bouw",items:[["voortgang","Voortgang project"],["bronnen","Bronnen & partners"]]},
  {k:"Winkel",c:"echt",t:"Lightspeed, alleen lezen",items:[["dashboard","Winkeldashboard"],["orders","Orders"],["producten","Producten"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"]]}
 ];
 var ADMBAND={
- acties:["mock","<b>Ontwerp.</b> Zo komt het beheer van acties en banners eruit te zien. Nog niets wordt opgeslagen; de acties en controles hieronder zijn voorbeelden."],
+ acties:["echt","<b>Werkt.</b> Acties die je hier maakt, staan op hun datum vanzelf op de site. Prijzen en kortingscodes stel je in Lightspeed in; hier kies je de flessen, de plek, de tekst en de foto. Er verandert niets in Lightspeed."],
  gidsen:["echt","<b>Werkt al.</b> Alle gidsen met hun foto en logo. Keur tekst en beeld goed of af; na inloggen wordt je oordeel opgeslagen en in de kennisbank verwerkt."],
  hiaten:["echt","<b>Werkt al.</b> Echte vragen over jullie catalogus en teksten. Je antwoorden worden na inloggen direct opgeslagen."],
  beoordeel:["echt","<b>Werkt al.</b> Echte flessen uit jullie catalogus. Je oordeel wordt na inloggen opgeslagen en verwerkt."],
@@ -4009,7 +3945,7 @@ function vAdmin(rt){
  }else if(sub==="beoordeel"){
   body=vAdminBeoordeel();
  }else if(sub==="acties"){
-  body=vAdminActies();
+  body=typeof vAdminActies==="function"?vAdminActies():'<p>acties.js ontbreekt.</p>';
  }else if(sub==="gidsen"){
   body=vAdminGidsen();
  }else if(sub==="hiaten"){
