@@ -16,7 +16,7 @@
 "use strict";
 var BT={KADER:800,DOELHOOGTE:0.92,MAXBREEDTE:0.94,TOL:14,UNIFORM:0.97,WIT:244,RAND:3,MAXBRON:2400,MAXMB:20};
 var TEGELS=[["grijs","Grijs","#ece8e3"],["wit","Wit","#ffffff"],["creme","Crème","#f7f3ee"],["donker","Donker","#241b16"],["ruit","Ruit",""]];
-var st={img:null,naam:"foto",pid:null,kies:null,vakken:[],dicht:true,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
+var st={img:null,naam:"foto",pid:null,kies:null,vakken:[],vorm:"rect",punten:[],hover:null,dicht:true,bezig:false,klaar:[],tol:BT.TOL,laatStaan:false,forceer:false,tegel:"grijs",uit:null};
 
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function $(id){return document.getElementById(id);}
@@ -100,13 +100,17 @@ function verloopWeg(c,k,tol,bes){
    Vakken staan in fracties van de hele foto; hier omgerekend naar de uitsnede. */
 function beschermMasker(w,h,v,cw,ch){
  if(!st.vakken.length)return null;
- var m=new Uint8Array(w*h),t=0;
- st.vakken.forEach(function(r){
-  var x0=Math.max(0,Math.round(r.x0*cw)-v.x0),x1=Math.min(w-1,Math.round(r.x1*cw)-v.x0),
-      y0=Math.max(0,Math.round(r.y0*ch)-v.y0),y1=Math.min(h-1,Math.round(r.y1*ch)-v.y0);
-  for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++){m[y*w+x]=1;t++;}});
+ var c=document.createElement("canvas");c.width=w;c.height=h;var x=c.getContext("2d",{willReadFrequently:true});
+ x.fillStyle="#000";
+ st.vakken.forEach(function(r){var q=vakPunten(r);x.beginPath();
+  q.forEach(function(pt,k){var px=pt.x*cw-v.x0,py=pt.y*ch-v.y0;if(k)x.lineTo(px,py);else x.moveTo(px,py);});
+  x.closePath();x.fill();});
+ var a=x.getImageData(0,0,w,h).data,m=new Uint8Array(w*h),t=0;
+ for(var i=0;i<w*h;i++)if(a[i*4+3]>127){m[i]=1;t++;}
  return t?m:null;
 }
+/* Een vak is een rechthoek {x0,y0,x1,y1} of een vrije vorm {p:[{x,y},…]}, in fracties van de foto. */
+function vakPunten(r){return r.p?r.p:[{x:r.x0,y:r.y0},{x:r.x1,y:r.y0},{x:r.x1,y:r.y1},{x:r.x0,y:r.y1}];}
 /* Een witte doos op een witte achtergrond wordt via een zwakke rand soms 'leeggelopen':
    het witte vlak verdwijnt, de opdruk blijft zweven. Zulke weggehaalde pixels liggen dan
    ingesloten in het product: links én rechts in dezelfde rij, en boven én onder in dezelfde
@@ -170,19 +174,33 @@ function tegelStijl(el){
  var t=TEGELS.filter(function(x){return x[0]===st.tegel;})[0];
  el.style.background=t[0]==="ruit"?"repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/20px 20px":t[2];
 }
+function afst(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function bijStart(q){return st.punten.length&&afst(st.punten[0],q)<0.03;}
+function oppervlak(pp){var o=0;for(var i=0,j=pp.length-1;i<pp.length;j=i++)o+=(pp[j].x+pp[i].x)*(pp[j].y-pp[i].y);return Math.abs(o/2);}
+function vormUitleg(){return st.vorm==="veel"
+ ?"Klik punt voor punt langs de rand, of houd de muis ingedrukt en trek een vrije lijn (die sluit vanzelf bij loslaten). Sluit punten door op het eerste punt te klikken, te dubbelklikken of op Enter te drukken. Backspace haalt het laatste punt weg, Esc begint opnieuw."
+ :"Sleep met de muis een rechthoek om de doos.";}
 function teken(){
  var voor=$("btVoor"),na=$("btNa");if(!voor||!na)return;
  [voor,na].forEach(tegelStijl);
  if(st.img){var s=naarCanvas(st.img),f=Math.min(1,400/Math.max(s.width,s.height));
   voor.width=Math.round(s.width*f);voor.height=Math.round(s.height*f);var vx=voor.getContext("2d");vx.drawImage(s,0,0,voor.width,voor.height);
-  st.vakken.concat(st.trek?[st.trek]:[]).forEach(function(r){vx.save();vx.strokeStyle="#c9963f";vx.lineWidth=2;vx.setLineDash([6,4]);
-   vx.fillStyle="rgba(201,150,63,.12)";vx.fillRect(r.x0*voor.width,r.y0*voor.height,(r.x1-r.x0)*voor.width,(r.y1-r.y0)*voor.height);
-   vx.strokeRect(r.x0*voor.width,r.y0*voor.height,(r.x1-r.x0)*voor.width,(r.y1-r.y0)*voor.height);vx.restore();});}
+  var W=voor.width,H=voor.height;
+  st.vakken.concat(st.trek?[st.trek]:[]).forEach(function(r){var q=vakPunten(r);vx.save();vx.strokeStyle="#c9963f";vx.lineWidth=2;vx.setLineDash([6,4]);
+   vx.fillStyle="rgba(201,150,63,.12)";vx.beginPath();q.forEach(function(pt,k){if(k)vx.lineTo(pt.x*W,pt.y*H);else vx.moveTo(pt.x*W,pt.y*H);});
+   vx.closePath();vx.fill();vx.stroke();vx.restore();});
+  if(st.punten.length){var pp=st.punten;vx.save();vx.strokeStyle="#c9963f";vx.lineWidth=2;vx.beginPath();
+   pp.forEach(function(pt,k){if(k)vx.lineTo(pt.x*W,pt.y*H);else vx.moveTo(pt.x*W,pt.y*H);});
+   if(st.hover){vx.setLineDash([4,4]);vx.lineTo(st.hover.x*W,st.hover.y*H);}vx.stroke();vx.setLineDash([]);
+   var dicht=pp.length>=3&&st.hover&&bijStart(st.hover);
+   vx.fillStyle=dicht?"#7a1f2b":"#c9963f";vx.beginPath();vx.arc(pp[0].x*W,pp[0].y*H,dicht?7:5,0,7);vx.fill();
+   vx.fillStyle="#c9963f";pp.slice(1).forEach(function(pt){if(pp.length<60){vx.beginPath();vx.arc(pt.x*W,pt.y*H,2.5,0,7);vx.fill();}});vx.restore();}
+ }
  if(st.uit){na.width=400;na.height=400;var nx=na.getContext("2d");nx.clearRect(0,0,400,400);nx.imageSmoothingQuality="high";nx.drawImage(st.uit,0,0,400,400);}
 }
 function meld(niveau,tekst){var e=$("btDiag");if(!e)return;e.className="bt-diag bt-"+niveau;e.textContent=tekst;}
 function wis(){
- st.img=null;st.uit=null;st.pid=null;st.forceer=false;st.vakken=[];st.trek=null;var vw=$("btVakWis");if(vw)vw.style.display="none";
+ st.img=null;st.uit=null;st.pid=null;st.forceer=false;st.vakken=[];st.trek=null;st.punten=[];st.hover=null;var vw=$("btVakWis");if(vw)vw.style.display="none";
  ["btVoor","btNa"].forEach(function(id){var c=$(id);if(c){c.getContext("2d").clearRect(0,0,c.width,c.height);}});
  var fk=$("btForceer");if(fk)fk.style.display="none";
  knoppen();
@@ -308,7 +326,7 @@ var CSS='.bt-grid{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:2
 +'.bt-inst{margin-top:16px;font-size:12.5px}.bt-inst label{display:block;margin-top:10px}'
 +'.bt-tegels{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.bt-tegels button{font:inherit;font-size:12px;padding:6px 11px;border:1px solid var(--line);border-radius:20px;background:transparent;color:var(--text);cursor:pointer}.bt-tegels button.on{border-color:var(--amber);color:var(--amber);font-weight:600}'
 +'.bt-paar{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bt-paar figure{margin:0}.bt-paar figcaption{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}'
-+'.bt-paar canvas{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block}#btVoor{cursor:crosshair;touch-action:none}'
++'.bt-paar canvas{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;border:1px solid var(--line);display:block}#btVoor{cursor:crosshair;touch-action:none}.bt-vorm{display:flex;gap:14px;margin-top:6px}.bt-vorm label{display:flex;gap:5px;align-items:center;font-size:13px}'
 +'.bt-diag{font-size:12.5px;margin:12px 0;padding:10px 12px;border-radius:9px;background:var(--card);border:1px solid var(--line)}.bt-waarschuwing{border-color:#c9963f}.bt-fout{border-color:#8a1c26;color:#8a1c26}'
 +'.bt-knoppen{display:flex;gap:8px;flex-wrap:wrap}.bt-leeg{font-size:12px;color:var(--muted);padding:6px}'
 +'.bt-hit.bt-klaar{opacity:.45;text-decoration:line-through}.bt-klaar-lijst{margin-top:12px;font-size:12px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card)}.bt-klaar-lijst span{display:inline-block;margin:3px 4px 0 0;padding:1px 7px;border-radius:9px;border:1px solid var(--line);font-size:11px}.bt-klaar-lijst small{color:var(--muted)}'
@@ -327,8 +345,12 @@ window.vBeeldtool=function(){
  +'<div class="bt-inst"><label>Tolerantie achtergrond: <b id="btTolW">'+st.tol+'</b><input type="range" id="btTol" min="4" max="40" value="'+st.tol+'"></label>'
  +'<label><input type="checkbox" id="btLaat"'+(st.laatStaan?" checked":"")+'> Achtergrond laten staan (alleen kaderen)</label>'
  +'<label><input type="checkbox" id="btDicht"'+(st.dicht?" checked":"")+'> Gaten dichten (houdt een witte doos heel)</label>'
- +'<p class="bt-leeg" style="margin-top:10px">Doos toch aangevreten? Trek in <b>Nu</b> met de muis een vak om de doos: binnen dat vak wordt niets weggehaald. '
- +'<button type="button" class="btn btn-s" id="btVakWis" style="display:none;margin-top:6px">Vakken wissen</button></p></div>'
+ +'<p class="bt-leeg" style="margin-top:10px">Doos toch aangevreten? Teken in <b>Nu</b> een vak om de doos: binnen dat vak wordt niets weggehaald.</p>'
+ +'<div class="bt-vorm" role="radiogroup" aria-label="Vorm van het vak"><label><input type="radio" name="btVorm" value="rect"'+(st.vorm==="rect"?" checked":"")+'> Rechthoek</label>'
+ +'<label><input type="radio" name="btVorm" value="veel"'+(st.vorm==="veel"?" checked":"")+'> Vrije vorm</label></div>'
+ +'<p class="bt-leeg" id="btVormUitleg" style="margin-top:4px">'+vormUitleg()+'</p>'
+ +'<button type="button" class="btn btn-s" id="btVakTerug" style="display:none;margin:6px 6px 0 0">Laatste vak weg</button>'
+ +'<button type="button" class="btn btn-s" id="btVakWis" style="display:none;margin-top:6px">Vakken wissen</button></div>'
  +'</div><div>'
  +'<div class="bt-tegels">'+TEGELS.map(function(t){return '<button type="button" data-tegel="'+t[0]+'"'+(t[0]===st.tegel?' class="on"':'')+'>'+t[1]+'</button>';}).join("")+'</div>'
  +'<div class="bt-paar"><figure><figcaption>Nu</figcaption><canvas id="btVoor" width="400" height="400"></canvas></figure><figure><figcaption>Opgemaakt</figcaption><canvas id="btNa" width="400" height="400"></canvas></figure></div>'
@@ -357,17 +379,41 @@ window.btInit=function(){
  $("btTol").addEventListener("input",function(e){st.tol=+e.target.value;$("btTolW").textContent=st.tol;verwerk();});
  $("btLaat").addEventListener("change",function(e){st.laatStaan=e.target.checked;verwerk();});
  $("btDicht").addEventListener("change",function(e){st.dicht=e.target.checked;verwerk();});
- $("btVakWis").addEventListener("click",function(){st.vakken=[];this.style.display="none";teken();verwerk();});
- /* vak trekken op de Nu-tegel; de tegel toont de foto met object-fit:contain */
- var voor=$("btVoor"),begin=null;
+ function vakKnoppen(){var n=st.vakken.length;$("btVakWis").style.display=n?"":"none";$("btVakTerug").style.display=n?"":"none";}
+ $("btVakWis").addEventListener("click",function(){st.vakken=[];st.punten=[];vakKnoppen();teken();verwerk();});
+ $("btVakTerug").addEventListener("click",function(){st.vakken.pop();vakKnoppen();teken();verwerk();});
+ document.querySelectorAll('input[name="btVorm"]').forEach(function(r){r.addEventListener("change",function(){
+  st.vorm=r.value;st.punten=[];st.hover=null;$("btVormUitleg").innerHTML=vormUitleg();teken();});});
+ /* vak tekenen op de Nu-tegel; de tegel toont de foto met object-fit:contain.
+    Rechthoek: slepen. Vrije vorm: klik punt voor punt (of sleep voor een vrije lijn) en sluit op het eerste punt. */
+ var voor=$("btVoor"),begin=null,lasso=false; /* lasso = aantal punten bij indrukken, of false */
  function punt(e){var r=voor.getBoundingClientRect(),sc=Math.min(r.width/voor.width,r.height/voor.height),
    ox=(r.width-voor.width*sc)/2,oy=(r.height-voor.height*sc)/2;
   return {x:Math.min(1,Math.max(0,(e.clientX-r.left-ox)/sc/voor.width)),y:Math.min(1,Math.max(0,(e.clientY-r.top-oy)/sc/voor.height))};}
- voor.addEventListener("pointerdown",function(e){if(!st.img)return;begin=punt(e);voor.setPointerCapture(e.pointerId);});
- voor.addEventListener("pointermove",function(e){if(!begin)return;var q=punt(e);
+ voor.addEventListener("pointerdown",function(e){if(!st.img)return;var q=punt(e);
+  if(st.vorm==="veel"){e.preventDefault();
+   if(st.punten.length>=3&&bijStart(q)){sluitVorm();return;}
+   var l=st.punten[st.punten.length-1];if(!l||afst(l,q)>0.004)st.punten.push(q);
+   lasso=st.punten.length;voor.setPointerCapture(e.pointerId);teken();return;}
+  begin=q;voor.setPointerCapture(e.pointerId);});
+ voor.addEventListener("pointermove",function(e){var q=punt(e);
+  if(st.vorm==="veel"){if(!st.punten.length)return;st.hover=q;
+   if(lasso!==false){var l=st.punten[st.punten.length-1];if(afst(l,q)>0.012&&st.punten.length<400)st.punten.push(q);}teken();return;}
+  if(!begin)return;
   st.trek={x0:Math.min(begin.x,q.x),y0:Math.min(begin.y,q.y),x1:Math.max(begin.x,q.x),y1:Math.max(begin.y,q.y)};teken();});
- voor.addEventListener("pointerup",function(){if(!begin)return;begin=null;var r=st.trek;st.trek=null;
-  if(r&&(r.x1-r.x0)>0.02&&(r.y1-r.y0)>0.02){st.vakken.push(r);$("btVakWis").style.display="";}teken();verwerk();});
+ voor.addEventListener("pointerup",function(){if(st.vorm==="veel"){var getrokken=lasso!==false&&st.punten.length-lasso>=8;lasso=false;if(getrokken)sluitVorm();return;}
+  if(!begin)return;begin=null;var r=st.trek;st.trek=null;
+  if(r&&(r.x1-r.x0)>0.02&&(r.y1-r.y0)>0.02){st.vakken.push(r);vakKnoppen();}teken();verwerk();});
+ voor.addEventListener("pointerleave",function(){if(st.hover){st.hover=null;teken();}});
+ voor.addEventListener("dblclick",function(e){if(st.vorm==="veel"){e.preventDefault();sluitVorm();}});
+ if(!st.toetsen){st.toetsen=true;document.addEventListener("keydown",function(e){
+  if(st.vorm!=="veel"||!st.punten.length||!$("btVoor"))return;var t=e.target&&e.target.tagName;if(t==="INPUT"||t==="TEXTAREA")return;
+  if(e.key==="Enter"){e.preventDefault();sluitVorm();}
+  else if(e.key==="Escape"){st.punten=[];st.hover=null;teken();}
+  else if(e.key==="Backspace"){e.preventDefault();st.punten.pop();teken();}});}
+ function sluitVorm(){var pp=st.punten;st.punten=[];st.hover=null;
+  if(pp.length>=3&&oppervlak(pp)>0.0004){st.vakken.push({p:pp});vakKnoppen();verwerk();}teken();}
+ vakKnoppen();
  document.querySelectorAll(".bt-tegels button").forEach(function(b){b.addEventListener("click",function(){
   st.tegel=b.getAttribute("data-tegel");document.querySelectorAll(".bt-tegels button").forEach(function(x){x.classList.toggle("on",x===b);});teken();});});
  $("btForceer").addEventListener("click",function(){st.forceer=!st.forceer;verwerk();});
