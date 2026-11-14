@@ -13,7 +13,8 @@ var AC_MAX_KORTING=25;
 var AC_IDX=null;
 function acP(id){if(!AC_IDX||AC_IDX._n!==CAT.length){AC_IDX={_n:CAT.length};CAT.forEach(function(p){AC_IDX[String(p.id)]=p;});}return AC_IDX[String(id)]||null;}
 function acVandaag(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Amsterdam"}).format(new Date());}
-function acLoopt(a){var d=acVandaag();return !a.ingetrokken&&a.markt==="NL"&&a.van<=d&&d<=a.tot;}
+/* Besluit Jack 20-10 en 05-11: een actie geldt voor iedereen, ook in het Engels en uit het buitenland. Geen filter op markt; nieuwe acties krijgen markt "ALLE". */
+function acLoopt(a){var d=acVandaag();return !a.ingetrokken&&a.van<=d&&d<=a.tot;}
 function acStatus(a){var d=acVandaag();if(a.ingetrokken)return ["Ingetrokken","warn"];if(d<a.van)return ["Ingepland","bouw"];if(d>a.tot)return ["Verlopen","warn"];return ["Live","ok"];}
 function acDatum(d){if(!d)return "";var m=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"],x=d.split("-");return (+x[2])+" "+m[+x[1]-1];}
 function acBeheer(){return typeof WS!=="undefined"&&WS.gebruiker&&WS.geladen&&!WS.fout;}
@@ -156,7 +157,7 @@ function acNieuw(){
  var d=acVandaag(),t=new Date(Date.now()+14*86400000);
  AC.edit={id:null,slug:"",titel:"",regel:"",knop:"Bekijk",code:"",code_pct:null,code_niet_op_aanbiedingen:true,voorwaarden:"",
   van:d,tot:new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Amsterdam"}).format(t),plekken:["tegel"],selectie:"lijst",regel_filter:"",
-  beeld_url:"",beeld_bron:"",beeld_rechten:"",markt:"NL",ingetrokken:false,_ids:[]};
+  beeld_url:"",beeld_bron:"",beeld_rechten:"",markt:"ALLE",ingetrokken:false,_ids:[]};
  AC.ctrl=null;render();
 }
 function acBewerk(id){
@@ -258,7 +259,7 @@ function acOpslaan(){
  var rij={slug:e.slug||acSlug(e.titel),titel:e.titel.trim(),regel:(e.regel||"").trim()||null,knop:(e.knop||"").trim()||null,
   code:(e.code||"").trim()||null,code_pct:e.code?e.code_pct:null,code_niet_op_aanbiedingen:!!e.code_niet_op_aanbiedingen,voorwaarden:(e.voorwaarden||"").trim()||null,
   van:e.van,tot:e.tot,plekken:e.plekken,selectie:e.selectie,regel_filter:e.selectie==="regel"?(e.regel_filter||""):null,
-  beeld_url:(e.beeld_url||"").trim()||null,beeld_bron:(e.beeld_bron||"").trim()||null,beeld_rechten:(e.beeld_rechten||"").trim()||null,markt:"NL",ingetrokken:!!e.ingetrokken};
+  beeld_url:(e.beeld_url||"").trim()||null,beeld_bron:(e.beeld_bron||"").trim()||null,beeld_rechten:(e.beeld_rechten||"").trim()||null,markt:"ALLE",ingetrokken:!!e.ingetrokken};
  var q=e.id?WS.sb.from("ws_acties").update(rij).eq("id",e.id).select("id").single():WS.sb.from("ws_acties").insert(rij).select("id").single();
  q.then(function(r){
   if(r.error)throw r.error;var id=r.data.id;
