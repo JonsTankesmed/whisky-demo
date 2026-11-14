@@ -194,6 +194,11 @@ h2{font-size:29px}
 .tbar.leeg{background:transparent;border:1px dashed var(--line)}
 .tbar.leeg s{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:9px;color:var(--muted)}
 .tleeg{font-size:9px;color:var(--muted);margin-top:3px}
+.turfschaal{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted);white-space:nowrap}
+.turfschaal i{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--line)}
+.turfschaal i.aan{background:var(--amber)}
+.turfschaal i:first-of-type{margin-left:3px}
+.turfschaal i:last-of-type{margin-right:3px}
 .pnaam em.nnb{color:var(--amber);font-style:normal}
 .tlabels{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:8px;color:var(--muted);text-align:center}
 .price{display:flex;align-items:baseline;gap:9px;margin-top:auto}
@@ -1352,6 +1357,15 @@ function similar(p,n){
    wél zeker weten: andere flessen van dezelfde distilleerderij. */
 function zelfdeStokerij(p,n){
  return CAT.filter(x=>x.id!==p.id&&x.dist===p.dist&&p.dist!=="Onbekend").slice(0,n);}
+/* Turfschaal (besluit Jack 20-10, indeling akkoord John 14-11): uit de rookas van het smaakprofiel.
+   rook 0-1 = ongeturfd (0), 2 = licht (1), 3 = middel (2), 4-5 = zwaar (3). Geen profiel = null, 'Nog niet bepaald'.
+   De rookas zegt hoe rokerig de fles smaakt, niet hoeveel turf er in de mout zat. Een oordeel van Jack gaat voor. */
+function turfVan(r){return r==null?null:(r>=4?3:(r>=3?2:(r>=2?1:0)));}
+var TURFNAAM=["","licht","middel","zwaar"];
+function turfSchaal(p){
+ if(!p._turf)return "";
+ return '<span class="turfschaal" title="Turf: '+TURFNAAM[p._turf]+'">Turf <i'+(p._turf>=1?' class="aan"':'')+'></i><i'+(p._turf>=2?' class="aan"':'')+'></i><i'+(p._turf>=3?' class="aan"':'')+'></i> '+TURFNAAM[p._turf]+'</span>';
+}
 function bars(t,geen){
  if(geen)return '<div class="geenprofiel">Nog geen smaakprofiel — deze fles wacht op beoordeling.</div>';
  var leeg=t.some(v=>v==null);
@@ -1368,7 +1382,7 @@ function card(p,prof,opt){
  +'<div class="pbody"><div class="pname" onclick="go(\'#/product/'+p.id+'\')">'+p.name+(p.demo?'<span class="demoflag" title="Gegenereerd voorbeeldproduct, geen echte botteling">voorbeeld</span>':'')+'</div>'
  +'<div class="pmeta">'+p.region+' · '+p.age+' · '+p.abv+'</div>'
  +(p.rev?'<div class="rev" style="color:var(--muted);font-weight:500">Proefnotitie voorzien · '+p.rev.s+'</div>':"")
- +(compact?"":'<div class="tags">'+(p.tags||[]).filter(function(t){return KTAGS[t];}).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>')
+ +(compact?"":'<div class="tags">'+(p.tags||[]).filter(function(t){return KTAGS[t]&&!(t==="turf"&&p._turf);}).map(t=>'<span class="tag">'+t+'</span>').join("")+turfSchaal(p)+'</div>')
  +'<div class="price"><b>'+eur(p.price)+'</b>'+(p.was?'<s>'+eur(p.was)+'</s>':"")+'</div>'
  +'<div class="prow"><button class="add" '+(p.rare?"disabled":"")+' onclick="wmToe(\''+p.id+'\')">'+(p.rare?"Op aanvraag":"In winkelwagen")+'</button>'
  +(p.sample?'<button class="smp" onclick="wmSample(\''+p.id+'\')">Sample '+eur(p.sample)+'</button>':"")+'</div>'
@@ -1438,7 +1452,7 @@ function genereer(n){
    t:t,tags:[vat[0].toLowerCase(),turf>1?"turf":"ongeturfd"],
    sum:"Voorbeeldproduct. Het smaakprofiel is gegenereerd om het filteren op schaal te tonen — geen proefnotitie.",
    pair:[],demo:true,_vol:sample?5:70,_sample:sample,_leeftijd:leeftijd,_abv:abv,
-   _vaten:vat[1],_turf:turf,_dagen:dagen,_voorraad:rnd()<.93});
+   _vaten:vat[1],_turf:turfVan(t[0]),_dagen:dagen,_voorraad:rnd()<.93});
  }
  return uit;
 }
@@ -1460,7 +1474,7 @@ function normEcht(p){
     null geeft ze een eigen filterwaarde 'Nog niet bepaald'. */
  p.geenprofiel=!p.t;
  if(!p.t)p.t=[3,3,3,3];
- p._turf=(p.geenprofiel||p.t[0]==null)?null:(p.t[0]>=4?2:(p.t[0]>=2?1:0));
+ p._turf=(p.geenprofiel||p.t[0]==null)?null:turfVan(p.t[0]);
  if(p._vol==null)p._vol=70;
  if(p._sample==null)p._sample=/sample|5cl|3cl/i.test(p.name||"");
  p._dagen=p.isNew?12:200;
@@ -1502,7 +1516,7 @@ var P_ECHT=false;
   var q=byId[P_TWEELING[p.id]];if(!q)return;
   if(p.rev&&!q.rev)q.rev=p.rev;
   if(p.fest)q.fest=p.fest;
-  if(q.geenprofiel&&p.t){q.t=p.t.slice();q.geenprofiel=false;q._turf=q.t[0]>=4?2:(q.t[0]>=2?1:0);if(!q.tags||!q.tags.length)q.tags=p.tags;q._profielDemo=true;}
+  if(q.geenprofiel&&p.t){q.t=p.t.slice();q.geenprofiel=false;q._turf=turfVan(q.t[0]);if(!q.tags||!q.tags.length)q.tags=p.tags;q._profielDemo=true;}
   q._uitgelicht=true;echt.push(q);
  });
  if(!echt.length)return;
@@ -1522,9 +1536,9 @@ var P_ECHT=false;
  (OORDELEN.turfJa||[]).forEach(function(id){var p=byId[id];if(p)p._turfJack="ja";});
  Object.keys(OORDELEN.profiel||{}).forEach(function(id){var p=byId[id];if(!p)return;
   var a=OORDELEN.profiel[id];p.t=a.slice();p.geenprofiel=false;p._profielJack=true;
-  if(p._turfJack!=="nee")p._turf=a[0]==null?null:(a[0]>=4?2:(a[0]>=2?1:0));});
- /* Vervolgvraag turf: licht = rook 2, ongeturfd = rook 0, toch uitgesproken = rook 4. */
- var TG={"Licht turfig":[1,2],"Ongeturfd":[0,0],"Toch uitgesproken":[2,4]};
+  if(p._turfJack!=="nee")p._turf=turfVan(a[0]);});
+ /* Vervolgvraag turf: [schaal, rookas]. De oude keuzes (Licht turfig, Toch uitgesproken) blijven geldig. */
+ var TG={"Licht turfig":[1,2],"Licht":[1,2],"Middel":[2,3],"Zwaar":[3,4],"Toch uitgesproken":[3,4],"Ongeturfd":[0,0]};
  Object.keys(OORDELEN.turfGraad||{}).forEach(function(id){var p=byId[id],g=TG[OORDELEN.turfGraad[id]];if(!p||!g)return;
   p._turf=g[0];if(!p.geenprofiel&&p.t)p.t[0]=g[1];p._turfJack="graad";
   if(g[0]>0&&p.tags&&p.tags.indexOf("turf")<0)p.tags.push("turf");});
@@ -1543,7 +1557,10 @@ function bktSterkte(p){return p._abv>=50?"Vatsterkte (50%+)":p._abv>=46?"46 tot 
    zilt >= 4 staat 45% buiten Islay, Island en Campbeltown, dus het streekfilter
    dekt dit niet af. De drempel van 4 ligt bij Jack ter bevestiging. */
 function lblZee(p){return p._z==null?"Nog niet bepaald":p._z>=4?"Maritiem":"Niet maritiem";}
-function lblTurf(p){return p._turf==null?"Nog niet bepaald":p._turf===2?"Uitgesproken turf":p._turf===1?"Licht turfig":"Ongeturfd";}
+var TURFLBL=["Ongeturfd","Licht geturfd","Middel geturfd","Zwaar geturfd"],TURFALLE="Alle geturfde flessen";
+function lblTurf(p){return p._turf==null?"Nog niet bepaald":TURFLBL[p._turf];}
+/* 'Alle geturfde flessen' is de hoofdkeuze; licht, middel en zwaar verfijnen. */
+function turfWaarden(p){var l=lblTurf(p);return p._turf>0?[TURFALLE,l]:[l];}
 /* de facetlijst is redactioneel beheerd, niet afgeleid uit de producten:
    anders komen streek en land door elkaar te staan ("Blend" naast "Islay") */
 var STREKEN=["Islay","Speyside","Highland","Island","Lowland","Campbeltown"];
@@ -1556,7 +1573,7 @@ var FACETS=[
  {id:"vat",n:"Vatsoort",vs:function(p){return p._vaten;}},
  {id:"leeftijd",n:"Leeftijd",v:bktLeeftijd,vast:["Tot 10 jaar","10 tot 15 jaar","15 tot 21 jaar","21 jaar en ouder","Geen leeftijd (NAS)"]},
  {id:"sterkte",n:"Alcohol",v:bktSterkte,vast:["Tot 46%","46 tot 50%","Vatsterkte (50%+)"]},
- {id:"turf",n:"Turf",v:lblTurf,vast:["Ongeturfd","Licht turfig","Uitgesproken turf","Nog niet bepaald"]},
+ {id:"turf",n:"Turf",vs:turfWaarden,vast:[TURFALLE,"Licht geturfd","Middel geturfd","Zwaar geturfd","Ongeturfd","Nog niet bepaald"]},
  {id:"zee",n:"Maritiem",v:lblZee,vast:["Maritiem","Niet maritiem","Nog niet bepaald"]},
  {id:"huis",n:"Bottelaar",vs:function(p){return huizenVan(p);},top:12},
  {id:"bottelaar",n:"Botteling",v:function(p){return p.ib?"Independent bottler":"Eigen botteling";}},
@@ -3127,6 +3144,7 @@ function vProduct(rt){
  +(typeof acProductKnop==="function"?acProductKnop(p):"")
  +(p.sample?'<div class="sample-box"><i style="font-style:normal;color:var(--amber)">'+I("flask",26)+'</i><div><b>Proef eerst — sample '+eur(p.sample)+'</b><p>Niet zeker? Bestel een 6cl-sample en ontdek of deze bij je smaakprofiel past.</p></div><button class="btn btn-g btn-s" style="margin-left:auto" onclick="wmSample(\''+p.id+'\')">Bestel sample</button></div>':"")
  +'<h3 style="font-size:18px;margin-top:20px">Smaakprofiel</h3><div style="max-width:420px;margin-top:10px">'+bars(p.t,p.geenprofiel)+'</div>'
+ +(p._turf?'<p style="margin-top:8px">'+turfSchaal(p)+'</p>':'')
  +(p._turfJack==='nee'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Rook nog niet bepaald: Jack keurde het label \'uitgesproken turf\' af. Licht of geen turf volgt.</p>':p._profielJack?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Smaakprofiel bijgesteld door Jack.</p>':p._turfJack==='graad'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Turf: '+lblTurf(p).toLowerCase()+', volgens Jack.</p>':p._turfJack==='ja'?'<p style="font-size:12px;color:var(--muted);margin-top:8px">Turf bevestigd door Jack.</p>':'')
  +'<table class="spec"><tr><th>Distilleerderij</th><td>'+p.dist+'</td></tr><tr><th>Regio</th><td>'+plaats(p)+'</td></tr>'+(soortVan(p)?'<tr><th>Soort</th><td>'+soortVan(p).n+(p._soortJack?' <small style="color:var(--muted)">(bevestigd door Jack)</small>':p._soortAfg?' <small style="color:var(--muted)">(afgeleid uit het merk — wacht op controle)</small>':'')+'</td></tr>':'')+'<tr><th>Leeftijd</th><td>'+p.age+'</td></tr><tr><th>Alcohol</th><td>'+(p.abv||"—")+'</td></tr><tr><th>Vatsoort</th><td>'+(p.cask||"—")+'</td></tr><tr><th>Inhoud</th><td>'+volTekst(p)+'</td></tr></table>'
  /* De 20 handgemaakte producten hebben een spijsadvies, de 6.371 uit de winkel
@@ -3697,7 +3715,7 @@ function bExtraVragen(){
  if(BEXTRA||typeof BEOORDELING==="undefined"||typeof CAT==="undefined")return;BEXTRA=true;
  var bij=[],byI={};CAT.forEach(function(p){byI[String(p.id)]=p;});
  if(typeof OORDELEN!=="undefined"&&OORDELEN)(OORDELEN.turfNee||[]).forEach(function(id){var p=byI[id];if(!p)return;
-  bij.push({k:"turfgraad",id:"turfgraad:"+id,pid:id,titel:p.name,foto:p.img,uitleg:"Je keurde 'uitgesproken turf' af. Wat klopt wel?",opties:["Licht turfig","Ongeturfd","Toch uitgesproken"]});});
+  bij.push({k:"turfgraad",id:"turfgraad:"+id,pid:id,titel:p.name,foto:p.img,uitleg:"Je keurde 'uitgesproken turf' af. Wat klopt wel?",opties:["Licht turfig","Middel","Zwaar","Ongeturfd"]});});
  CAT.filter(function(p){return p.country==="Amerika";}).forEach(function(p){var x=soortVan(p);if(!x)return;
   var onb=x.n.indexOf("Overig")===0;if(!onb&&!p._soortAfg)return;
   bij.push({k:"soort",id:"soort:"+p.id,pid:String(p.id),titel:p.name,foto:p.img,
@@ -3712,7 +3730,7 @@ function vAdminBeoordeel(){
  if(typeof BEOORDELING==="undefined")return '<h3 style="font-size:20px">Beoordelen</h3><p style="color:var(--muted)">De beoordeelrij is niet geladen.</p>';
  bExtraVragen();
  var alle=BEOORDELING.items, gedaan=Object.keys(BSLT).length;
- var soorten=[["turfgraad","Turf: licht of geen"],["soort","Soort (VS)"],["catalogus","Catalogus"],["herkomst","Herkomst van een stokerij"],["product","Per product"],["turf","Turflabel"],["vat","Vatsoort"]];
+ var soorten=[["turfgraad","Turf: licht, middel, zwaar of geen"],["soort","Soort (VS)"],["catalogus","Catalogus"],["herkomst","Herkomst van een stokerij"],["product","Per product"],["turf","Turflabel"],["vat","Vatsoort"]];
  var tel={};soorten.forEach(function(s){tel[s[0]]=alle.filter(function(x){return x.k===s[0];}).length;});
  var open=alle.filter(function(x){return !BSLT[x.id];});
  var lijst=BFILTER==="open"?open:BFILTER==="gedaan"?alle.filter(function(x){return BSLT[x.id];}):alle.filter(function(x){return x.k===BFILTER;});
