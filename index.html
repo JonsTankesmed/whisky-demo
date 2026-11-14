@@ -1132,6 +1132,7 @@ footer.voetmini .f18{padding-bottom:22px}
 <script src="merkposities.js" onerror="void 0"></script>
 <script src="vragenlijst.js" onerror="void 0"></script>
 <script src="acties.js" onerror="void 0"></script>
+<script src="stappenplan.js" onerror="void 0"></script>
 <script src="lightspeed.js" onerror="void 0"></script>
 <script src="winkelmand.js" onerror="void 0"></script>
 <script>
@@ -3815,12 +3816,13 @@ function vAdminBeoordeel(){
 }
 /* ---------- Beheer: indeling en overzicht ---------- */
 var ADMGROEP=[
- {k:"",items:[["start","Overzicht"]]},
+ {k:"",items:[["start","Overzicht"],["stappen","Naar de testsite"]]},
  {k:"Werkt al",c:"echt",t:"echte gegevens",items:[["hiaten","Vragen voor Jack"],["beoordeel","Beoordelen"],["gidsen","Gidsen beoordelen"],["acties","Acties en banners"],["beeld","Beeldvoorstellen"],["beeldtool","Beeldtool"]]},
  {k:"Voortgang",c:"bouw",t:"stand van de bouw",items:[["voortgang","Voortgang project"],["bronnen","Bronnen & partners"]]},
  {k:"Winkel",c:"echt",t:"Lightspeed, alleen lezen",items:[["dashboard","Winkeldashboard"],["orders","Orders"],["producten","Producten"],["smaak","Smaakprofielen"],["sync","Lightspeed-sync"]]}
 ];
 var ADMBAND={
+ stappen:["bouw","<b>Stappenplan.</b> Wat we gaan doen om van de demo een afgesloten testsite te maken, waarom, en wat jij daarvoor doet. Na inloggen kun je stappen afvinken."],
  acties:["echt","<b>Werkt.</b> Acties die je hier maakt, staan op hun datum vanzelf op de site. Prijzen en kortingscodes stel je in Lightspeed in; hier kies je de flessen, de plek, de tekst en de foto. Er verandert niets in Lightspeed."],
  gidsen:["echt","<b>Werkt al.</b> Alle gidsen met hun foto en logo. Keur tekst en beeld goed of af; na inloggen wordt je oordeel opgeslagen en in de kennisbank verwerkt."],
  hiaten:["echt","<b>Werkt al.</b> Echte vragen over jullie catalogus en teksten. Je antwoorden worden na inloggen direct opgeslagen."],
@@ -3919,6 +3921,7 @@ function vAdminStart(){
  +'<div class="ov-leg"><span><i class="dot echt"></i>Werkt al, met echte gegevens</span><span><i class="dot bouw"></i>Stand van de bouw</span></div>'
  +'<div class="ov-grid">'
  +'<div class="ov-card echt"><h4>Wacht op jou</h4><div class="ov-wat">Werkt al. Wat je hier doet, gebruiken we direct in de bouw.</div>'
+ +'<div class="ov-taak"><a href="#/admin/stappen">Naar de testsite: stappenplan →</a><p>Wat we gaan doen, waarom, en wat jij daarvoor doet. Samen af te vinken.</p></div>'
  +'<div class="ov-taak"><a href="#/admin/hiaten">Vragen voor Jack →</a>'+(hg===null?'<p>'+hz.length+' vragen. Log in om je stand te zien en antwoorden op te slaan.</p>':balk(hg,hz.length))+'</div>'
  +'<div class="ov-taak"><a href="#/admin/beoordeel" onclick="BFILTER=\'open\'">Beoordelen →</a><p>Klopt wat we bij een fles tonen? Begin bij de kleinste stapel.</p>'
  +[["herkomst","Herkomst van een stokerij"],["turf","Turflabel"],["vat","Vatsoort"],["product","Per fles"]].map(function(so){
@@ -3944,6 +3947,8 @@ function vAdmin(rt){
   body=vAdminStart();
  }else if(sub==="beoordeel"){
   body=vAdminBeoordeel();
+ }else if(sub==="stappen"){
+  body=typeof vAdminStappen==="function"?vAdminStappen():'<p>stappenplan.js ontbreekt.</p>';
  }else if(sub==="acties"){
   body=typeof vAdminActies==="function"?vAdminActies():'<p>acties.js ontbreekt.</p>';
  }else if(sub==="gidsen"){
