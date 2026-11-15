@@ -89,7 +89,7 @@ function spLaad(){
   SP.tabel=true;SP.fout="";SP.geladen=true;wsHerteken();
  });
 }
-function spZet(id,aan){
+function spVink(id,aan){
  /* alleen bekende stappen; de database controleert het id en het account nog een keer */
  var bekend=spAlle().some(function(s){return s.id===id&&!s.d;});
  if(!bekend||!spKan()||!SP.tabel||SP.bewaar)return false;
@@ -111,7 +111,7 @@ function spStap(s){
  var st=SP.stand[s.id]||{},af=!!st.gedaan,wie=SP_WIE[s.w]||SP_WIE.wij,kan=spKan()&&SP.tabel&&!s.d;
  var vak=s.d?'<span class="st warn" style="white-space:nowrap" title="Loopt door, niet af te vinken">loopt</span>'
   :'<input type="checkbox" aria-label="'+wsH(s.t)+' afvinken" style="width:18px;height:18px;accent-color:var(--green);cursor:'+(kan?"pointer":"not-allowed")+'"'
-   +(af?" checked":"")+(kan&&SP.bewaar!==s.id?"":" disabled")+' onchange="spZet(\''+s.id+'\',this.checked)">';
+   +(af?" checked":"")+(kan&&SP.bewaar!==s.id?"":" disabled")+' onchange="spVink(\''+s.id+'\',this.checked)">';
  return '<tr'+(af?' style="opacity:.62"':'')+'><td style="width:56px;vertical-align:top;padding-top:12px">'+vak+'</td>'
   +'<td style="vertical-align:top"><b style="font-size:13.5px'+(af?';text-decoration:line-through':'')+'">'+wsH(s.t)+'</b> <span class="st '+wie[1]+'">'+wie[0]+'</span>'
   +'<div style="margin-top:4px">'+wsH(s.wat)+'</div>'
