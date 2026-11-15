@@ -26,7 +26,9 @@ var SP_BLAD={
   ["Cloudflare","Laat de testsite zien en regelt het inloggen met een code per e-mail.","Op jouw naam. Ziet het e-mailadres van wie inlogt."],
   ["Supabase","Bewaart jouw antwoorden, de acties en de foto's.","Op jouw naam. Servers in de Europese Unie."],
   ["Jons TankeSmed","Bouwt en beheert de site in jouw accounts.","Kan erbij zolang jij dat wilt."],
-  ["Lightspeed","Blijft je winkel en je kassa.","Hier verandert niets."]
+  ["Lightspeed","Blijft je winkel en je kassa.","Hier verandert niets."],
+  ["Dennis (it2help)","IT en techniek.","Denkt mee over het domein, de hosting en de bestaande site."],
+  ["Dennis (2ndchapter)","Google: advertenties en vindbaarheid.","Denkt mee over wat er bij livegang met Google gebeurt."]
  ],
  later:"Het adres van de testsite is tijdelijk. Bij livegang komt de nieuwe site gewoon op www.whiskysite.nl. Dat zetten we dan samen om bij wie je domein beheert."
 };
@@ -52,7 +54,9 @@ var SP_STAPPEN=[
   {id:"j-nakijken",w:"jack",t:"De teksten laten nakijken",wat:"Je eigen jurist of adviseur, of een dienst voor webwinkels. In de zeven vragen kies je wie.",waarom:"Het zijn jouw teksten en jouw winkel. Een jurist moet zeggen of ze kloppen."},
   {id:"s-tekenen",w:"samen",t:"De overeenkomst over jouw gegevens tekenen",wat:"Hierin staat wat TankeSmed met gegevens van Whiskysite mag doen, hoe ze beveiligd zijn en wat er gebeurt als we stoppen.",waarom:"De wet vraagt dit zodra iemand anders bij jouw gegevens kan. Het beschermt jou."}
  ]},
- {k:"De testsite klaarzetten",ic:"bouw",t:"Dit doen wij, in jouw accounts. Je hoeft alleen de twee punten met jouw naam te doen.",items:[
+ {k:"De testsite klaarzetten",ic:"bouw",t:"Dit doen wij, in jouw accounts. Jij bent alleen nodig bij de punten met Jij of Samen.",items:[
+  {id:"s-it2help",w:"samen",t:"Afstemmen met Dennis van it2help",wat:"Een kort overleg over de techniek: het domein, de hosting en de bestaande site. Jij licht Dennis eerst zelf in. Daarna plant John het overleg.",waarom:"Dennis doet jullie IT. Hij moet weten wat er komt, en wij moeten weten wat er nu is ingesteld. Bij livegang is er een instelling nodig bij het domein."},
+  {id:"s-2ndchapter",w:"samen",t:"Afstemmen met Dennis van 2ndchapter",wat:"Een kort overleg over Google: de advertenties en de vindbaarheid. Jij licht Dennis eerst zelf in. Daarna plant John het overleg.",waarom:"Advertenties en zoekresultaten wijzen nu naar pagina's van je huidige site. Die moeten bij livegang blijven werken. De testsite zelf blijft onzichtbaar voor Google."},
   {id:"w-opslag",w:"wij",t:"De opslag Whiskysite inrichten",wat:"In jouw Supabase-account, op servers in de Europese Unie.",waarom:"Alles van Whiskysite staat dan bij elkaar, los van de rest."},
   {id:"w-verhuizen",w:"wij",t:"Jouw antwoorden en beelden verhuizen",wat:"Alles wat je tot nu toe hebt ingevuld gaat mee. Je raakt niets kwijt.",waarom:"De testsite moet verder gaan waar de demo ophoudt."},
   {id:"w-testsite",w:"wij",t:"De testsite achter een login zetten",wat:"In jouw Cloudflare-account. Een afgesloten adres; zoekmachines kunnen er niet bij.",waarom:"Jouw catalogus en teksten horen niet open op internet te staan zolang we testen."},
@@ -259,7 +263,7 @@ function spOverzicht(){
   +'<p style="font-size:13.5px;color:var(--text);margin-top:6px">'+spW(SP_BLAD.kort)+'</p></div>';
  h+='<div class="sp-kop">De route</div><div class="sp-route">'+haltes+'</div>';
  h+='<div class="sp-kop">Wie doet wat</div><div class="sp-drie">'
-  +[["Jij",tj,"Accounts, gidsen, vragen en een paar dingen regelen."],["TankeSmed",tw,"Inrichten, verhuizen, bouwen en de voorzet voor de teksten."],["Samen",ts,"Abonnement, tekenen, sleutels, testbestelling en het eindoordeel."]].map(function(x){
+  +[["Jij",tj,"Accounts, gidsen, vragen en een paar dingen regelen."],["TankeSmed",tw,"Inrichten, verhuizen, bouwen en de voorzet voor de teksten."],["Samen",ts,"Abonnement, afstemmen met IT en Google, tekenen, sleutels, testbestelling en het eindoordeel."]].map(function(x){
    return '<div class="sp-teller">'+(toon?spRond(x[1][0],x[1][1]):'<div class="rond" style="background:var(--line)"><span style="width:44px;height:44px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center">'+x[1][1]+'</span></div>')
     +'<div><b>'+x[0]+'</b><p>'+x[2]+'</p></div></div>';}).join("")+'</div>';
  if(eerst.length)h+='<div class="sp-kop">Als eerste voor jou</div><div class="sp-eerst"><b style="font-size:13.5px">Begin hier</b><ol>'
