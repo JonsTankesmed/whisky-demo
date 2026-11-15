@@ -17,7 +17,7 @@ var SP_BLAD={
   ["De juridische teksten","De teksten van je webwinkel, zoals ze nu zijn.","Een voorzet van ons voor vier teksten. Jij laat ze nakijken.","De nieuwe site doet een paar dingen die nog niet in je teksten staan. Zodra we met echte bezoekers testen, moet dat erin staan."]
  ],
  blijft:[
-  "Je webwinkel blijft gewoon draaien. Daar verandert niets aan.",
+  "Tijdens het testen blijft je webwinkel gewoon draaien. Pas bij livegang komt de nieuwe site op www.whiskysite.nl.",
   "In Lightspeed passen wij niets aan zonder jouw akkoord per regel.",
   "Vragen aan jou blijven via dit beheer lopen. Je krijgt geen losse lijsten of bijlagen.",
   "Je hoeft niet alle flessen beoordeeld te hebben voordat we gaan testen. Flessen die je nog niet zag, tonen de tekst uit je winkel."
