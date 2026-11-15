@@ -1,3 +1,4 @@
 cache/
 fase0-*
 *.backup-*
+supabase/.temp/
