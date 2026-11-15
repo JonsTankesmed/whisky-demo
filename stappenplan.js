@@ -6,7 +6,7 @@
    is het blad alleen-lezen. Alleen de publieke sleutel wordt gebruikt (WS uit vragenlijst.js).
    Geen geheimen en geen handelscijfers in dit bestand. */
 var SP={stand:{},geladen:false,bezig:false,tabel:true,fout:"",bewaar:"",tab:"overzicht"};
-var SP_VERSIE="14 november 2026";
+var SP_VERSIE="15 november 2026";
 
 var SP_BLAD={
  kort:"De demo wordt een echte testsite. Die komt op een eigen, afgesloten plek op jouw naam: alleen wie jij toelaat, kan erbij. Daar testen we samen de hele site. Pas als jij tevreden bent, praten we over livegang.",
@@ -28,7 +28,7 @@ var SP_BLAD={
   ["Jons TankeSmed","Bouwt en beheert de site in jouw accounts.","Kan erbij zolang jij dat wilt."],
   ["Lightspeed","Blijft je winkel en je kassa.","Hier verandert niets."]
  ],
- later:"Het adres van de testsite is tijdelijk en eindigt niet op whiskysite.nl. Het echte adres (bijvoorbeeld ontdek.whiskysite.nl) regelen we bij livegang. Daarvoor is dan één instelling nodig bij wie je domein beheert."
+ later:"Het adres van de testsite is tijdelijk. Bij livegang komt de nieuwe site gewoon op www.whiskysite.nl. Dat zetten we dan samen om bij wie je domein beheert."
 };
 
 /* w = wie (jack / wij / samen), d = doorlopend (niet af te vinken), l = link in het beheer,
@@ -68,6 +68,61 @@ var SP_STAPPEN=[
   {id:"s-akkoord",w:"samen",t:"Jouw oordeel: klaar voor livegang of niet",wat:"We lopen de testlijst na. Jij beslist.",waarom:"De site gaat pas naar buiten als jij dat wilt."}
  ]}
 ];
+
+/* Uitleg bij vaktermen voor Jack: [patroon, uitleg]. Langste patroon eerst.
+   In elke tekst krijgt een term één keer een stippellijn met een ballon (spW). */
+var SP_UITLEG=[
+ ["een opslag die TankeSmed ook voor andere dingen gebruikt","Nu staan jouw antwoorden in de database van TankeSmed, bij de dienst Supabase. In dat account staan ook andere projecten van TankeSmed. Straks verhuist alles van Whiskysite naar een eigen database bij Supabase, op jouw naam."],
+ ["servers in de Europese Unie","De computers waarop de gegevens staan, staan in de Europese Unie. Dan gelden de Europese privacyregels."],
+ ["tweestapsverificatie","Bij het inloggen vul je na je wachtwoord nog een code in. Die code komt uit een app op je telefoon. Zo komt niemand binnen met alleen je wachtwoord."],
+ ["reservekopie","Een kopie van alle gegevens (een back-up). Gaat er iets mis, dan zetten we die kopie terug."],
+ ["toegangscode","Eén code die iedereen gebruikt om de demo te openen. Wie de code kent, kan erin."],
+ ["inlogcode|code in je mail|code per e-mail","Je vult je e-mailadres in en krijgt een code in je mail. Die code werkt één keer. Alleen adressen die jij toelaat, krijgen een code."],
+ ["Cloudflare-account|Cloudflare","Cloudflare is een dienst die websites op internet zet en afschermt. Hier staat straks de testsite, achter een login."],
+ ["Supabase-account|Supabase","Supabase is een dienst voor opslag via internet: een database. Daar staan jouw antwoorden, de acties en de foto's."],
+ ["sleutels?","Een sleutel is een lange code waarmee de site bij Lightspeed gegevens mag ophalen (een API-sleutel). Wat een sleutel mag, alleen lezen of ook schrijven, stel je in Lightspeed in."],
+ ["organisatie","Zo noemt Supabase de map waarin jouw projecten staan. Daar hangen ook het abonnement en de leden aan."],
+ ["beheerder","Iemand die in het account alles mag instellen. Jij blijft eigenaar en kunt dit weer intrekken."],
+ ["livegang","Het moment dat de nieuwe site voor iedereen opengaat, op www.whiskysite.nl."],
+ ["testsite","Een afgesloten proefversie van de nieuwe site, met je eigen catalogus. Alleen wie jij toelaat, kan erbij. Het is de tussenstap naar de definitieve site op www.whiskysite.nl."],
+ ["cookies","Kleine bestandjes die een website in de browser van een bezoeker zet, bijvoorbeeld om de winkelwagen te onthouden."],
+ ["GitHub","Een dienst waar de code van een site wordt bewaard, met alle eerdere versies."],
+ ["domein","Het adres van je website: whiskysite.nl. Dat beheer je bij het bedrijf waar je het adres hebt vastgelegd."],
+ ["opslag","De plek waar de gegevens van de site bewaard worden: een database bij de dienst Supabase."]
+];
+var SP_UITRE=new RegExp("(^|[^A-Za-z\\u00C0-\\u00FF0-9-])("+SP_UITLEG.map(function(u){return u[0];}).join("|")+")(?![A-Za-z\\u00C0-\\u00FF0-9])","gi");
+function spW(tekst){
+ var gehad={};
+ return wsH(tekst).replace(SP_UITRE,function(m,voor,woord){
+  var i=-1;SP_UITLEG.some(function(u,n){if(new RegExp("^(?:"+u[0]+")$","i").test(woord)){i=n;return true;}return false;});
+  if(i<0||gehad[i])return m;
+  gehad[i]=1;
+  return voor+'<span class="sp-uit" tabindex="0" data-uit="'+wsH(SP_UITLEG[i][1])+'">'+woord+'</span>';
+ });
+}
+/* De ballon: één los element, zodat hij niet wordt afgesneden door een kader. Muis, toetsenbord en tikken. */
+(function(){
+ if(typeof document==="undefined")return;
+ var b=null;
+ function weg(){if(b)b.style.display="none";}
+ function toon(el){
+  if(!b){b=document.createElement("div");b.id="spBallon";b.setAttribute("role","tooltip");document.body.appendChild(b);}
+  b.textContent=el.getAttribute("data-uit")||"";b.style.left="0";b.style.top="0";b.style.display="block";
+  var r=el.getBoundingClientRect(),bw=b.offsetWidth,bh=b.offsetHeight,vw=document.documentElement.clientWidth;
+  var x=Math.max(8,Math.min(r.left+r.width/2-bw/2,vw-bw-8)),y=r.top-bh-8;
+  if(y<8)y=r.bottom+8;
+  b.style.left=x+"px";b.style.top=y+"px";
+ }
+ function doel(e){return e.target&&e.target.closest?e.target.closest(".sp-uit"):null;}
+ document.addEventListener("mouseover",function(e){var el=doel(e);if(el)toon(el);});
+ document.addEventListener("mouseout",function(e){if(doel(e))weg();});
+ document.addEventListener("focusin",function(e){var el=doel(e);if(el)toon(el);});
+ document.addEventListener("focusout",function(e){if(doel(e))weg();});
+ document.addEventListener("click",function(e){var el=doel(e);if(el)toon(el);else weg();});
+ document.addEventListener("keydown",function(e){if(e.key==="Escape")weg();});
+ window.addEventListener("scroll",weg,true);
+ window.addEventListener("hashchange",weg);
+})();
 
 var SP_WIE={jack:["Jij","ok"],wij:["TankeSmed","warn"],samen:["Samen","warn"]};
 
@@ -114,9 +169,9 @@ function spStap(s){
    +(af?" checked":"")+(kan&&SP.bewaar!==s.id?"":" disabled")+' onchange="spVink(\''+s.id+'\',this.checked)">';
  return '<tr'+(af?' style="opacity:.62"':'')+'><td style="width:56px;vertical-align:top;padding-top:12px">'+vak+'</td>'
   +'<td style="vertical-align:top"><b style="font-size:13.5px'+(af?';text-decoration:line-through':'')+'">'+wsH(s.t)+'</b> <span class="st '+wie[1]+'">'+wie[0]+'</span>'
-  +'<div style="margin-top:4px">'+wsH(s.wat)+'</div>'
-  +'<div style="margin-top:3px;color:var(--muted)"><i>Waarom:</i> '+wsH(s.waarom)+'</div>'
-  +(s.hoe?'<ol style="margin:6px 0 0 18px;line-height:1.6">'+s.hoe.map(function(x){return '<li>'+wsH(x)+'</li>';}).join("")+'</ol>':'')
+  +'<div style="margin-top:4px">'+spW(s.wat)+'</div>'
+  +'<div style="margin-top:3px;color:var(--muted)"><i>Waarom:</i> '+spW(s.waarom)+'</div>'
+  +(s.hoe?'<ol style="margin:6px 0 0 18px;line-height:1.6">'+s.hoe.map(function(x){return '<li>'+spW(x)+'</li>';}).join("")+'</ol>':'')
   +(s.l?'<div style="margin-top:5px"><a href="#/admin/'+s.l[0]+'" style="color:var(--amber);font-weight:600">'+wsH(s.l[1])+' →</a></div>':'')
   +(af&&st.op?'<div style="margin-top:4px;font-size:11.5px;color:var(--muted)">Afgevinkt'+(st.door_naam?' door '+wsH(st.door_naam):'')+' op '+spDatum(st.op)+'</div>':'')
   +'</td></tr>';
@@ -180,6 +235,8 @@ var SP_CSS='<style>'
  +'.sp-blijft div{display:flex;gap:8px;align-items:flex-start}.sp-blijft div:before{content:"✓";color:var(--green);font-weight:700}'
  +'@media(max-width:860px){.sp-route{grid-template-columns:repeat(3,1fr);row-gap:18px}.sp-halte:nth-child(4):before{display:none}.sp-drie,.sp-blijft{grid-template-columns:1fr}'
  +'.sp-keten,.sp-onder{grid-template-columns:1fr}.sp-pijl{transform:rotate(90deg);padding:4px 0}.sp-onder .lijn,.sp-onder .sp-blok{grid-column:1}}'
+ +'.sp-uit{border-bottom:1px dotted var(--amber);cursor:help}.sp-uit:focus{outline:2px solid var(--amber);outline-offset:2px;border-radius:2px}'
+ +'#spBallon{position:fixed;z-index:9999;display:none;max-width:300px;padding:10px 12px;border-radius:10px;background:#2b2320;color:#fff;font-size:12.5px;line-height:1.45;font-weight:400;text-align:left;box-shadow:0 6px 22px rgba(0,0,0,.28);pointer-events:none}'
  +'</style>';
 
 function spRond(af,tot){var p=tot?Math.round(af/tot*100):0;
@@ -194,12 +251,12 @@ function spOverzicht(){
   var jij=g.items.filter(function(s){return s.w==="jack"&&!s.d;}).length;
   return '<div class="sp-halte '+(af?"af":nu?"nu":"")+'"><div class="sp-bol">'+(af?spIc("vink",24):spIc(g.ic,24))+'</div><b>'+(i+1)+' · '+wsH(g.k)+'</b>'
    +'<span>'+(toon?t[0]+' van '+t[1]+' klaar':t[1]+' stappen')+(jij?' · '+jij+' voor jou':'')+'</span>'+(nu?'<em>Hier zijn we</em>':'')+'</div>';
- }).join("")+'<div class="sp-halte"><div class="sp-bol">'+spIc("vlag",24)+'</div><b>Livegang</b><span>Pas na jouw akkoord</span></div>';
+ }).join("")+'<div class="sp-halte"><div class="sp-bol">'+spIc("vlag",24)+'</div><b>Livegang</b><span>Op www.whiskysite.nl · pas na jouw akkoord</span></div>';
  var jack=spAlle().filter(function(s){return s.w==="jack";}),wij=spAlle().filter(function(s){return s.w==="wij";}),sam=spAlle().filter(function(s){return s.w==="samen";});
  var tj=spTel(jack),tw=spTel(wij),ts=spTel(sam);
  var eerst=jack.filter(function(s){return !s.d&&!spAf(s);}).slice(0,3);
  var h='<div class="sync-box" style="margin-bottom:6px"><b style="font-family:var(--serif,Georgia,serif);font-size:17px">Van demo naar testsite</b>'
-  +'<p style="font-size:13.5px;color:var(--text);margin-top:6px">'+wsH(SP_BLAD.kort)+'</p></div>';
+  +'<p style="font-size:13.5px;color:var(--text);margin-top:6px">'+spW(SP_BLAD.kort)+'</p></div>';
  h+='<div class="sp-kop">De route</div><div class="sp-route">'+haltes+'</div>';
  h+='<div class="sp-kop">Wie doet wat</div><div class="sp-drie">'
   +[["Jij",tj,"Accounts, gidsen, vragen en een paar dingen regelen."],["TankeSmed",tw,"Inrichten, verhuizen, bouwen en de voorzet voor de teksten."],["Samen",ts,"Abonnement, tekenen, sleutels, testbestelling en het eindoordeel."]].map(function(x){
@@ -209,18 +266,18 @@ function spOverzicht(){
   +eerst.map(function(s){return '<li>'+wsH(s.t)+(s.l?' · <a href="#/admin/'+s.l[0]+'">'+wsH(s.l[1])+' →</a>':'')+'</li>';}).join("")
   +'</ol><p style="margin:8px 0 0;font-size:12.5px"><a href="#" onclick="return spTab(\'stappen\')" style="color:var(--amber);font-weight:600">Alle stappen met uitleg en afvinken →</a></p></div>';
  h+='<div class="sp-kop">Wat verandert er</div><div class="sp-drie">'
-  +SP_BLAD.verandert.slice(0,3).map(function(v){return '<div class="sp-wissel"><h5>'+wsH(v[0])+'</h5><div class="van"><small>Nu</small>'+wsH(v[1])+'</div><div class="naar"><small>Straks</small>'+wsH(v[2])+'</div></div>';}).join("")+'</div>';
+  +SP_BLAD.verandert.slice(0,3).map(function(v){return '<div class="sp-wissel"><h5>'+wsH(v[0])+'</h5><div class="van"><small>Nu</small>'+spW(v[1])+'</div><div class="naar"><small>Straks</small>'+spW(v[2])+'</div></div>';}).join("")+'</div>';
  h+='<div class="sp-kop">Zo werkt de testsite</div>'
   +'<div class="sp-keten">'
-  +'<div class="sp-blok"><div class="ic">'+spIc("mens")+'</div><b>Jij en de testers</b><i>wie jij toelaat</i><p>Openen het adres van de testsite.</p></div>'
+  +'<div class="sp-blok"><div class="ic">'+spIc("mens")+'</div><b>Jij en de testers</b><i>wie jij toelaat</i><p>'+spW("Openen het adres van de testsite.")+'</p></div>'
   +'<div class="sp-pijl">→</div>'
-  +'<div class="sp-blok"><div class="ic">'+spIc("deur")+'</div><b>Cloudflare</b><i>de deur en de etalage</i><p>Vraagt je e-mailadres en stuurt een inlogcode. Laat daarna de site zien.</p><span class="tag">Op jouw naam</span></div>'
+  +'<div class="sp-blok"><div class="ic">'+spIc("deur")+'</div><b>'+spW("Cloudflare")+'</b><i>de deur en de etalage</i><p>'+spW("Vraagt je e-mailadres en stuurt een inlogcode. Laat daarna de site zien.")+'</p><span class="tag">Op jouw naam</span></div>'
   +'<div class="sp-pijl">→</div>'
-  +'<div class="sp-blok"><div class="ic">'+spIc("kluis")+'</div><b>Supabase</b><i>de opslag in de EU</i><p>Bewaart je antwoorden, de acties en de foto\'s. Elke dag een reservekopie.</p><span class="tag">Op jouw naam</span></div>'
+  +'<div class="sp-blok"><div class="ic">'+spIc("kluis")+'</div><b>'+spW("Supabase")+'</b><i>de opslag in de EU</i><p>'+spW("Bewaart je antwoorden, de acties en de foto's. Elke dag een reservekopie.")+'</p><span class="tag">Op jouw naam</span></div>'
   +'</div><div class="sp-onder"><div class="lijn">↕<br>leest prijzen en voorraad<br>schrijven alleen na jouw akkoord per regel</div>'
   +'<div class="sp-blok rustig"><div class="ic">'+spIc("winkel")+'</div><b>Lightspeed</b><i>je winkel en je kassa</i><p>Blijft zoals hij is. Bestellen en betalen gaat hier.</p><span class="tag">Verandert niet</span></div></div>'
-  +'<p style="font-size:12.5px;color:var(--muted);margin-top:10px">Jons TankeSmed bouwt en beheert de site in jouw accounts. '+wsH(SP_BLAD.later)+'</p>';
- h+='<div class="sp-kop">Wat blijft zoals het is</div><div class="sp-blijft">'+SP_BLAD.blijft.map(function(b){return '<div>'+wsH(b)+'</div>';}).join("")+'</div>';
+  +'<p style="font-size:12.5px;color:var(--muted);margin-top:10px">Jons TankeSmed bouwt en beheert de site in jouw accounts. '+spW(SP_BLAD.later)+'</p>';
+ h+='<div class="sp-kop">Wat blijft zoals het is</div><div class="sp-blijft">'+SP_BLAD.blijft.map(function(b){return '<div><span>'+spW(b)+'</span></div>';}).join("")+'</div>';
  return h;
 }
 
@@ -230,7 +287,7 @@ function spLijst(){
   var t=spTel(g.items);
   h+='<h4 style="font-size:14.5px;margin:20px 0 2px;display:flex;align-items:center;gap:8px"><span style="color:var(--amber);display:flex">'+spIc(g.ic,20)+'</span>'+(i+1)+' · '+wsH(g.k)
    +(spKan()&&SP.tabel?' <span style="font-size:11.5px;font-weight:500;color:var(--muted)">'+t[0]+' van '+t[1]+' klaar</span>':'')+'</h4>'
-   +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:4px">'+wsH(g.t)+'</p><table class="atable">'+g.items.map(spStap).join("")+'</table>';
+   +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:4px">'+spW(g.t)+'</p><table class="atable">'+g.items.map(spStap).join("")+'</table>';
  });
  return h;
 }
@@ -238,13 +295,13 @@ function spLijst(){
 function spUitleg(){
  return '<h3 style="font-size:16px;margin:4px 0 10px">Wat verandert er, en waarom</h3>'
   +'<table class="atable"><tr><th>Onderdeel</th><th>Nu</th><th>Straks</th><th>Waarom</th></tr>'
-  +SP_BLAD.verandert.map(function(v){return '<tr><td style="vertical-align:top"><b>'+wsH(v[0])+'</b></td><td style="vertical-align:top;color:var(--muted)">'+wsH(v[1])+'</td><td style="vertical-align:top">'+wsH(v[2])+'</td><td style="vertical-align:top;color:var(--muted)">'+wsH(v[3])+'</td></tr>';}).join("")+'</table>'
+  +SP_BLAD.verandert.map(function(v){return '<tr><td style="vertical-align:top"><b>'+wsH(v[0])+'</b></td><td style="vertical-align:top;color:var(--muted)">'+spW(v[1])+'</td><td style="vertical-align:top">'+spW(v[2])+'</td><td style="vertical-align:top;color:var(--muted)">'+spW(v[3])+'</td></tr>';}).join("")+'</table>'
   +'<h3 style="font-size:16px;margin:24px 0 10px">Wie helpt daarbij</h3>'
   +'<table class="atable"><tr><th>Partij</th><th>Wat ze doen</th><th>Goed om te weten</th></tr>'
-  +SP_BLAD.partijen.map(function(p){return '<tr><td><b>'+wsH(p[0])+'</b></td><td>'+wsH(p[1])+'</td><td style="color:var(--muted)">'+wsH(p[2])+'</td></tr>';}).join("")+'</table>'
+  +SP_BLAD.partijen.map(function(p){return '<tr><td><b>'+wsH(p[0])+'</b></td><td>'+spW(p[1])+'</td><td style="color:var(--muted)">'+spW(p[2])+'</td></tr>';}).join("")+'</table>'
   +'<h3 style="font-size:16px;margin:24px 0 10px">Waarom accounts op jouw naam</h3>'
-  +'<ul style="margin:0 0 0 18px;font-size:13px;line-height:1.7"><li>De opslag en de testsite zijn dan vanaf de eerste dag van jou.</li><li>Jij bepaalt wie erbij kan. John is beheerder zolang jij dat wilt.</li><li>Er hoeft later niets te worden overgedragen.</li><li>Een account bij GitHub (waar de code staat) is nu niet nodig. Dat komt pas bij de overdracht van de code.</li></ul>'
-  +'<p style="font-size:12.5px;color:var(--muted);margin-top:14px">'+wsH(SP_BLAD.later)+'</p>';
+  +'<ul style="margin:0 0 0 18px;font-size:13px;line-height:1.7">'+["De opslag en de testsite zijn dan vanaf de eerste dag van jou.","Jij bepaalt wie erbij kan. John is beheerder zolang jij dat wilt.","Er hoeft later niets te worden overgedragen.","Een account bij GitHub (waar de code staat) is nu niet nodig. Dat komt pas bij de overdracht van de code."].map(function(x){return '<li>'+spW(x)+'</li>';}).join("")+'</ul>'
+  +'<p style="font-size:12.5px;color:var(--muted);margin-top:14px">'+spW(SP_BLAD.later)+'</p>';
 }
 
 function vAdminStappen(){
@@ -252,7 +309,7 @@ function vAdminStappen(){
  var tabs=[["overzicht","Overzicht"],["stappen","Stappen en afvinken"],["uitleg","Uitleg"]];
  if(!tabs.some(function(t){return t[0]===SP.tab;}))SP.tab="overzicht";
  var h=SP_CSS+'<h3 style="font-size:20px;margin-bottom:6px">Naar de testsite</h3>'
-  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Bijgewerkt op '+SP_VERSIE+'. Dit blad lopen John en jij samen na.</p>';
+  +'<p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Bijgewerkt op '+SP_VERSIE+'. Dit blad lopen John en jij samen na. Woorden met een stippellijn hebben uitleg: ga er met je muis op staan, of tik erop.</p>';
  if(typeof WS==="undefined"||!WS.gebruiker)h+=(typeof wsLoginBlok==="function"?wsLoginBlok("stappen af te vinken"):"");
  else h+=(typeof wsStatusRegel==="function"?wsStatusRegel():"");
  if(!SP.tabel)h+='<div class="sync-box"><b>Afvinken staat nog uit</b><p>De opslag voor dit blad is nog niet aangezet. Lezen kan al wel.</p></div>';
