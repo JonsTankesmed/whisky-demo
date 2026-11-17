@@ -57,6 +57,7 @@ var SP_STAPPEN=[
  {k:"De testsite klaarzetten",ic:"bouw",t:"Dit doen wij, in jouw accounts. Jij bent alleen nodig bij de punten met Jij of Samen.",items:[
   {id:"s-it2help",w:"samen",t:"Afstemmen met Dennis van it2help",wat:"Een kort overleg over de techniek: het domein, de hosting en de bestaande site. Jij licht Dennis eerst zelf in. Daarna plant John het overleg.",waarom:"Dennis doet jullie IT. Hij moet weten wat er komt, en wij moeten weten wat er nu is ingesteld. Bij livegang is er een instelling nodig bij het domein."},
   {id:"s-2ndchapter",w:"samen",t:"Afstemmen met Dennis van 2ndchapter",wat:"Een kort overleg over Google: de advertenties en de vindbaarheid. Jij licht Dennis eerst zelf in. Daarna plant John het overleg.",waarom:"Advertenties en zoekresultaten wijzen nu naar pagina's van je huidige site. Die moeten bij livegang blijven werken. De testsite zelf blijft onzichtbaar voor Google."},
+  {id:"j-ls-testwinkel",w:"jack",t:"Een testwinkel aanvragen bij Lightspeed",wat:"Je vraagt Lightspeed om een testwinkel naast je echte winkel, en laat die openzetten zolang we testen.",waarom:"Daarin proberen we betalen, acties en bestellen van begin tot eind. Je echte winkel, je klanten en je administratie merken daar niets van."},
   {id:"w-opslag",w:"wij",t:"De opslag Whiskysite inrichten",wat:"In jouw Supabase-account, op servers in de Europese Unie.",waarom:"Alles van Whiskysite staat dan bij elkaar, los van de rest."},
   {id:"w-verhuizen",w:"wij",t:"Jouw antwoorden en beelden verhuizen",wat:"Alles wat je tot nu toe hebt ingevuld gaat mee. Je raakt niets kwijt.",waarom:"De testsite moet verder gaan waar de demo ophoudt."},
   {id:"w-testsite",w:"wij",t:"De testsite achter een login zetten",wat:"In jouw Cloudflare-account. Een afgesloten adres; zoekmachines kunnen er niet bij.",waarom:"Jouw catalogus en teksten horen niet open op internet te staan zolang we testen."},
@@ -92,6 +93,7 @@ var SP_UITLEG=[
  ["cookies","Kleine bestandjes die een website in de browser van een bezoeker zet, bijvoorbeeld om de winkelwagen te onthouden."],
  ["GitHub","Een dienst waar de code van een site wordt bewaard, met alle eerdere versies."],
  ["domein","Het adres van je website: whiskysite.nl. Dat beheer je bij het bedrijf waar je het adres hebt vastgelegd."],
+ ["testwinkel","Een tweede winkel bij Lightspeed (een demo-shop), los van je echte winkel. Wat we daarin doen, raakt je echte winkel, je klanten en je administratie niet."],
  ["opslag","De plek waar de gegevens van de site bewaard worden: een database bij de dienst Supabase."]
 ];
 var SP_UITRE=new RegExp("(^|[^A-Za-z\\u00C0-\\u00FF0-9-])("+SP_UITLEG.map(function(u){return u[0];}).join("|")+")(?![A-Za-z\\u00C0-\\u00FF0-9])","gi");
