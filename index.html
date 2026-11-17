@@ -3740,7 +3740,7 @@ function vAdminBeoordeel(){
  var rest=Math.max(0,lijst.length-TOON);
 
  var knop=function(id,w,lbl,kl){var a=BSLT[id]&&BSLT[id].w===w;
-  return '<button class="bbtn'+(a?" aan":"")+(kl?" "+kl:"")+'" onclick="bZet(\''+id+'\','+(a?'null':JSON.stringify(w).replace(/"/g,"&quot;"))+')">'+lbl+'</button>';};
+  return '<button class="bbtn'+(a?" aan":"")+(kl?" "+kl:"")+'" onclick="bZet(\''+esc(id)+'\','+(a?'null':JSON.stringify(w).replace(/"/g,"&quot;"))+')">'+lbl+'</button>';};
 
  var rijen=lijst.slice(0,TOON).map(function(x){
   var b=BSLT[x.id];
@@ -3751,14 +3751,14 @@ function vAdminBeoordeel(){
       beantwoorden: hun flessen komen van tientallen stokerijen. Dan hoort de
       knop er te staan om dat te zeggen, in plaats van een gok af te dwingen. */
    keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
-    +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+x.id+'\',v)">Ander land…</button>'
+    +'<button class="bbtn" onclick="var v=prompt(\'Welk land hoort hierbij?\');if(v)bZet(\''+esc(x.id)+'\',v)">Ander land…</button>'
     +(x.twijfel?knop(x.id,"bottelaar","Is een bottelaar","neutraal")+knop(x.id,"geen naam","Geen naam","neutraal"):"")
     +knop(x.id,"onbekend","Weet ik niet","neutraal");
   }else if(x.k==="turfgraad"||x.k==="soort"||x.k==="catalogus"){
    /* Vervolgvragen: vaste keuzes, plus ruimte voor een eigen antwoord. */
    var eigen=b&&typeof b.w==="string"&&(x.opties||[]).indexOf(b.w)<0&&b.w!=="onbekend";
    keuzes=(x.opties||[]).map(function(o){return knop(x.id,o,o);}).join("")
-    +'<button class="bbtn'+(eigen?" aan":"")+'" title="'+(eigen?b.w.replace(/"/g,"&quot;"):"")+'" onclick="var v=prompt(\'Jouw antwoord:\''+(eigen?',\''+esc(b.w).replace(/"/g,"&quot;")+'\'':'')+');if(v&&v.trim())bZet(\''+x.id+'\',v.trim())">'+(x.opties&&x.opties.length?"Anders…":"Antwoorden…")+'</button>'
+    +'<button class="bbtn'+(eigen?" aan":"")+'" title="'+(eigen?b.w.replace(/"/g,"&quot;"):"")+'" onclick="var v=prompt(\'Jouw antwoord:\''+(eigen?',\''+esc(b.w).replace(/"/g,"&quot;")+'\'':'')+');if(v&&v.trim())bZet(\''+esc(x.id)+'\',v.trim())">'+(x.opties&&x.opties.length?"Anders…":"Antwoorden…")+'</button>'
     +knop(x.id,"onbekend","Weet ik niet","neutraal");
   }else if(x.k==="product"){
    keuzes=knop(x.id,"ja","Alles klopt","ja")+knop(x.id,"onbekend","Weet ik niet","neutraal");
