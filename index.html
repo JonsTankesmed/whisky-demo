@@ -100,12 +100,16 @@ h2{font-size:29px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
 .pcard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:.15s;position:relative}
 .pcard:hover{border-color:var(--amber2);transform:translateY(-3px)}
-.sampband{position:absolute;left:50%;top:50%;width:62%;transform:translate(-50%,-50%) rotate(-24deg);z-index:2;pointer-events:none;
- background:rgba(38,40,45,.8);border-top:2px solid rgba(255,255,255,.92);border-bottom:2px solid rgba(255,255,255,.92);text-align:center;line-height:1}
-.sampband b{display:block;color:#fff;font-weight:800;letter-spacing:.16em;font-size:clamp(11px,4.2cqw,22px);padding:.42em 0}
+/* Jacks eigen sample-logo als watermerk (beelden/merk, tools/sample_logo.py). Vierkant en altijd
+   72% van de fotohoogte van het vak (--fh = max-height van de foto), dus overal dezelfde
+   verhouding tot fles en productblok, ongeacht hoe breed de tegel is. */
+.pimg{--fh:178px}.pd-img{--fh:400px}
+.sampmerk{position:absolute;left:50%;top:50%;width:calc(var(--fh)*.72);max-width:86%;aspect-ratio:1;transform:translate(-50%,-50%);z-index:2;pointer-events:none;
+ background:url(beelden/merk/sample.png) center/contain no-repeat}
+.sampmerk.m6{background-image:url(beelden/merk/sample-6cl.png)}.sampmerk.m3{background-image:url(beelden/merk/sample-3cl.png)}
 .samplabel{position:absolute;left:8px;bottom:8px;z-index:3;pointer-events:none;background:#26282d;color:#fff;border:2px solid #fff;
  font-size:11px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
-.pd-img .sampband{width:44%}.pd-img .sampband b{font-size:26px}.pd-img .samplabel{left:18px;bottom:18px;font-size:14px;padding:4px 10px}
+.pd-img .samplabel{left:18px;bottom:18px;font-size:14px;padding:4px 10px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .pimg{container-type:inline-size;position:relative;background:linear-gradient(180deg,#f7f3ec,#e9e2d4);height:200px;display:grid;place-items:center;cursor:pointer}
 .pimg img{max-height:178px;max-width:80%;object-fit:contain}
@@ -457,7 +461,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
   h2{font-size:24px}
   .grid{grid-template-columns:1fr 1fr;gap:12px}
   .pimg{height:150px}
-  .pimg img{max-height:132px}
+  .pimg img{max-height:132px}.pimg{--fh:132px}
   .pname{font-size:13px;min-height:36px}
   .tlabels{font-size:7px}
   .prow{flex-direction:column}
@@ -466,7 +470,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
   .sl-h b{font-size:15px}
   .sl-h .val{font-size:20px}
   .pd-img{min-height:280px;padding:20px}
-  .pd-img img{max-height:260px}
+  .pd-img img{max-height:260px}.pd-img{--fh:260px}
   .pd h1{font-size:25px}
   .feat{gap:22px;margin-bottom:34px}
   .art.big{min-height:220px}
@@ -3092,11 +3096,9 @@ function plaats(p){return p.region===p.country?p.region:p.region+' ('+p.country+
    halve flessen en literflessen; dan is een vaste tekst gewoon onjuist. */
 /* Een sample leent de foto van de ouderfles (F-g). Het inhoudslabel is dan geen versiering
    maar een noodzaak: zonder dat label toont de site een 0,70 fles bij een 6 cl monster. */
-/* Zelfde ontwerp als op de voor-en-na-pagina die Jack heeft gezien (test 28/29, F-g):
-   een schuine SAMPLE-band óver de fles — naast de fles wordt hij over het hoofd gezien —
-   en linksonder een pil met de inhoudsmaat. Band half-doorzichtig zodat het etiket leesbaar
-   blijft, met een lichte lijn boven en onder; pil dekkend met een lichte rand. Zo blijven
-   beide leesbaar op elke tegelkleur en op elke flesskleur. */
+/* Jacks eigen sample-logo ligt als watermerk óver de fles (naast de fles wordt het over het
+   hoofd gezien), op een halfdoorzichtige witte schijf zodat het op elke flesskleur leesbaar is.
+   Wijkt de maat af van 6 cl, dan het logo zonder maat en linksonder een pil met de echte maat. */
 /* Terugval (F-b): laadt een opgemaakt beeld niet, dan alsnog de winkelfoto. Nooit een leeg vak. */
 /* wordt al bij het inlezen van de catalogus gevuld (hierboven); hier alleen niet overschrijven */
 var BEELD_TERUG=window.BEELD_TERUG||{};
@@ -3123,8 +3125,10 @@ document.addEventListener("error",function(e){
 function samplLabel(p){
  if(!p._toonSample)return "";
  var v=p._vol?((p._vol%1?String(p._vol.toFixed(1)).replace(".",","):p._vol)+" CL"):"";
- return '<span class="sampband" aria-hidden="true"><b>SAMPLE</b></span>'
-  +(v?'<span class="samplabel">'+v+'</span>':'')
+ /* 6 en 3 cl: Jacks logo zegt de maat zelf al. Andere maat: logo zonder maat, met de echte maat als pil. */
+ var eigen=p._vol===6?' m6':p._vol===3?' m3':'';
+ return '<span class="sampmerk'+eigen+'" aria-hidden="true"></span>'
+  +(v&&!eigen?'<span class="samplabel">'+v+'</span>':'')
   +'<span class="sr-only">Sample'+(v?' van '+v:'')+'; foto van de hoofdfles</span>';
 }
 function volTekst(p){var v=p._vol||70;return (v/100).toFixed(2).replace(".",",")+" ltr";}
