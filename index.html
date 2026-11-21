@@ -740,6 +740,9 @@ a.gidsteaser:hover{border-color:var(--amber2)}
 .gidsmeta{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:22px}
 .gidsintro p{font-size:17px;line-height:1.7;color:var(--text);margin-bottom:12px}
 .gidsbody h2{font-family:var(--serif);font-size:23px;margin:30px 0 10px}
+.gidsintern{margin-top:30px;border:1px dashed var(--amber2);border-radius:12px;padding:4px 18px 10px;background:var(--card)}
+.gidsintern>span{display:inline-block;margin-top:10px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber)}
+.gidsintern h2{margin-top:6px}
 .gidsbody h3{font-size:17px;margin:20px 0 8px}
 .gidsbody p,.gidsbody li{font-size:15px;line-height:1.75;color:var(--text)}
 .gidsbody p{margin-bottom:12px}
@@ -2387,6 +2390,15 @@ function beeldStart(id){
    25-08) zijn vervallen omdat de kennisbank ze niet onderbouwde. */
 var GIDS=(typeof GIDSEN!=="undefined"&&GIDSEN)||{};
 function gidsVan(soort,id){return (GIDS[soort]||{})[id]||null;}
+/* "Nog niet uitgezocht" is werkvoorraad, geen klantinformatie. Bezoekers zien de sectie niet;
+   beheerders (deze browser kent #/admin, zie wsadmin bij de footer) wel, gemarkeerd als intern.
+   Let op: dit verbergt, het beveiligt niet; de tekst staat in het openbare gidsen.js. */
+function gidsTekst(html){
+ var re=/<h2>Nog niet uitgezocht<\/h2>[\s\S]*?(?=<h2|$)/,beheer=false;
+ try{beheer=localStorage.getItem("wsadmin")==="1";}catch(e){}
+ if(!beheer)return (html||"").replace(re,"");
+ return (html||"").replace(re,function(s){return '<div class="gidsintern"><span>Alleen zichtbaar voor beheer</span>'+s+'</div>';});
+}
 /* Lightspeed kent geen bottelaarsveld. De bottelaar volgt uit de productnaam, met de
    series per bottelaar uit het onderzoek van 08-10 (kluis: 16 Independent Bottlers,
    'Series en labels'). Alleen voor flessen die als independent bottling gemarkeerd zijn. */
@@ -2820,7 +2832,7 @@ function vGids(rt){
  +'<div class="gidsintro">'+gids.intro+'</div>'
  +(it&&n?'<div class="gidscta"><div><b>'+n.toLocaleString("nl-NL")+' flessen en samples</b><span>'+(sel==="rare"?'in de voorselectie '+it.n:'uit '+it.n)+' in onze collectie</span></div><button class="btn btn-a btn-s" onclick="selVerfijn(\''+sel+'\',\''+it.id+'\')">Bekijk de selectie →</button></div>':'')
  +(it&&soortenIn(ingLijst(sel,it)).length>1?'<div class="gidssoort"><h3>Direct naar de flessen per soort</h3><p>Eén klik en je ziet alleen die soort, met de filters erbij. De definities hieronder in de gids.</p>'+soortTegels(sel,it,ingLijst(sel,it))+'</div>':'')
- +'<div class="gidsbody">'+gids.html+'</div>'
+ +'<div class="gidsbody">'+gidsTekst(gids.html)+'</div>'
  +'<div class="gidsvoet">'+bronPop(gids,true)+'<span>Elke feitelijke zin verwijst naar een bron; ga met de muis over een nummer of over de knop.</span></div>'
  +(reeks.length?'<div class="streekblok"><h2>Meer '+g.reeks.toLowerCase()+'</h2><div class="dchips">'
    +reeks.map(function(k){return '<a class="dchip" href="#/gids/'+rt.soort+'/'+k+'">'+naam(k)+'</a>';}).join("")+'</div></div>':'')
