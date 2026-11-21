@@ -529,11 +529,21 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:42px 0;mar
 .sherolagen{position:absolute;inset:0;z-index:-2}
 .sherolaag{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.1s ease}
 .sherolaag.aan{opacity:1}
-.streekhero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(28,18,11,.93) 0%,rgba(38,25,15,.82) 46%,rgba(43,29,18,.42) 100%)}
+.streekhero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(28,18,11,.84) 0%,rgba(38,25,15,.55) 45%,rgba(43,29,18,.08) 100%)}
 .streekhero.metbeeld{min-height:330px;display:flex;flex-direction:column;justify-content:center}
+.streekhero.metbeeld .statuschip{align-self:flex-start}
 .beeldcredit{margin-top:18px;font-size:11px;color:rgba(246,239,230,.72);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .beeldcredit a{color:rgba(246,239,230,.9);text-decoration:underline;text-underline-offset:2px}
-.beeldcredit .bstatus{border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:2px 9px}
+.beeldcredit{justify-content:flex-end}
+.brecht{position:relative;margin-left:auto}
+.beeldnav+.brecht{margin-left:4px}
+.brecht>button{width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(20,12,8,.45);color:#fff;font-size:13px;line-height:1;cursor:pointer;padding:0;display:grid;place-items:center;backdrop-filter:blur(3px)}
+.brecht>button:hover,.brecht:focus-within>button{background:rgba(20,12,8,.75);border-color:#fff}
+.brecht>button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.brechtpop{position:absolute;right:0;bottom:calc(100% + 8px);width:max-content;max-width:min(320px,80vw);background:#fff;color:#2b1d12;border-radius:10px;padding:9px 12px;font-size:11.5px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.3);display:none;flex-direction:column;gap:2px;z-index:5;text-align:left}
+.brechtpop::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px}
+.brechtpop a{color:#7b1e2b;text-decoration:underline;text-underline-offset:2px}
+.brecht:hover .brechtpop,.brecht:focus-within .brechtpop{display:flex}
 .beeldnav{display:flex;gap:6px;margin-left:auto}
 .beeldnav button{width:22px;height:6px;border-radius:4px;border:0;background:rgba(255,255,255,.3);cursor:pointer;padding:0}
 .beeldnav button.aan{background:rgba(255,255,255,.85)}
@@ -852,8 +862,11 @@ footer.voetmini .f18{padding-bottom:22px}
 
 /* ===== 09-10c: gidsen met beeld, bronnen als pop-up, gidsakkoord ===== */
 .gidshero{position:relative;border-radius:18px;overflow:hidden;margin:16px 0 14px;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;color:#f6efe6;background:linear-gradient(135deg,#2b1d12,#503018)}
-.gidshero .sherolagen{position:absolute;inset:0}
-.gidshero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,12,8,.15) 0%,rgba(20,12,8,.25) 40%,rgba(20,12,8,.86) 100%)}
+.gidshero{isolation:isolate;min-height:360px}
+.gidshero .sherolagen{position:absolute;inset:0;z-index:-2}
+.gidshero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(20,12,8,0) 0%,rgba(20,12,8,.05) 30%,rgba(20,12,8,.62) 55%,rgba(20,12,8,.88) 100%)}
+.gidshero h1,.gidshero .kicker,.streekhero.metbeeld h1,.streekhero.metbeeld p{text-shadow:0 1px 12px rgba(0,0,0,.55)}
+.gidshero.info::after{display:none}
 .gidshero-in{position:relative;z-index:1;padding:26px 28px 16px;display:flex;gap:16px;align-items:flex-end}
 .gidshero .kicker{color:#e8c48a;margin:0 0 4px}
 .gidshero h1{font-family:var(--serif);font-size:clamp(26px,3.6vw,38px);line-height:1.13;margin:0;color:#fff}
@@ -2307,15 +2320,19 @@ function beeldLagen(lijst){
   return '<div class="sherolaag'+(i===0?" aan":"")+'" data-b="'+i+'" style="background-image:url(\''+b.url+'\')"></div>';
  }).join("")+'</div>';
 }
+/* Rechtenvermelding voor de bezoeker: alleen een klein ©-icoon; maker, licentie en bron verschijnen bij aanwijzen of aantikken.
+   Beoordelingsstatus en interne notities horen in het beheer, niet hier. */
 function beeldCredit(lijst){
  if(!lijst||!lijst.length)return "";
  var b=lijst[BEELDIX]||lijst[0];
  return '<div class="beeldcredit" id="beeldcredit">'
-  +'<span class="bstatus">'+(b.status==="goedgekeurd"?"Goedgekeurd beeld":"Voorstel — nog niet goedgekeurd")+'</span>'
-  +'<span>'+b.plek+' · '+b.maker+' · <a href="'+b.licentieUrl+'" target="_blank" rel="noopener">'+b.licentie+'</a>'
-  +' via <a href="'+b.bronUrl+'" target="_blank" rel="noopener">'+b.bron+'</a>'+(b.bewerking?' · '+b.bewerking:'')+'</span>'
   +(lijst.length>1?'<div class="beeldnav">'+lijst.map(function(x,i){
      return '<button aria-label="Toon beeld '+(i+1)+' van '+lijst.length+'" class="'+(i===BEELDIX?"aan":"")+'" onclick="beeldToon('+i+',true)"></button>';}).join("")+'</div>':"")
+  +'<div class="brecht"><button type="button" aria-label="Beeldrechten">©</button><div class="brechtpop" role="tooltip">'
+  +(b.plek?'<b>'+b.plek+'</b>':'')
+  +'<span>Beeld: '+b.maker+'</span>'
+  +'<span><a href="'+b.licentieUrl+'" target="_blank" rel="noopener">'+b.licentie+'</a>'
+  +' via <a href="'+b.bronUrl+'" target="_blank" rel="noopener">'+b.bron+'</a></span></div></div>'
   +'</div>';
 }
 function beeldToon(i,handmatig){
@@ -2534,7 +2551,7 @@ function vSelectie(rt){
  return '<section><div class="wrap">'
  +'<a class="back" href="#/collectie" onclick="return snel({cat:\''+g.cat+'\'})">← '+CATS[g.cat]+'</a>'
  +'<div class="streekhero'+(beelden.length?" metbeeld":"")+'" style="margin-top:12px">'+beeldLagen(beelden)
- +'<span class="statuschip">'+I("pin",13)+' '+g.enk+' · concept — nog niet goedgekeurd</span>'
+ +'<span class="statuschip">'+I("pin",13)+' '+g.enk+'</span>'
  +'<h1>'+titel+'</h1>'
  +(gids&&gids.k?'<p style="margin-bottom:10px">'+gids.k+'</p>':'')
  +'<div class="selstats"><span><b>'+flessen.length.toLocaleString("nl-NL")+'</b> flessen</span>'
@@ -2703,7 +2720,7 @@ function andereInfo(soort,huidig){
 var GIDSLOGO={}; /* bv. {"bottelaar-signatory-vintage":"beelden/merk/signatory-vintage.svg"} zodra aangeleverd en goedgekeurd */
 function gidsFoto(gsoort,id){
  var g=gidsVan(gsoort,id),f=g&&g.beeld&&g.beeld.foto;
- if(f&&f.url)return {url:f.url,plek:f.oms||"",maker:f.maker||"",licentie:f.licentie||"",licentieUrl:f.licurl||f.pagina,bron:f.bron||"Wikimedia Commons",bronUrl:f.pagina,bewerking:"alleen verkleind",status:f.status==="goedgekeurd"?"goedgekeurd":"voorstel"};
+ if(f&&f.url)return {url:f.url,plek:(f.oms||"").split(/\s*[(;]/)[0],maker:f.maker||"",licentie:f.licentie||"",licentieUrl:f.licurl||f.pagina,bron:f.bron||"Wikimedia Commons",bronUrl:f.pagina,bewerking:"alleen verkleind",status:f.status==="goedgekeurd"?"goedgekeurd":"voorstel"};
  if(gsoort==="streek"){var it=ingItem("streek",id),b=it&&it.beeld?beeldVoor(it.beeld):[];if(b.length)return b[0];}
  return null;
 }
@@ -2773,9 +2790,9 @@ function vGids(rt){
  +'<a class="link-a" href="#/inspiratie">← Gidsen</a>'
  +'<div class="gidshero'+(foto?'':' info')+'">'+beeldLagen(lijst)
  +'<div class="gidshero-in">'+gidsMerk(sel,it,idx)+'<div><div class="kicker">'+g.gidsnaam+(it?' · '+it.n:'')+'</div><h1>'+gids.t+'</h1></div></div>'
- +(foto?beeldCredit(lijst):(it?'<div class="gidsinfo"><span><b>'+n.toLocaleString("nl-NL")+'</b> flessen en samples</span>'+(dist?'<span><b>'+dist+'</b> distilleerderijen</span>':'')+'<span>foto volgt — wacht op een vrij te gebruiken beeld</span></div>':''))
+ +(foto?beeldCredit(lijst):(it?'<div class="gidsinfo"><span><b>'+n.toLocaleString("nl-NL")+'</b> flessen en samples</span>'+(dist?'<span><b>'+dist+'</b> distilleerderijen</span>':'')+'</div>':''))
  +'</div>'
- +'<div class="gidsmeta"><span class="demoflag">concept · '+gids.st.toLowerCase()+'</span><span>'+gids.lt+' min lezen</span>'+bronPop(gids,false)+'<span>bijgewerkt '+wzDatum(gids.bijgewerkt)+'</span></div>'
+ +'<div class="gidsmeta"><span>'+gids.lt+' min lezen</span>'+bronPop(gids,false)+'<span>bijgewerkt '+wzDatum(gids.bijgewerkt)+'</span></div>'
  +'<div class="gidsintro">'+gids.intro+'</div>'
  +(it&&n?'<div class="gidscta"><div><b>'+n.toLocaleString("nl-NL")+' flessen en samples</b><span>'+(sel==="rare"?'in de voorselectie '+it.n:'uit '+it.n)+' in onze collectie</span></div><button class="btn btn-a btn-s" onclick="selVerfijn(\''+sel+'\',\''+it.id+'\')">Bekijk de selectie →</button></div>':'')
  +(it&&soortenIn(ingLijst(sel,it)).length>1?'<div class="gidssoort"><h3>Direct naar de flessen per soort</h3><p>Eén klik en je ziet alleen die soort, met de filters erbij. De definities hieronder in de gids.</p>'+soortTegels(sel,it,ingLijst(sel,it))+'</div>':'')
@@ -2783,8 +2800,6 @@ function vGids(rt){
  +'<div class="gidsvoet">'+bronPop(gids,true)+'<span>Elke feitelijke zin verwijst naar een bron; ga met de muis over een nummer of over de knop.</span></div>'
  +(reeks.length?'<div class="streekblok"><h2>Meer '+g.reeks.toLowerCase()+'</h2><div class="dchips">'
    +reeks.map(function(k){return '<a class="dchip" href="#/gids/'+rt.soort+'/'+k+'">'+naam(k)+'</a>';}).join("")+'</div></div>':'')
- +'<p style="font-size:11.5px;color:var(--muted);margin-top:26px">Uit de kennisbank: <i>20 Website-content/Gidsen/'+rt.soort+'-'+rt.id+'.md</i> · status '+gids.status+' · content status '+gids.st
- +'. Tekst en beeld gaan pas live na akkoord van Jack (beheer, tab Gidsen).</p>'
  +'</div></section>';
 }
 /* Kennisbanklinks in een gids: een distilleerderij uit de catalogus wordt een link naar
