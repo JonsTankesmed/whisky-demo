@@ -842,6 +842,15 @@ footer.voetmini .f18{padding-bottom:22px}
 .selkop h1 small{font-family:var(--sans,inherit);font-size:13px;font-weight:400;opacity:.75;margin-left:6px}
 .selkop .selterug{margin-left:auto;color:#f6efe6;font-size:12.5px;border:1px solid rgba(255,255,255,.3);border-radius:18px;padding:6px 12px;white-space:nowrap}
 .selkop .selterug:hover{background:rgba(255,255,255,.1)}
+.selkop.metbeeld{position:relative;isolation:isolate;min-height:96px}
+.selkopbeeld{position:absolute;inset:0;z-index:-2;background-size:cover;background-position:center 55%;border-radius:inherit}
+.selkop.metbeeld::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(100deg,rgba(28,18,11,.9) 0%,rgba(38,25,15,.72) 40%,rgba(43,29,18,.38) 100%)}
+.selkop.metbeeld h1{text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.selkop .brecht{margin-left:0;align-self:flex-end}
+.selkop .brecht>button{width:20px;height:20px;font-size:11px}
+.selkop .brechtpop{bottom:auto;top:calc(100% + 8px)}
+.selkop .brechtpop::after{top:auto;bottom:100%}
+@media(max-width:700px){.selkop .brecht{margin-left:auto}}
 .qchips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;margin-bottom:6px;scrollbar-width:thin}
 .qchips .dchip{flex:0 0 auto;white-space:nowrap}
 .qchips .dchip.on{background:var(--amber);border-color:var(--amber);color:#fff}
@@ -2328,12 +2337,21 @@ function beeldCredit(lijst){
  return '<div class="beeldcredit" id="beeldcredit">'
   +(lijst.length>1?'<div class="beeldnav">'+lijst.map(function(x,i){
      return '<button aria-label="Toon beeld '+(i+1)+' van '+lijst.length+'" class="'+(i===BEELDIX?"aan":"")+'" onclick="beeldToon('+i+',true)"></button>';}).join("")+'</div>':"")
-  +'<div class="brecht"><button type="button" aria-label="Beeldrechten">©</button><div class="brechtpop" role="tooltip">'
+  +beeldRecht(b)
+  +'</div>';
+}
+function beeldRecht(b){
+ return '<div class="brecht"><button type="button" aria-label="Beeldrechten">©</button><div class="brechtpop" role="tooltip">'
   +(b.plek?'<b>'+b.plek+'</b>':'')
   +'<span>Beeld: '+b.maker+'</span>'
   +'<span><a href="'+b.licentieUrl+'" target="_blank" rel="noopener">'+b.licentie+'</a>'
-  +' via <a href="'+b.bronUrl+'" target="_blank" rel="noopener">'+b.bron+'</a></span></div></div>'
-  +'</div>';
+  +' via <a href="'+b.bronUrl+'" target="_blank" rel="noopener">'+b.bron+'</a></span></div></div>';
+}
+/* Eén rustige foto voor een streek, distilleerderij of bottelaar: streekfoto eerst, anders de gidsfoto. */
+function beeldEerste(g,it){
+ var b=it&&it.beeld?beeldVoor(it.beeld):[];
+ if(!b.length&&it){var gf=gidsFoto(g.gsoort,it.id);if(gf)b=[gf];}
+ return b[0]||null;
 }
 function beeldToon(i,handmatig){
  var lagen=document.querySelectorAll(".sherolaag");if(!lagen.length)return;
@@ -2691,8 +2709,10 @@ function vSelectieVerfijnd(rt,g,it){
  var gekozen=F.dist||[],idx=g.items.indexOf(it);
  var lijst=sorteer(selectie(null)),n=lijst.length,toon=lijst.slice(0,120);
  return '<section><div class="wrap">'
- +'<div class="selkop">'+mono(it,idx<0?0:idx,52)+'<div><div class="kicker">'+g.enk+'</div><h1>'+it.n+(it.toel?'<small>'+it.toel+'</small>':'')+'</h1></div>'
- +'<a class="selterug" href="#/selectie/'+rt.soort+'/'+rt.id+'">↩ Overzicht '+it.n+'</a></div>'
+ +(function(){var kb=beeldEerste(g,it);return '<div class="selkop'+(kb?' metbeeld':'')+'">'
+   +(kb?'<div class="selkopbeeld" style="background-image:url(\''+kb.url+'\')"></div>':'')
+   +mono(it,idx<0?0:idx,52)+'<div><div class="kicker">'+g.enk+'</div><h1>'+it.n+(it.toel?'<small>'+it.toel+'</small>':'')+'</h1></div>'
+   +'<a class="selterug" href="#/selectie/'+rt.soort+'/'+rt.id+'">↩ Overzicht '+it.n+'</a>'+(kb?beeldRecht(kb):'')+'</div>';})()
  +(sv.length>1?'<div class="qlabel">Soort whisky</div><div class="qchips">'
    +'<button class="dchip'+(sk.length?'':' on')+'" onclick="fWis(\'soort\')">Alle soorten <u>'+zs.length+'</u></button>'
    +sv.map(function(x){var aan=sk.indexOf(x.n)>=0;return '<button class="dchip schip'+(aan?' on':'')+'" style="--sk:'+x.kl+'" aria-pressed="'+aan+'" title="'+esc(x.def)+'" onclick="fTog(\'soort\',\''+esc(x.n)+'\')">'+x.n+' <u>'+(st[x.n]||0)+'</u></button>';}).join("")
@@ -2963,6 +2983,13 @@ function vKaart(){
 function go(h){location.hash=h;window.scrollTo(0,0);var mm=el("mmenu");if(mm)mm.classList.remove("open");}
 window.addEventListener("hashchange",function(){var mm=el("mmenu");if(mm)mm.classList.remove("open");});
 window.addEventListener("hashchange",render);
+/* Naar een andere pagina = bovenaan beginnen. Alleen filters of sortering wijzigen (deel na "?") laat de stand staan. */
+var VORIGPAD=(location.hash||"#/").split("?")[0];
+window.addEventListener("hashchange",function(){
+ var pad=(location.hash||"#/").split("?")[0];
+ if(pad!==VORIGPAD)window.scrollTo(0,0);
+ VORIGPAD=pad;
+});
 function route(){
  var vol=location.hash||"#/";
  var deel=vol.split("?"),h=deel[0]||"#/";
