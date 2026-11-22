@@ -993,6 +993,7 @@ footer.voetmini .f18{padding-bottom:22px}
 .atijd .nu{position:absolute;top:0;bottom:0;width:2px;background:#a33}
 .avoorbeeld{border:1px dashed var(--line);border-radius:14px;padding:12px;background:var(--bg2)}
 @media(max-width:900px){.aform{grid-template-columns:1fr}}
+.wtekst{margin:4px 0 16px;font-size:14px;line-height:1.6;color:var(--text)}.wtekst h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}.wtekst p{margin:0 0 8px}.wtekst b{color:var(--amber);font-weight:600}
 </style>
 </head>
 <body>
@@ -1154,6 +1155,7 @@ footer.voetmini .f18{padding-bottom:22px}
 <script src="catalogus-lokaal.js" onerror="void 0"></script>
 <script src="beoordeling.js" onerror="void 0"></script>
 <script src="oordelen-jack.js" onerror="void 0"></script>
+<script src="winkelteksten.js" onerror="void 0"></script>
 <script src="wijzigingen.js" onerror="void 0"></script>
 <script src="afstemming.js" onerror="void 0"></script>
 <script src="beelden-manifest.js" onerror="void 0"></script>
@@ -1574,6 +1576,8 @@ var P_ECHT=false;
  (OORDELEN.omsNee||[]).forEach(function(id){var p=byId[id];if(p){p.sum="";p._omsJack="nee";}});
  Object.keys(OORDELEN.omsTekst||{}).forEach(function(id){var p=byId[id];if(p){p.sum=OORDELEN.omsTekst[id];p._omsJack="tekst";}});
 })();
+/* Eigen producttekst van de winkel (Kleur/Neus/Smaak/Afdronk), uit winkelteksten.js; los van de catalogus. */
+function winkelTekst(p){var w=typeof WINKELTEKST!=="undefined"&&WINKELTEKST[p.id];if(!w||!w.length)return"";var h=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};return'<div class="wtekst">'+w.map(function(b){return b.h?'<h4>'+h(b.h)+'</h4>':'<p>'+(b.k?'<b>'+h(b.k)+'</b> ':'')+h(b.t)+'</p>';}).join("")+'</div>';}
 function wsUrl(p){return p&&p.url?"https://www.whiskysite.nl/"+encodeURIComponent(p.url)+".html":null;}
 var DISTS={};CAT.forEach(function(p){DISTS[p.dist]=(DISTS[p.dist]||0)+1;});
 /* Op kaarten alleen kenmerken uit de catalogus (vat, sample, turf); smaakwoorden horen bij het profiel op de productpagina. */
@@ -3191,6 +3195,7 @@ function vProduct(rt){
  +'<div class="kicker">'+(p.region===p.country?p.region:p.region+' · '+p.country)+'</div><h1>'+p.name+'</h1>'
  +'<div class="pmeta">'+[p.dist,p.age,p.abv,volTekst(p)].filter(Boolean).join(" · ")+'</div>'
  +(p.sum?'<p style="margin:14px 0;color:var(--text);font-size:15px">'+p.sum+'</p>':"")
+ +winkelTekst(p)
  +(p.rev?revBlok(p):"")
  +'<div class="tags">'+(p.tags||[]).map(t=>'<span class="tag">'+t+'</span>').join("")+'</div>'
  +(typeof acLabel==="function"?acLabel(p):"")
