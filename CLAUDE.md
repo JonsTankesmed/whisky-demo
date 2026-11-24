@@ -15,7 +15,7 @@ Demo van de ontdeksite voor Whiskysite.nl. Publieke repo, GitHub Pages. Opdracht
 - Commits op naam van TankeSmed. Regeleinden in de repo: LF.
 
 ## Gegenereerde bestanden — niet met de hand bewerken
-`gidsen.js`, `hiaten.js`, `winkelteksten.js`, `oordelen-jack.js`, `beoordeling.js`, `merkposities.js`, `kaart-*.js`, `streekgrenzen.js`. Ze komen uit de kennisbank (Obsidian-kluis Whiskysite, `.scripts/`) of uit `tools/`. Pas de bron aan en draai het script opnieuw.
+`gidsen.js`, `hiaten.js`, `winkelteksten.js`, `producentteksten.js`, `oordelen-jack.js`, `beoordeling.js`, `merkposities.js`, `kaart-*.js`, `streekgrenzen.js`. Ze komen uit de kennisbank (Obsidian-kluis Whiskysite, `.scripts/`) of uit `tools/`. Pas de bron aan en draai het script opnieuw.
 
 ## Grenzen
 - Niets schrijven naar Lightspeed zonder Jacks akkoord per regel. De sync (`ws-ls-sync`) leest alleen.
